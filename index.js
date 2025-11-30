@@ -31,7 +31,7 @@ const client = new Client({
 
 client.commands = new Collection();
 
-// Sincronizar datos a MongoDB cada 5 minutos
+// Sincronizar datos a MongoDB cada 1 minuto (backup automático)
 setInterval(async () => {
   if (isMongoConnected()) {
     try {
@@ -40,12 +40,22 @@ setInterval(async () => {
         await saveUserToMongo(user.guildId, user.userId, user);
       }
       await saveBoostsToMongo(db.boosts);
-      console.log('✅ Datos sincronizados con MongoDB');
     } catch (error) {
       console.error('Error en sincronización:', error.message);
     }
   }
-}, 5 * 60 * 1000);
+}, 60 * 1000);
+
+// Función para guardar datos críticos inmediatamente a MongoDB
+global.syncToDB = async (guildId, userId, userData) => {
+  if (isMongoConnected()) {
+    try {
+      await saveUserToMongo(guildId, userId, userData);
+    } catch (error) {
+      console.error('Error guardando a MongoDB:', error.message);
+    }
+  }
+};
 
 // Servidor HTTP para Render, Uptime Robot y Dashboard Web
 const app = express();
