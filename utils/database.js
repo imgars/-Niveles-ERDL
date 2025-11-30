@@ -63,11 +63,13 @@ class Database {
     this.users[key] = { ...this.users[key], ...data };
     this.saveFile(USERS_FILE, this.users);
     
-    // Guardar inmediatamente a MongoDB (no esperar)
+    // Guardar a MongoDB en background (no bloquea Discord)
     if (this.mongoSync) {
-      this.mongoSync.saveUserToMongo(guildId, userId, this.users[key]).catch(err => 
-        console.error('Error guardando a MongoDB:', err.message)
-      );
+      setImmediate(() => {
+        this.mongoSync.saveUserToMongo(guildId, userId, this.users[key]).catch(err => 
+          console.error('Error guardando a MongoDB:', err.message)
+        );
+      });
     }
   }
 
@@ -96,11 +98,13 @@ class Database {
 
     this.saveFile(BOOSTS_FILE, this.boosts);
     
-    // Guardar boosts a MongoDB
+    // Guardar boosts a MongoDB en background
     if (this.mongoSync) {
-      this.mongoSync.saveBoostsToMongo(this.boosts).catch(err => 
-        console.error('Error guardando boosts en MongoDB:', err.message)
-      );
+      setImmediate(() => {
+        this.mongoSync.saveBoostsToMongo(this.boosts).catch(err => 
+          console.error('Error guardando boosts en MongoDB:', err.message)
+        );
+      });
     }
   }
 
@@ -131,9 +135,11 @@ class Database {
     if (boostsChanged) {
       this.saveFile(BOOSTS_FILE, this.boosts);
       if (this.mongoSync) {
-        this.mongoSync.saveBoostsToMongo(this.boosts).catch(err => 
-          console.error('Error guardando boosts en MongoDB:', err.message)
-        );
+        setImmediate(() => {
+          this.mongoSync.saveBoostsToMongo(this.boosts).catch(err => 
+            console.error('Error guardando boosts en MongoDB:', err.message)
+          );
+        });
       }
     }
 
@@ -145,9 +151,11 @@ class Database {
     this.saveFile(BOOSTS_FILE, this.boosts);
     
     if (this.mongoSync) {
-      this.mongoSync.saveBoostsToMongo(this.boosts).catch(err => 
-        console.error('Error guardando boosts en MongoDB:', err.message)
-      );
+      setImmediate(() => {
+        this.mongoSync.saveBoostsToMongo(this.boosts).catch(err => 
+          console.error('Error guardando boosts en MongoDB:', err.message)
+        );
+      });
     }
   }
 
