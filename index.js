@@ -5,6 +5,7 @@ import { calculateLevel, getXPProgress, getRandomXP, calculateBoostMultiplier, a
 import { generateRankCard } from './utils/cardGenerator.js';
 import { initializeNightBoost, getNightBoostMultiplier } from './utils/timeBoost.js';
 import { isStaff } from './utils/helpers.js';
+import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected } from './utils/mongoSync.js';
 import express from 'express';
 
 import fs from 'fs';
@@ -13,6 +14,9 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Conectar a MongoDB en startup
+await connectMongoDB();
 
 // Cliente de Discord (definido antes de los endpoints para poder usarlo en la API)
 const client = new Client({
@@ -26,6 +30,22 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+
+// Sincronizar datos a MongoDB cada 5 minutos
+setInterval(async () => {
+  if (isMongoConnected()) {
+    try {
+      const allUsers = Object.values(db.users);
+      for (const user of allUsers) {
+        await saveUserToMongo(user.guildId, user.userId, user);
+      }
+      await saveBoostsToMongo(db.boosts);
+      console.log('✅ Datos sincronizados con MongoDB');
+    } catch (error) {
+      console.error('Error en sincronización:', error.message);
+    }
+  }
+}, 5 * 60 * 1000);
 
 // Servidor HTTP para Render, Uptime Robot y Dashboard Web
 const app = express();

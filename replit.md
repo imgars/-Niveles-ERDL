@@ -174,20 +174,25 @@ Nivel 90+:   3500 XP base (MUY lento)
 
 Multiplicador por nivel: `baseXP * (1 + nivel * 0.1)`
 
-## 💾 Datos Persistentes
+## 💾 Datos Persistentes - MongoDB (RECOMENDADO)
 
-Todos los datos se guardan en archivos JSON:
-- `data/users.json` - Datos de usuarios (XP, niveles)
-- `data/boosts.json` - Boosts activos
-- `data/cooldowns.json` - Cooldowns de minijuegos
-- `data/bans.json` - Usuarios y canales baneados
+Datos persistentes con MongoDB Atlas (gratis):
+- Sincronización automática cada 5 minutos
+- Backup automático en la nube
+- Datos no se pierden en deploys
 
-**Importante**: Los datos sobreviven a reinicios del bot.
+**Configuración:**
+1. Ve a https://www.mongodb.com/cloud/atlas
+2. Crea cuenta gratis
+3. Crea un cluster gratis
+4. Copia la connection string
+5. En Render/Replit: Agrégala como variable `MONGODB_URI` en Secrets
+6. ¡Listo! Los datos se sincronizan automáticamente
 
-**Para persistencia en Render** (sin pagar):
-- Opción 1: Usar **Supabase PostgreSQL** (gratis, 500MB) - Recomendado
-- Opción 2: Usar **Firebase Realtime Database** (gratis, 1GB)
-- Opción 3: Hacer git push de cambios en `data/` a GitHub
+**Si no quieres MongoDB:**
+- Los datos se guardan localmente en JSON (`data/`)
+- Se pierden en deploys de Render
+- Opción: Hacer git push de `data/` a GitHub
 
 ## 🌐 Despliegue a Producción
 
