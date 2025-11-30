@@ -33,6 +33,14 @@ Bot de Discord completo con sistema de niveles, XP, minijuegos y tarjetas de ran
 - Temas pixel art según rango del usuario
 - Temas especiales para boosters, VIPs y usuario especial
 
+### Dashboard Web (NUEVO)
+- Página web con tema retro pixel art (Pokemon, Zelda, Mario)
+- Secciones: Inicio, Características, Comandos, Minijuegos, Tarjetas, Leaderboard
+- Leaderboard completo con hasta 500 usuarios (más que los 10 de Discord)
+- API REST para obtener datos del leaderboard
+- Diseño responsive para móviles
+- Efectos visuales: scanlines, glitch, animaciones retro
+
 ## 🔧 Configuración Actual
 
 ### IDs Configurados en `config.js`
@@ -66,10 +74,17 @@ Este proyecto está completamente configurado para Replit:
 1. **Variables de entorno**: `DISCORD_BOT_TOKEN` configurado en Secrets ✅
 2. **Workflow**: Configurado para ejecutar `node index.js` automáticamente ✅
 3. **Dependencias**: Instaladas automáticamente con npm ✅
-4. **Puerto**: Servidor web en puerto 5000 para health checks ✅
+4. **Puerto**: Servidor web en puerto 5000 con Dashboard ✅
 5. **Deployment**: Configurado para VM (24/7) ✅
+6. **Dashboard Web**: Accesible en la URL del proyecto ✅
 
 El bot está corriendo y conectado a Discord. Solo presiona "Run" para iniciarlo.
+
+### URLs del Dashboard
+- `/` - Página principal con todas las secciones
+- `/api/leaderboard` - API JSON con hasta 500 usuarios
+- `/api/stats` - Estadísticas generales
+- `/health` - Health check para Uptime Robot
 
 ### Localmente
 ```bash

@@ -64,6 +64,10 @@ app.get('/ping', (req, res) => {
   res.status(200).send('pong');
 });
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌐 Servidor web escuchando en puerto ${PORT}`);
   console.log(`📍 URLs disponibles:`);
