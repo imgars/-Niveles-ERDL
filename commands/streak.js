@@ -2,11 +2,11 @@ import { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRo
 import { getStreakBetween, saveStreakToMongo, getUserStreaks } from '../utils/mongoSync.js';
 
 export const data = new SlashCommandBuilder()
-  .setName('crear')
-  .setDescription('Crea una racha con otro usuario')
+  .setName('racha')
+  .setDescription('Gestiona tus rachas')
   .addSubcommand(subcommand =>
     subcommand
-      .setName('racha')
+      .setName('crear')
       .setDescription('Crea una racha con otro usuario')
       .addUserOption(option =>
         option.setName('usuario')
@@ -18,12 +18,22 @@ export const data = new SlashCommandBuilder()
     subcommand
       .setName('ver')
       .setDescription('Ve tus rachas activas')
+  )
+  .addSubcommand(subcommand =>
+    subcommand
+      .setName('usuario')
+      .setDescription('Ve las rachas de un usuario')
+      .addUserOption(option =>
+        option.setName('usuario')
+          .setDescription('Usuario del que ver rachas')
+          .setRequired(true)
+      )
   );
 
 export async function execute(interaction) {
   const subcommand = interaction.options.getSubcommand();
   
-  if (subcommand === 'racha') {
+  if (subcommand === 'crear') {
     const targetUser = interaction.options.getUser('usuario');
     
     if (targetUser.id === interaction.user.id) {
@@ -78,7 +88,8 @@ export async function execute(interaction) {
     
     const streakList = userStreaks.map(s => {
       const otherUserId = s.user1Id === interaction.user.id ? s.user2Id : s.user1Id;
-      return `<@${otherUserId}>: **${s.streakCount} días** 🔥`;
+      const lastDate = new Date(s.lastMessageDate);
+      return `<@${otherUserId}>: **${s.streakCount} días** 🔥 (última: ${lastDate.toLocaleDateString('es-ES')})`;
     }).join('\n');
     
     const embed = new EmbedBuilder()
@@ -88,5 +99,28 @@ export async function execute(interaction) {
       .setFooter({ text: 'Mensajea a tu compañero todos los días para mantener la racha' });
     
     return interaction.reply({ embeds: [embed], ephemeral: true });
+  }
+  
+  if (subcommand === 'usuario') {
+    const targetUser = interaction.options.getUser('usuario');
+    const userStreaks = await getUserStreaks(interaction.guildId, targetUser.id);
+    
+    if (userStreaks.length === 0) {
+      return interaction.reply({ content: `📊 ${targetUser.username} no tiene rachas activas`, ephemeral: true });
+    }
+    
+    const streakList = userStreaks.map(s => {
+      const otherUserId = s.user1Id === targetUser.id ? s.user2Id : s.user1Id;
+      const lastDate = new Date(s.lastMessageDate);
+      return `<@${otherUserId}>: **${s.streakCount} días** 🔥 (última: ${lastDate.toLocaleDateString('es-ES')})`;
+    }).join('\n');
+    
+    const embed = new EmbedBuilder()
+      .setColor('#39FF14')
+      .setTitle(`🔥 Rachas de ${targetUser.username}`)
+      .setDescription(streakList)
+      .setThumbnail(targetUser.displayAvatarURL());
+    
+    return interaction.reply({ embeds: [embed] });
   }
 }

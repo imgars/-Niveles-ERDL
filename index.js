@@ -5,8 +5,9 @@ import { calculateLevel, getXPProgress, getRandomXP, calculateBoostMultiplier, a
 import { generateRankCard } from './utils/cardGenerator.js';
 import { initializeNightBoost, getNightBoostMultiplier } from './utils/timeBoost.js';
 import { isStaff } from './utils/helpers.js';
-import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo } from './utils/mongoSync.js';
+import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getStreakBetween, saveStreakToMongo, updateStreakDate } from './utils/mongoSync.js';
 import express from 'express';
+import cron from 'node-cron';
 
 import fs from 'fs';
 import path from 'path';
@@ -372,6 +373,35 @@ client.on('messageCreate', async (message) => {
   
   if (userData.level > oldLevel) {
     await handleLevelUp(message, member, userData, oldLevel);
+  }
+  
+  // Sistema de Rachas
+  if (isMongoConnected()) {
+    try {
+      const mentions = message.mentions.users.filter(u => !u.bot);
+      for (const mentionedUser of mentions.values()) {
+        const streak = await updateStreakDate(message.guild.id, message.author.id, mentionedUser.id);
+        if (streak) {
+          if (streak.updated) {
+            const streakChannel = message.guild.channels.cache.get(CONFIG.LEVEL_UP_CHANNEL_ID);
+            if (streakChannel) {
+              streakChannel.send({
+                content: `🔥 ${streak.message}\n<@${message.author.id}> y <@${mentionedUser.id}>`
+              }).catch(err => console.error('Error sending streak update:', err));
+            }
+          } else if (streak.broken) {
+            const streakChannel = message.guild.channels.cache.get(CONFIG.LEVEL_UP_CHANNEL_ID);
+            if (streakChannel) {
+              streakChannel.send({
+                content: `😢 ${streak.message}\n<@${message.author.id}> y <@${mentionedUser.id}>`
+              }).catch(err => console.error('Error sending streak broken:', err));
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error procesando rachas:', error);
+    }
   }
 });
 
