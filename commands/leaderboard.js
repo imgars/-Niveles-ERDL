@@ -27,7 +27,7 @@ export default {
       const viewFullButton = new ButtonBuilder()
         .setLabel('Ver leaderboard completo')
         .setStyle(ButtonStyle.Link)
-        .setURL(`https://${process.env.REPLIT_DOMAINS || 'localhost:5000'}/`);
+        .setURL('https://niveles-bbe6.onrender.com/#leaderboard');
       
       const row = new ActionRowBuilder().addComponents(viewFullButton);
       
