@@ -14,13 +14,95 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Cliente de Discord (definido antes de los endpoints para poder usarlo en la API)
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessageReactions
+  ]
+});
+
+client.commands = new Collection();
+
 // Servidor HTTP para Render, Uptime Robot y Dashboard Web
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/leaderboard', (req, res) => {
+const userCache = new Map();
+const CACHE_DURATION = 10 * 60 * 1000;
+
+function getDiscordUserFromCache(userId) {
+  if (client && client.isReady()) {
+    const cached = userCache.get(userId);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+    
+    const discordUser = client.users.cache.get(userId);
+    if (discordUser) {
+      const data = {
+        username: discordUser.username,
+        displayName: discordUser.displayName || discordUser.username,
+        avatar: discordUser.displayAvatarURL({ format: 'png', size: 64 })
+      };
+      userCache.set(userId, { data, timestamp: Date.now() });
+      return data;
+    }
+  }
+  return null;
+}
+
+async function fetchDiscordUsersBatch(userIds) {
+  const results = new Map();
+  const toFetch = [];
+  
+  for (const userId of userIds) {
+    const cached = getDiscordUserFromCache(userId);
+    if (cached) {
+      results.set(userId, cached);
+    } else {
+      toFetch.push(userId);
+    }
+  }
+  
+  if (client && client.isReady() && toFetch.length > 0) {
+    const batchSize = 10;
+    for (let i = 0; i < toFetch.length; i += batchSize) {
+      const batch = toFetch.slice(i, i + batchSize);
+      const fetchPromises = batch.map(userId => 
+        client.users.fetch(userId)
+          .then(user => ({ userId, user }))
+          .catch(() => ({ userId, user: null }))
+      );
+      
+      const batchResults = await Promise.race([
+        Promise.all(fetchPromises),
+        new Promise(resolve => setTimeout(() => resolve([]), 5000))
+      ]);
+      
+      for (const result of batchResults) {
+        if (result && result.user) {
+          const data = {
+            username: result.user.username,
+            displayName: result.user.displayName || result.user.username,
+            avatar: result.user.displayAvatarURL({ format: 'png', size: 64 })
+          };
+          userCache.set(result.userId, { data, timestamp: Date.now() });
+          results.set(result.userId, data);
+        }
+      }
+    }
+  }
+  
+  return results;
+}
+
+app.get('/api/leaderboard', async (req, res) => {
   try {
     const allUsers = Object.values(db.users);
     
@@ -29,9 +111,17 @@ app.get('/api/leaderboard', (req, res) => {
       .sort((a, b) => b.totalXp - a.totalXp)
       .slice(0, 500);
     
+    const userIds = sortedUsers.map(u => u.userId);
+    const discordInfoMap = await fetchDiscordUsersBatch(userIds);
+    
+    const usersWithDiscordInfo = sortedUsers.map(user => {
+      const discordInfo = discordInfoMap.get(user.userId) || { username: null, displayName: null, avatar: null };
+      return { ...user, ...discordInfo };
+    });
+    
     res.json({
       total: allUsers.length,
-      users: sortedUsers
+      users: usersWithDiscordInfo
     });
   } catch (error) {
     console.error('Error getting leaderboard:', error);
@@ -75,18 +165,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`   - http://localhost:${PORT}/health   (Uptime Robot)`);
   console.log(`   - http://localhost:${PORT}/api/leaderboard  (API)`);
 });
-
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildMessageReactions
-  ]
-});
-
-client.commands = new Collection();
 
 const commandFolders = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFolders) {

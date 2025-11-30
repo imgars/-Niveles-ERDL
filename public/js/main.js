@@ -124,10 +124,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 rankIcon = '&#9815;';
             }
             
+            const displayName = user.displayName || user.username || `Usuario ${user.userId.slice(-4)}`;
+            const avatarUrl = user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+            
             return `
                 <tr>
                     <td class="rank-col ${rankClass}">${rankIcon} #${rank}</td>
-                    <td class="user-col">${escapeHtml(user.userId)}</td>
+                    <td class="user-col">
+                        <div class="user-info">
+                            <img src="${avatarUrl}" alt="Avatar" class="user-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                            <span class="user-name">${escapeHtml(displayName)}</span>
+                        </div>
+                    </td>
                     <td class="level-col">Nivel ${user.level}</td>
                     <td class="xp-col">${formatNumber(user.totalXp)} XP</td>
                 </tr>

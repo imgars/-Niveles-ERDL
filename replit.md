@@ -37,6 +37,8 @@ Bot de Discord completo con sistema de niveles, XP, minijuegos y tarjetas de ran
 - Página web con tema retro pixel art (Pokemon, Zelda, Mario)
 - Secciones: Inicio, Características, Comandos, Minijuegos, Tarjetas, Leaderboard
 - Leaderboard completo con hasta 500 usuarios (más que los 10 de Discord)
+- Avatares y nombres de usuario de Discord en el leaderboard
+- Sistema de caché de 10 minutos para datos de Discord
 - API REST para obtener datos del leaderboard
 - Diseño responsive para móviles
 - Efectos visuales: scanlines, glitch, animaciones retro
