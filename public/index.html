@@ -539,6 +539,31 @@
             </div>
         </section>
 
+        <!-- MODAL DE RESPUESTA -->
+        <div id="answer-modal" class="answer-modal">
+            <div class="answer-modal-content">
+                <span class="answer-modal-close">&times;</span>
+                <h3>Responder Pregunta</h3>
+                <div id="answer-question-preview" class="answer-question-preview"></div>
+                <form id="answer-form" class="pixel-form">
+                    <textarea 
+                        id="answer-text" 
+                        placeholder="Tu respuesta..." 
+                        maxlength="1000"
+                        required
+                        class="pixel-textarea"></textarea>
+                    <input 
+                        type="password" 
+                        id="admin-password" 
+                        placeholder="Contraseña de staff" 
+                        required
+                        class="pixel-input">
+                    <button type="submit" class="pixel-btn">Enviar Respuesta</button>
+                    <div id="answer-message" class="form-message"></div>
+                </form>
+            </div>
+        </div>
+
         <!-- LEADERBOARD -->
         <section id="leaderboard" class="section">
             <h2 class="section-title">

@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             questions.forEach(q => {
                 const card = document.createElement('div');
-                card.className = `question-card ${q.answered ? 'answered' : ''}`;
+                card.className = `question-card ${q.answered ? 'answered' : 'unanswered'}`;
                 
                 const date = new Date(q.createdAt).toLocaleDateString('es-ES');
                 
@@ -75,15 +75,90 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="answer-label">Respuesta:</span>
                             <div class="answer-text">${q.answer}</div>
                         </div>
-                    ` : '<div class="no-answered">Pendiente de respuesta...</div>'}
+                    ` : `
+                        <div class="no-answered">Pendiente de respuesta...</div>
+                        <button type="button" class="answer-button" data-question-id="${q._id}">Responder</button>
+                    `}
                 `;
                 
                 questionsList.appendChild(card);
+                
+                // Agregar event listener al botón de responder
+                if (!q.answered) {
+                    const answerBtn = card.querySelector('.answer-button');
+                    answerBtn.addEventListener('click', () => openAnswerModal(q));
+                }
             });
         } catch (error) {
             console.error('Error loading questions:', error);
         }
     }
+    
+    // Abrir modal de respuesta
+    function openAnswerModal(question) {
+        const modal = document.getElementById('answer-modal');
+        const preview = document.getElementById('answer-question-preview');
+        
+        preview.innerHTML = `
+            <div class="preview-asker">${question.askerName}</div>
+            <div class="preview-text">${question.question}</div>
+        `;
+        
+        // Guardar ID de la pregunta en el formulario
+        document.getElementById('answer-form').dataset.questionId = question._id;
+        
+        modal.classList.add('show');
+    }
+    
+    // Cerrar modal de respuesta
+    function closeAnswerModal() {
+        const modal = document.getElementById('answer-modal');
+        modal.classList.remove('show');
+        document.getElementById('answer-form').reset();
+        document.getElementById('answer-message').className = 'form-message';
+    }
+    
+    // Evento para cerrar modal
+    document.querySelector('.answer-modal-close').addEventListener('click', closeAnswerModal);
+    
+    document.getElementById('answer-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'answer-modal') closeAnswerModal();
+    });
+    
+    // Manejar envío de respuesta
+    const answerForm = document.getElementById('answer-form');
+    answerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const questionId = answerForm.dataset.questionId;
+        const answerText = document.getElementById('answer-text').value;
+        const password = document.getElementById('admin-password').value;
+        const messageDiv = document.getElementById('answer-message');
+        
+        try {
+            const response = await fetch(`/api/questions/${questionId}/answer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answer: answerText, password })
+            });
+            
+            if (response.ok) {
+                messageDiv.textContent = '✅ Respuesta enviada correctamente!';
+                messageDiv.className = 'form-message success';
+                setTimeout(() => {
+                    closeAnswerModal();
+                    loadQuestions();
+                }, 1500);
+            } else {
+                const error = await response.json();
+                messageDiv.textContent = '❌ ' + error.error;
+                messageDiv.className = 'form-message error';
+            }
+        } catch (error) {
+            messageDiv.textContent = '❌ Error al enviar respuesta';
+            messageDiv.className = 'form-message error';
+        }
+    });
     
     // Manejar formulario de preguntas
     const questionForm = document.getElementById('question-form');
