@@ -82,7 +82,11 @@ const PORT = process.env.PORT || 5000;
 app.use(express.static(path.join(__dirname, 'public')));
 
 const userCache = new Map();
-const CACHE_DURATION = 10 * 60 * 1000;
+const leaderboardCache = new Map();
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hora
+const LEADERBOARD_CACHE_KEY = 'leaderboard-full';
+const LEADERBOARD_CACHE_TIME = 5 * 60 * 1000; // 5 minutos
+let leaderboardProcessing = false;
 
 function getDiscordUserFromCache(userId) {
   if (client && client.isReady()) {
@@ -152,27 +156,50 @@ async function fetchDiscordUsersBatch(userIds) {
 
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    const allUsers = Object.values(db.users);
+    // Verificar caché del leaderboard completo
+    const cached = leaderboardCache.get(LEADERBOARD_CACHE_KEY);
+    if (cached && Date.now() - cached.timestamp < LEADERBOARD_CACHE_TIME) {
+      return res.json(cached.data);
+    }
     
-    const sortedUsers = allUsers
-      .filter(user => user.totalXp > 0)
-      .sort((a, b) => b.totalXp - a.totalXp)
-      .slice(0, 500);
+    // Si ya hay una solicitud procesándose, esperar a que termine
+    if (leaderboardProcessing) {
+      return res.status(503).json({ error: 'Leaderboard cargándose, intenta de nuevo en unos segundos' });
+    }
     
-    const userIds = sortedUsers.map(u => u.userId);
-    const discordInfoMap = await fetchDiscordUsersBatch(userIds);
+    leaderboardProcessing = true;
     
-    const usersWithDiscordInfo = sortedUsers.map(user => {
-      const discordInfo = discordInfoMap.get(user.userId) || { username: null, displayName: null, avatar: null };
-      return { ...user, ...discordInfo };
-    });
-    
-    res.json({
-      total: allUsers.length,
-      users: usersWithDiscordInfo
-    });
+    try {
+      const allUsers = Object.values(db.users);
+      
+      const sortedUsers = allUsers
+        .filter(user => user.totalXp > 0)
+        .sort((a, b) => b.totalXp - a.totalXp)
+        .slice(0, 500);
+      
+      const userIds = sortedUsers.map(u => u.userId);
+      const discordInfoMap = await fetchDiscordUsersBatch(userIds);
+      
+      const usersWithDiscordInfo = sortedUsers.map(user => {
+        const discordInfo = discordInfoMap.get(user.userId) || { username: null, displayName: null, avatar: null };
+        return { ...user, ...discordInfo };
+      });
+      
+      const response = {
+        total: allUsers.length,
+        users: usersWithDiscordInfo
+      };
+      
+      // Cachear resultado
+      leaderboardCache.set(LEADERBOARD_CACHE_KEY, { data: response, timestamp: Date.now() });
+      
+      res.json(response);
+    } finally {
+      leaderboardProcessing = false;
+    }
   } catch (error) {
     console.error('Error getting leaderboard:', error);
+    leaderboardProcessing = false;
     res.status(500).json({ error: 'Error al obtener el leaderboard' });
   }
 });
