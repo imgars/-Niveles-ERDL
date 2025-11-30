@@ -16,10 +16,36 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Conectar a MongoDB en startup
-await connectMongoDB();
+const mongoConnected = await connectMongoDB();
 
 // Pasar funciones de MongoDB a la base de datos
 db.setMongoSync({ saveUserToMongo, saveBoostsToMongo });
+
+// Cargar datos desde MongoDB si está conectado
+if (mongoConnected) {
+  try {
+    const { getAllUsersFromMongo, getAllBoostsFromMongo } = await import('./utils/mongoSync.js');
+    const mongoUsers = await getAllUsersFromMongo();
+    const mongoBoosts = await getAllBoostsFromMongo();
+    
+    // Cargar usuarios desde MongoDB
+    if (mongoUsers && mongoUsers.length > 0) {
+      for (const user of mongoUsers) {
+        const key = `${user.guildId}-${user.userId}`;
+        db.users[key] = user;
+      }
+      console.log(`✅ Cargados ${mongoUsers.length} usuarios desde MongoDB`);
+    }
+    
+    // Cargar boosts desde MongoDB
+    if (mongoBoosts) {
+      db.boosts = mongoBoosts;
+      console.log('✅ Boosts cargados desde MongoDB');
+    }
+  } catch (error) {
+    console.error('Error cargando datos desde MongoDB:', error.message);
+  }
+}
 
 // Cliente de Discord (definido antes de los endpoints para poder usarlo en la API)
 const client = new Client({

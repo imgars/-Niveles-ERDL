@@ -59,10 +59,11 @@ export async function saveUserToMongo(guildId, userId, userData) {
   }
 }
 
-export async function getAllUsersFromMongo(guildId) {
+export async function getAllUsersFromMongo(guildId = null) {
   if (!isConnected) return [];
   try {
-    const users = await User.find({ guildId }).lean();
+    const query = guildId ? { guildId } : {};
+    const users = await User.find(query).lean();
     return users;
   } catch (error) {
     console.error('Error obteniendo usuarios de MongoDB:', error.message);
@@ -79,6 +80,17 @@ export async function saveBoostsToMongo(boosts) {
     }
   } catch (error) {
     console.error('Error guardando boosts en MongoDB:', error.message);
+  }
+}
+
+export async function getAllBoostsFromMongo() {
+  if (!isConnected) return { global: [], users: {}, channels: {} };
+  try {
+    const boosts = await Boost.find({}).lean();
+    return { global: boosts || [], users: {}, channels: {} };
+  } catch (error) {
+    console.error('Error obteniendo boosts de MongoDB:', error.message);
+    return { global: [], users: {}, channels: {} };
   }
 }
 
