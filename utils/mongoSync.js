@@ -49,6 +49,34 @@ const streakSchema = new mongoose.Schema({
 
 const Streak = mongoose.model('Streak', streakSchema);
 
+// Esquema de Misiones Semanales
+const missionSchema = new mongoose.Schema({
+  guildId: String,
+  userId: String,
+  weekNumber: Number,
+  year: Number,
+  missions: [{
+    id: Number,
+    title: String,
+    description: String,
+    type: String, // 'greeting', 'question', 'help', 'participate'
+    target: Number, // cantidad de veces que debe hacer la acción
+    progress: { type: Number, default: 0 },
+    completed: { type: Boolean, default: false },
+    difficulty: { type: Number, default: 1 }, // 1-3
+    reward: {
+      xp: Number,
+      multiplier: Number,
+      levels: Number
+    }
+  }],
+  completedCount: { type: Number, default: 0 },
+  completedAt: Date,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Mission = mongoose.model('Mission', missionSchema);
+
 let isConnected = false;
 
 export async function connectMongoDB() {
@@ -259,6 +287,102 @@ export async function getAllStreaksFromMongo(guildId = null) {
   } catch (error) {
     console.error('Error obteniendo todas las rachas de MongoDB:', error.message);
     return [];
+  }
+}
+
+export async function getUserMissions(guildId, userId, weekNumber, year) {
+  if (!isConnected) return null;
+  try {
+    const missions = await Mission.findOne({
+      guildId,
+      userId,
+      weekNumber,
+      year
+    });
+    return missions;
+  } catch (error) {
+    console.error('Error obteniendo misiones:', error.message);
+    return null;
+  }
+}
+
+export async function createUserMissions(guildId, userId) {
+  if (!isConnected) return null;
+  try {
+    const weekNumber = Math.ceil((new Date().getDate()) / 7);
+    const year = new Date().getFullYear();
+    
+    const missionTemplates = [
+      { id: 1, title: 'Saludador', description: 'Di hola a 5 personas', type: 'greeting', target: 5, difficulty: 1, reward: { xp: 100, multiplier: 0.1, levels: 0 } },
+      { id: 2, title: 'Preguntón', description: 'Pregunta cómo están a 3 personas', type: 'question', target: 3, difficulty: 1, reward: { xp: 150, multiplier: 0.15, levels: 0 } },
+      { id: 3, title: 'Socializador', description: 'Participa en 10 conversaciones', type: 'participate', target: 10, difficulty: 2, reward: { xp: 250, multiplier: 0.25, levels: 1 } },
+      { id: 4, title: 'Ayudante', description: 'Ofrece ayuda a 4 personas', type: 'help', target: 4, difficulty: 2, reward: { xp: 200, multiplier: 0.2, levels: 0 } },
+      { id: 5, title: 'Visitante', description: 'Envía mensajes en 6 canales diferentes', type: 'channels', target: 6, difficulty: 1, reward: { xp: 120, multiplier: 0.12, levels: 0 } },
+      { id: 6, title: 'Amigable', description: 'Interactúa con 8 usuarios nuevos', type: 'newusers', target: 8, difficulty: 2, reward: { xp: 280, multiplier: 0.28, levels: 1 } },
+      { id: 7, title: 'Comunicador', description: 'Envía 50 mensajes en el chat', type: 'messages', target: 50, difficulty: 2, reward: { xp: 200, multiplier: 0.22, levels: 0 } },
+      { id: 8, title: 'Entusiasta', description: 'Reacciona a 20 mensajes', type: 'reactions', target: 20, difficulty: 1, reward: { xp: 150, multiplier: 0.15, levels: 0 } },
+      { id: 9, title: 'Comentarista', description: 'Responde a 7 preguntas en el chat', type: 'answers', target: 7, difficulty: 3, reward: { xp: 350, multiplier: 0.35, levels: 2 } },
+      { id: 10, title: 'Leyenda', description: 'Completa 9 misiones en la semana', type: 'meta', target: 9, difficulty: 3, reward: { xp: 500, multiplier: 0.5, levels: 3 } }
+    ];
+    
+    const newMissions = new Mission({
+      guildId,
+      userId,
+      weekNumber,
+      year,
+      missions: missionTemplates
+    });
+    
+    await newMissions.save();
+    return newMissions;
+  } catch (error) {
+    console.error('Error creando misiones:', error.message);
+    return null;
+  }
+}
+
+export async function updateMissionProgress(guildId, userId, weekNumber, year, missionId, increment = 1) {
+  if (!isConnected) return null;
+  try {
+    const missions = await Mission.findOne({
+      guildId,
+      userId,
+      weekNumber,
+      year
+    });
+    
+    if (!missions) return null;
+    
+    const mission = missions.missions.find(m => m.id === missionId);
+    if (!mission || mission.completed) return null;
+    
+    mission.progress = Math.min(mission.progress + increment, mission.target);
+    if (mission.progress >= mission.target) {
+      mission.completed = true;
+      missions.completedCount += 1;
+    }
+    
+    await missions.save();
+    return { mission, completed: mission.completed, reward: mission.reward };
+  } catch (error) {
+    console.error('Error actualizando progreso de misión:', error.message);
+    return null;
+  }
+}
+
+export async function getMissionsStats(guildId, userId, weekNumber, year) {
+  if (!isConnected) return null;
+  try {
+    const missions = await Mission.findOne({
+      guildId,
+      userId,
+      weekNumber,
+      year
+    }).lean();
+    return missions;
+  } catch (error) {
+    console.error('Error obteniendo estadísticas de misiones:', error.message);
+    return null;
   }
 }
 

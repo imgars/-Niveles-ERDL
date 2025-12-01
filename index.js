@@ -5,7 +5,7 @@ import { calculateLevel, getXPProgress, getRandomXP, calculateBoostMultiplier, a
 import { generateRankCard } from './utils/cardGenerator.js';
 import { initializeNightBoost, getNightBoostMultiplier } from './utils/timeBoost.js';
 import { isStaff } from './utils/helpers.js';
-import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getStreakBetween, saveStreakToMongo, updateStreakDate, getAllStreaksFromMongo } from './utils/mongoSync.js';
+import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getStreakBetween, saveStreakToMongo, updateStreakDate, getAllStreaksFromMongo, getUserMissions, updateMissionProgress } from './utils/mongoSync.js';
 import express from 'express';
 import cron from 'node-cron';
 
@@ -407,6 +407,53 @@ client.on('messageCreate', async (message) => {
       }
     } catch (error) {
       console.error('Error procesando rachas:', error);
+    }
+  }
+  
+  // Sistema de Misiones Semanales
+  if (isMongoConnected()) {
+    try {
+      const weekNumber = Math.ceil((new Date().getDate()) / 7);
+      const year = new Date().getFullYear();
+      const missions = await getUserMissions(message.guild.id, message.author.id, weekNumber, year);
+      
+      if (!missions) return;
+      
+      const msgLower = message.content.toLowerCase();
+      const mentions = message.mentions.users.filter(u => !u.bot).size;
+      
+      // Saludador - di hola
+      if ((msgLower.includes('hola') || msgLower.includes('hello') || msgLower.includes('hi')) && mentions > 0) {
+        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 1);
+      }
+      
+      // Preguntón - pregunta cómo están
+      if ((msgLower.includes('¿cómo estás') || msgLower.includes('como estas') || msgLower.includes('how are you')) && mentions > 0) {
+        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 2);
+      }
+      
+      // Socializador - participa
+      if (msgLower.length > 10) {
+        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 3);
+      }
+      
+      // Ayudante - ofrece ayuda
+      if ((msgLower.includes('ayuda') || msgLower.includes('help') || msgLower.includes('puedo')) && mentions > 0) {
+        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 4);
+      }
+      
+      // Visitante - envía en canales
+      await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 5, 0.1);
+      
+      // Comunicador - envía mensajes
+      await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 7);
+      
+      // Comentarista - responde preguntas
+      if ((msgLower.includes('?') && msgLower.length > 5) || msgLower.includes('respuesta')) {
+        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 9, 0.2);
+      }
+    } catch (error) {
+      console.error('Error procesando misiones:', error);
     }
   }
 });
