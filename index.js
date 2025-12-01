@@ -498,6 +498,40 @@ client.on('interactionCreate', async (interaction) => {
   if (!interaction.isButton()) return;
   
   try {
+    if (interaction.customId === 'earn_rewards') {
+      const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = await import('discord.js');
+      
+      const select = new StringSelectMenuBuilder()
+        .setCustomId('minigame_select')
+        .setPlaceholder('Elige un minijuego')
+        .addOptions(
+          new StringSelectMenuOptionBuilder()
+            .setLabel('🧠 Trivia')
+            .setDescription('Responde 5 preguntas')
+            .setValue('trivia'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('✋ Piedra, Papel o Tijeras')
+            .setDescription('Juega contra otro usuario')
+            .setValue('rps'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('🔫 Ruleta Rusa')
+            .setDescription('¡Riesgoso! Juega contra otro usuario')
+            .setValue('roulette'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('🎮 Ahorcado Solo')
+            .setDescription('3 rondas de ahorcado')
+            .setValue('ahorcado_solo'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('👥 Ahorcado Multijugador')
+            .setDescription('Host vs Adivinador')
+            .setValue('ahorcado_multi')
+        );
+      
+      const row = new (await import('discord.js')).ActionRowBuilder().addComponents(select);
+      
+      return interaction.reply({ content: '🎮 Elige un minijuego para jugar:', components: [row], flags: 64 });
+    }
+    
     if (interaction.customId.startsWith('accept_streak_')) {
       const [, proposerId, targetUserId] = interaction.customId.split('_');
       
@@ -541,6 +575,27 @@ client.on('interactionCreate', async (interaction) => {
     console.error('Error manejando botón:', error);
     if (!interaction.replied && !interaction.deferred) {
       await interaction.reply({ content: '❌ Error al procesar tu acción', flags: 64 });
+    }
+  }
+});
+
+// Manejador de select menus para minijuegos
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isStringSelectMenu()) return;
+  
+  if (interaction.customId === 'minigame_select') {
+    const selected = interaction.values[0];
+    
+    if (selected === 'trivia') {
+      return interaction.reply({ content: 'Usa `/minigame trivia` para jugar trivia', flags: 64 });
+    } else if (selected === 'rps') {
+      return interaction.reply({ content: 'Usa `/minigame rps @usuario` para jugar Piedra, Papel o Tijeras', flags: 64 });
+    } else if (selected === 'roulette') {
+      return interaction.reply({ content: 'Usa `/minigame roulette @usuario` para jugar Ruleta Rusa', flags: 64 });
+    } else if (selected === 'ahorcado_solo') {
+      return interaction.reply({ content: 'Usa `/ahorcado solo` para jugar Ahorcado', flags: 64 });
+    } else if (selected === 'ahorcado_multi') {
+      return interaction.reply({ content: 'Usa `/ahorcado multi` para jugar Ahorcado Multijugador', flags: 64 });
     }
   }
 });
