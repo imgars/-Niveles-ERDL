@@ -1,4 +1,5 @@
 import { CONFIG } from '../config.js';
+import { getNightBoostStatus } from './timeBoost.js';
 
 export function calculateXPForLevel(level) {
   if (level <= 0) return 0;
@@ -121,4 +122,27 @@ export function removeLevels(currentTotalXp, levelsToRemove) {
   }
   
   return Math.max(0, newTotalXp);
+}
+
+export function getActiveBoostsText(boosts) {
+  if (!boosts || boosts.length === 0) return '';
+  
+  let boostText = '\n';
+  const uniqueBoosts = new Map();
+  
+  for (const boost of boosts) {
+    const key = `${boost.target || 'global'}-${Math.round(boost.multiplier * 100)}`;
+    if (!uniqueBoosts.has(key)) {
+      uniqueBoosts.set(key, boost);
+    }
+  }
+  
+  for (const boost of uniqueBoosts.values()) {
+    const percentage = Math.round(boost.multiplier * 100);
+    const timeLeft = boost.expiresAt ? Math.ceil((boost.expiresAt - Date.now()) / 1000 / 60) : null;
+    const timeStr = timeLeft ? ` (${timeLeft}min)` : '';
+    boostText += `🚀 **+${percentage}% boost**${timeStr}\n`;
+  }
+  
+  return boostText;
 }
