@@ -821,18 +821,20 @@ async function playSoloHangman(interaction) {
   async function endHangmanGame() {
     const userData = db.getUser(interaction.guild.id, interaction.user.id);
     let reward = '❌ No ganaste.';
+    let rewardGiven = false;
     
-    if (roundsWon >= 2) {
+    if (roundsWon === 3) {
       const boostId = `hangman_${interaction.user.id}_${Date.now()}`;
       db.addBoost(boostId, 'Hangman Victory', 0.25, 24 * 60 * 60 * 1000, { userId: interaction.user.id });
-      reward = '🎉 ¡Ganaste 2/3 rondas! **+25% boost por 24 horas**';
+      reward = '🎉 ¡Ganaste 3/3 rondas! **+25% boost por 24 horas**';
+      rewardGiven = true;
     }
     
     db.setCooldown('minigame_hangman', interaction.user.id, 48 * 60 * 60 * 1000);
     
     await interaction.editReply({
       embeds: [{
-        color: roundsWon >= 2 ? 0x4CAF50 : 0xF04747,
+        color: rewardGiven ? 0x4CAF50 : 0xF04747,
         title: '🏆 ¡Juego Terminado!',
         description: `**Puntuación:** ${roundsWon}/3\n\n${reward}`
       }],

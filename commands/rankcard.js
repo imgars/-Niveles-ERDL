@@ -29,15 +29,14 @@ export default {
       const subcommand = interaction.options.getSubcommand();
       
       if (subcommand === 'select') {
-        await interaction.deferReply({ flags: 64 });
-        
         const member = await interaction.guild.members.fetch(interaction.user.id);
         const userData = db.getUser(interaction.guild.id, interaction.user.id);
         const available = await getAvailableThemes(member, userData.level);
 
         if (available.length === 1) {
-          return interaction.editReply({
-            content: `❌ Solo tienes 1 tema disponible: ${THEME_NAMES[available[0]]}`
+          return interaction.reply({
+            content: `❌ Solo tienes 1 tema disponible: ${THEME_NAMES[available[0]]}`,
+            flags: 64
           });
         }
 
@@ -64,7 +63,7 @@ export default {
             { name: 'Seleccionado', value: `${THEME_NAMES[userData.selectedCardTheme || 'automático']}` }
           );
 
-        return interaction.editReply({ embeds: [embed], components: [row] });
+        return interaction.reply({ embeds: [embed], components: [row], flags: 64 });
       }
     } catch (error) {
       console.error('Error in rankcard command:', error);
