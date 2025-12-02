@@ -1,0 +1,56 @@
+Emitted 'error' event on Client instance at:
+    at emitUnhandledRejectionOrErr (node:events:401:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:92:21) {
+  requestBody: {
+    files: [],
+    json: {
+      type: 4,
+      data: {
+        content: '❌ Hubo un error al ejecutar este comando.',
+        tts: false,
+        nonce: undefined,
+        enforce_nonce: false,
+        embeds: undefined,
+        components: undefined,
+        username: undefined,
+        avatar_url: undefined,
+        allowed_mentions: undefined,
+        flags: 64,
+        message_reference: undefined,
+        attachments: undefined,
+        sticker_ids: undefined,
+        thread_name: undefined,
+        applied_tags: undefined,
+        poll: undefined
+      }
+    }
+  },
+  rawError: { message: 'Unknown interaction', code: 10062 },
+  code: 10062,
+  status: 404,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1445250733703172169/aW50ZXJhY3Rpb246MTQ0NTI1MDczMzcwMzE3MjE2OTpWVElYTnM4MDFHWXVUSWdJU08yNmlKc0pFRWxEWUlzMXBnbGNwS1Q1T1NVT1BkR0FTZVRWN3V1VmFRVklUUVFxOEI1MFdNV1FMN3p4Q3hEcGxDckN5WG84ZXJMMVFzRVhVZEE3SDNJU1gxZHVjNW14WjA0ajVqTTVSY0dDSkdwTQ/callback?with_response=false'
+}
+Node.js v22.16.0
+Error generating leaderboard: RangeError: Non-premium and non-link buttons cannot have a URL.
+    at validateRequiredButtonParameters (/opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:586:13)
+    at ButtonBuilder.toJSON (/opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:743:5)
+    at /opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:2661:64
+    at Array.map (<anonymous>)
+    at ActionRowBuilder.toJSON (/opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:2661:35)
+    at /opt/render/project/src/node_modules/discord.js/src/structures/MessagePayload.js:151:46
+    at Array.map (<anonymous>)
+    at MessagePayload.resolveBody (/opt/render/project/src/node_modules/discord.js/src/structures/MessagePayload.js:150:49)
+    at InteractionWebhook.editMessage (/opt/render/project/src/node_modules/discord.js/src/structures/Webhook.js:344:50)
+    at ChatInputCommandInteraction.editReply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:247:36)
+Error generating leaderboard: RangeError: Non-premium and non-link buttons cannot have a URL.
+    at validateRequiredButtonParameters (/opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:586:13)
+    at ButtonBuilder.toJSON (/opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:743:5)
+    at /opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:2661:64
+    at Array.map (<anonymous>)
+    at ActionRowBuilder.toJSON (/opt/render/project/src/node_modules/@discordjs/builders/dist/index.js:2661:35)
+    at /opt/render/project/src/node_modules/discord.js/src/structures/MessagePayload.js:151:46
+    at Array.map (<anonymous>)
+    at MessagePayload.resolveBody (/opt/render/project/src/node_modules/discord.js/src/structures/MessagePayload.js:150:49)
+    at InteractionWebhook.editMessage (/opt/render/project/src/node_modules/discord.js/src/structures/Webhook.js:344:50)
+    at ChatInputCommandInteraction.editReply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionRespo

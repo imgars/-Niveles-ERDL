@@ -32,7 +32,7 @@ export default {
       
       const viewFullButton = new ButtonBuilder()
         .setLabel('Ver leaderboard completo')
-        .setStyle(isSuperActive ? ButtonStyle.Danger : ButtonStyle.Link)
+        .setStyle(ButtonStyle.Link)
         .setURL('https://niveles-bbe6.onrender.com/#leaderboard');
       
       const row = new ActionRowBuilder().addComponents(viewFullButton);
