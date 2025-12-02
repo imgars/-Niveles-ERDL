@@ -164,7 +164,6 @@ export async function saveUserEconomy(guildId, userId, data) {
   const mongoConnected = isMongoConnected();
   
   if (mongoConnected) {
-    // Si MongoDB está conectado, también guardamos ahí
     try {
       await addLagcoins(guildId, userId, 0, 'update');
     } catch (e) {
@@ -172,10 +171,102 @@ export async function saveUserEconomy(guildId, userId, data) {
     }
   }
   
-  // Siempre guardar en JSON local
   const economyData = loadEconomyFile();
   const key = `${guildId}-${userId}`;
   economyData[key] = { ...economyData[key], ...data };
   saveEconomyFile(economyData);
   return economyData[key];
+}
+
+// Sistema de trabajos mejorado
+export const JOBS = {
+  basico: { name: 'Trabajo Básico', minEarnings: 50, maxEarnings: 120, itemsNeeded: [] },
+  pescar: { name: 'Pescador', minEarnings: 100, maxEarnings: 250, itemsNeeded: ['cana_pesca'] },
+  talar: { name: 'Leñador', minEarnings: 120, maxEarnings: 300, itemsNeeded: ['hacha'] },
+  minar: { name: 'Minero', minEarnings: 150, maxEarnings: 400, itemsNeeded: ['pico'] },
+  construir: { name: 'Albañil', minEarnings: 180, maxEarnings: 450, itemsNeeded: ['pala'] }
+};
+
+// Sistema de items
+export const ITEMS = {
+  cana_pesca: { name: 'Caña de Pesca', price: 500, unlocks: 'pescar', description: 'Para pescar mejor' },
+  hacha: { name: 'Hacha', price: 600, unlocks: 'talar', description: 'Para talar árboles' },
+  pico: { name: 'Pico', price: 800, unlocks: 'minar', description: 'Para minar' },
+  pala: { name: 'Pala', price: 700, unlocks: 'construir', description: 'Para construcción' }
+};
+
+export async function getUserProfile(guildId, userId) {
+  const economy = await getUserEconomy(guildId, userId);
+  return {
+    userId,
+    lagcoins: economy.lagcoins || 0,
+    bankBalance: economy.bankBalance || 0,
+    items: economy.items || [],
+    totalEarned: (economy.transactions || []).reduce((a, t) => a + (t.amount > 0 ? t.amount : 0), 0),
+    createdAt: economy.createdAt
+  };
+}
+
+export async function buyItem(guildId, userId, itemId) {
+  const economy = await getUserEconomy(guildId, userId);
+  const item = ITEMS[itemId];
+  
+  if (!item || economy.lagcoins < item.price) return null;
+  
+  economy.lagcoins -= item.price;
+  if (!economy.items) economy.items = [];
+  economy.items.push(itemId);
+  
+  await saveUserEconomy(guildId, userId, economy);
+  return economy;
+}
+
+export async function getDailyReward(guildId, userId) {
+  const economy = await getUserEconomy(guildId, userId);
+  const today = new Date().toDateString();
+  
+  if (economy.lastDailyReward === today) {
+    return null; // Ya reclamó hoy
+  }
+  
+  const reward = Math.floor(Math.random() * 200) + 150; // 150-350 coins
+  economy.lastDailyReward = today;
+  economy.lagcoins = (economy.lagcoins || 0) + reward;
+  
+  await saveUserEconomy(guildId, userId, economy);
+  return reward;
+}
+
+export async function playCasino(guildId, userId, bet) {
+  const economy = await getUserEconomy(guildId, userId);
+  if (economy.lagcoins < bet) return null;
+  
+  const roll = Math.floor(Math.random() * 100);
+  const won = roll > 40; // 60% de probabilidad
+  const winnings = won ? Math.floor(bet * 1.5) : -bet;
+  
+  economy.lagcoins += winnings;
+  if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0 };
+  economy.casinoStats.plays++;
+  if (won) economy.casinoStats.wins++;
+  
+  await saveUserEconomy(guildId, userId, economy);
+  return { won, winnings, newBalance: economy.lagcoins };
+}
+
+export async function robBank(guildId, userId) {
+  const economy = await getUserEconomy(guildId, userId);
+  const success = Math.random() > 0.85; // 15% de probabilidad
+  
+  if (!success) {
+    const penalty = Math.floor(Math.random() * 200) + 100;
+    economy.lagcoins = Math.max(0, (economy.lagcoins || 0) - penalty);
+    await saveUserEconomy(guildId, userId, economy);
+    return { success: false, penalty };
+  }
+  
+  const stolen = Math.floor(Math.random() * 1000) + 500; // 500-1500 coins
+  economy.lagcoins = (economy.lagcoins || 0) + stolen;
+  await saveUserEconomy(guildId, userId, economy);
+  return { success: true, stolen };
 }

@@ -2,6 +2,7 @@ import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Moda
 import db from '../utils/database.js';
 import { addLevels, removeLevels, calculateLevel } from '../utils/xpSystem.js';
 import { formatDuration } from '../utils/helpers.js';
+import { addUserLagcoins } from '../utils/economyDB.js';
 
 const triviaQuestions = [
   { question: '¿Cuál es la capital de Venezuela?', options: ['Caracas', 'Maracaibo', 'Valencia', 'Barquisimeto'], correct: 0 },
