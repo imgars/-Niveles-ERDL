@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getEconomy, isMongoConnected } from '../utils/mongoSync.js';
+import { getUserEconomy, saveUserEconomy } from '../utils/economyDB.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -34,12 +34,8 @@ export default {
     ),
   
   async execute(interaction) {
-    if (!isMongoConnected()) {
-      return interaction.reply({ content: '❌ Sistema bancario no disponible', flags: 64 });
-    }
-
     const subcommand = interaction.options.getSubcommand();
-    const economy = await getEconomy(interaction.guildId, interaction.user.id);
+    const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
 
     if (!economy) {
       return interaction.reply({ content: '❌ Error al obtener tu cuenta', flags: 64 });
@@ -53,13 +49,8 @@ export default {
       }
 
       economy.lagcoins -= amount;
-      economy.bankBalance += amount;
-      economy.transactions.push({
-        type: 'bank_deposit',
-        amount,
-        date: new Date()
-      });
-      await economy.save();
+      economy.bankBalance = (economy.bankBalance || 0) + amount;
+      await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
 
       const embed = new EmbedBuilder()
         .setColor('#00FF00')
@@ -76,18 +67,13 @@ export default {
     if (subcommand === 'retirar') {
       const amount = interaction.options.getInteger('cantidad');
       
-      if (economy.bankBalance < amount) {
+      if ((economy.bankBalance || 0) < amount) {
         return interaction.reply({ content: '❌ No tienes suficientes Lagcoins en el banco', flags: 64 });
       }
 
-      economy.bankBalance -= amount;
+      economy.bankBalance = (economy.bankBalance || 0) - amount;
       economy.lagcoins += amount;
-      economy.transactions.push({
-        type: 'bank_withdraw',
-        amount,
-        date: new Date()
-      });
-      await economy.save();
+      await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
 
       const embed = new EmbedBuilder()
         .setColor('#00FF00')
@@ -107,8 +93,8 @@ export default {
         .setTitle('🏦 Tu Cuenta Bancaria')
         .addFields(
           { name: 'Cartera', value: `💵 ${economy.lagcoins} Lagcoins` },
-          { name: 'Banco', value: `🏦 ${economy.bankBalance} Lagcoins` },
-          { name: 'Total', value: `💎 ${economy.lagcoins + economy.bankBalance} Lagcoins` }
+          { name: 'Banco', value: `🏦 ${economy.bankBalance || 0} Lagcoins` },
+          { name: 'Total', value: `💎 ${economy.lagcoins + (economy.bankBalance || 0)} Lagcoins` }
         );
 
       return interaction.reply({ embeds: [embed] });

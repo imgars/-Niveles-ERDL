@@ -1,7 +1,6 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import { removeLagcoins, getEconomy, isMongoConnected } from '../utils/mongoSync.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { removeUserLagcoins, saveUserEconomy, getUserEconomy } from '../utils/economyDB.js';
 import db from '../utils/database.js';
-import { addLevels } from '../utils/xpSystem.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -22,14 +21,10 @@ export default {
     ),
   
   async execute(interaction) {
-    if (!isMongoConnected()) {
-      return interaction.reply({ content: '❌ Sistema de tienda no disponible', flags: 64 });
-    }
-
     await interaction.deferReply();
     
     const item = interaction.options.getString('item');
-    const economy = await getEconomy(interaction.guildId, interaction.user.id);
+    const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
 
     if (!economy) {
       return interaction.editReply('❌ Error al obtener tu cuenta');
@@ -49,13 +44,7 @@ export default {
       return interaction.editReply('❌ No tienes suficientes Lagcoins');
     }
 
-    economy.lagcoins -= itemData.price;
-    economy.transactions.push({
-      type: 'shop',
-      amount: -itemData.price,
-      date: new Date()
-    });
-    await economy.save();
+    const updated = await removeUserLagcoins(interaction.guildId, interaction.user.id, itemData.price, 'shop');
 
     const user = db.getUser(interaction.guildId, interaction.user.id);
     
@@ -80,7 +69,7 @@ export default {
       .setColor('#00FF00')
       .setTitle('✅ ¡Compra Realizada!')
       .setDescription(`Compraste: **${itemData.name}**`)
-      .addFields({ name: 'Saldo Restante', value: `💰 ${economy.lagcoins} Lagcoins` })
+      .addFields({ name: 'Saldo Restante', value: `💰 ${updated.lagcoins} Lagcoins` })
       .setFooter({ text: 'Gracias por tu compra' });
 
     return interaction.editReply({ embeds: [embed] });

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getEconomy, addLagcoins, isMongoConnected } from '../utils/mongoSync.js';
+import { getUserEconomy, addUserLagcoins, saveUserEconomy } from '../utils/economyDB.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -7,13 +7,9 @@ export default {
     .setDescription('Trabaja para ganar Lagcoins'),
   
   async execute(interaction) {
-    if (!isMongoConnected()) {
-      return interaction.reply({ content: '❌ Sistema de economía no disponible', flags: 64 });
-    }
-
     await interaction.deferReply();
     
-    const economy = await getEconomy(interaction.guildId, interaction.user.id);
+    const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
     if (!economy) {
       return interaction.editReply('❌ Error al obtener tu cuenta');
     }
@@ -38,20 +34,14 @@ export default {
     const job = jobs[Math.floor(Math.random() * jobs.length)];
     const bonus = Math.floor(Math.random() * 20) + job.earnings;
 
-    economy.lastWorkTime = new Date();
-    economy.lagcoins += bonus;
-    economy.transactions.push({
-      type: 'work',
-      amount: bonus,
-      date: new Date()
-    });
-    await economy.save();
+    const updated = await addUserLagcoins(interaction.guildId, interaction.user.id, bonus, 'work');
+    await saveUserEconomy(interaction.guildId, interaction.user.id, { lastWorkTime: new Date() });
 
     const embed = new EmbedBuilder()
       .setColor('#00FF00')
       .setTitle('💼 ¡Trabajo Completado!')
       .setDescription(`Trabajaste como **${job.name}** y ganaste **${bonus} Lagcoins**`)
-      .addFields({ name: 'Saldo Total', value: `💰 ${economy.lagcoins} Lagcoins` })
+      .addFields({ name: 'Saldo Total', value: `💰 ${updated.lagcoins} Lagcoins` })
       .setFooter({ text: 'Vuelve en 1 minuto' });
 
     return interaction.editReply({ embeds: [embed] });

@@ -1,5 +1,5 @@
-import { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } from 'discord.js';
-import { transferLagcoins, getEconomy, isMongoConnected } from '../utils/mongoSync.js';
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { transferUserLagcoins } from '../utils/economyDB.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -18,10 +18,6 @@ export default {
     ),
   
   async execute(interaction) {
-    if (!isMongoConnected()) {
-      return interaction.reply({ content: '❌ Sistema de trading no disponible', flags: 64 });
-    }
-
     const targetUser = interaction.options.getUser('usuario');
     const amount = interaction.options.getInteger('cantidad');
 
@@ -33,7 +29,7 @@ export default {
       return interaction.reply({ content: '❌ No puedes hacer trading contigo mismo', flags: 64 });
     }
 
-    const result = await transferLagcoins(interaction.guildId, interaction.user.id, targetUser.id, amount);
+    const result = await transferUserLagcoins(interaction.guildId, interaction.user.id, targetUser.id, amount);
 
     if (!result) {
       return interaction.reply({ content: '❌ No tienes suficientes Lagcoins para esta transferencia', flags: 64 });

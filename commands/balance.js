@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getEconomy, isMongoConnected } from '../utils/mongoSync.js';
+import { getUserEconomy } from '../utils/economyDB.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -11,12 +11,8 @@ export default {
     ),
   
   async execute(interaction) {
-    if (!isMongoConnected()) {
-      return interaction.reply({ content: '❌ Sistema de economía no disponible', flags: 64 });
-    }
-
     const targetUser = interaction.options.getUser('usuario') || interaction.user;
-    const economy = await getEconomy(interaction.guildId, targetUser.id);
+    const economy = await getUserEconomy(interaction.guildId, targetUser.id);
 
     if (!economy) {
       return interaction.reply({ content: '❌ Error al obtener saldo', flags: 64 });
@@ -27,8 +23,8 @@ export default {
       .setTitle(`💰 Saldo de ${targetUser.username}`)
       .addFields(
         { name: 'Cartera', value: `💵 ${economy.lagcoins} Lagcoins` },
-        { name: 'Banco', value: `🏦 ${economy.bankBalance} Lagcoins` },
-        { name: 'Total', value: `💎 ${economy.lagcoins + economy.bankBalance} Lagcoins` }
+        { name: 'Banco', value: `🏦 ${economy.bankBalance || 0} Lagcoins` },
+        { name: 'Total', value: `💎 ${(economy.lagcoins || 0) + (economy.bankBalance || 0)} Lagcoins` }
       )
       .setThumbnail(targetUser.displayAvatarURL());
 

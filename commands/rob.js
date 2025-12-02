@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getEconomy, transferLagcoins, isMongoConnected } from '../utils/mongoSync.js';
+import { getUserEconomy, transferUserLagcoins, removeUserLagcoins } from '../utils/economyDB.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,10 +12,6 @@ export default {
     ),
   
   async execute(interaction) {
-    if (!isMongoConnected()) {
-      return interaction.reply({ content: '❌ Sistema de robos no disponible', flags: 64 });
-    }
-
     await interaction.deferReply();
     
     const targetUser = interaction.options.getUser('usuario');
@@ -28,7 +24,7 @@ export default {
       return interaction.editReply('❌ No puedes robarte a ti mismo');
     }
 
-    const target = await getEconomy(interaction.guildId, targetUser.id);
+    const target = await getUserEconomy(interaction.guildId, targetUser.id);
     if (!target || target.lagcoins < 10) {
       return interaction.editReply('❌ Este usuario no tiene suficientes Lagcoins');
     }
@@ -37,7 +33,7 @@ export default {
     const robbedAmount = Math.floor(Math.random() * (target.lagcoins / 2)) + 10;
 
     if (success) {
-      const result = await transferLagcoins(interaction.guildId, targetUser.id, interaction.user.id, robbedAmount);
+      const result = await transferUserLagcoins(interaction.guildId, targetUser.id, interaction.user.id, robbedAmount);
       
       const embed = new EmbedBuilder()
         .setColor('#FF0000')
@@ -48,13 +44,7 @@ export default {
       return interaction.editReply({ embeds: [embed] });
     } else {
       const penalty = Math.floor(Math.random() * 50) + 20;
-      target.lagcoins += penalty;
-      target.transactions.push({
-        type: 'robbed_protection',
-        amount: penalty,
-        date: new Date()
-      });
-      await target.save();
+      await removeUserLagcoins(interaction.guildId, interaction.user.id, penalty, 'robbed_penalty');
 
       const embed = new EmbedBuilder()
         .setColor('#FFD700')
