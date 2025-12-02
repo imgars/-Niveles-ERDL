@@ -37,17 +37,32 @@ export default {
       
       const row = new ActionRowBuilder().addComponents(viewFullButton);
       
-      await interaction.editReply({
-        embeds: [{
-          color: isSuperActive ? 0xFFD700 : 0xFFD700,
-          title: '🏆 Tabla de Clasificación',
-          description: isSuperActive ? undefined : `Top ${sortedUsers.length} usuarios por experiencia`,
-          image: { url: 'attachment://leaderboard.png' },
-          footer: { text: isSuperActive ? `Total de usuarios activos: ${allUsers.length}` : '⭐ ¡Sigue chateando para subir en el ranking!' }
-        }],
-        files: [attachment],
-        components: [row]
-      });
+      if (isSuperActive) {
+        // Solo imagen para Super Activos
+        await interaction.editReply({
+          embeds: [{
+            color: 0xFFD700,
+            title: '🏆 Tabla de Clasificación',
+            image: { url: 'attachment://leaderboard.png' },
+            footer: { text: `Total de usuarios activos: ${allUsers.length}` }
+          }],
+          files: [attachment],
+          components: [row]
+        });
+      } else {
+        // Imagen para usuarios normales
+        await interaction.editReply({
+          embeds: [{
+            color: 0xFFD700,
+            title: '🏆 Tabla de Clasificación',
+            description: `Top ${sortedUsers.length} usuarios por experiencia`,
+            image: { url: 'attachment://leaderboard.png' },
+            footer: { text: '⭐ ¡Sigue chateando para subir en el ranking!' }
+          }],
+          files: [attachment],
+          components: [row]
+        });
+      }
     } catch (error) {
       console.error('Error generating leaderboard:', error);
       await interaction.editReply('❌ Error al generar la tabla de clasificación.');
