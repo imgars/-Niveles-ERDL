@@ -214,7 +214,7 @@
     "guildId": "1212886282645147768",
     "xp": 0,
     "level": 14,
-    "totalXp": 4781,
+    "totalXp": 4799,
     "$setOnInsert": {
       "__v": 0
     }
@@ -537,6 +537,14 @@
     "xp": 0,
     "level": 0,
     "totalXp": 30,
+    "selectedCardTheme": null
+  },
+  "1212886282645147768-1257099831684497443": {
+    "userId": "1257099831684497443",
+    "guildId": "1212886282645147768",
+    "xp": 0,
+    "level": 0,
+    "totalXp": 46,
     "selectedCardTheme": null
   }
 }
