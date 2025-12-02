@@ -422,35 +422,62 @@ client.on('messageCreate', async (message) => {
       const msgLower = message.content.toLowerCase();
       const mentions = message.mentions.users.filter(u => !u.bot).size;
       
+      const missionChannel = message.guild.channels.cache.get(CONFIG.MISSION_COMPLETE_CHANNEL_ID);
+      
+      // Helper function to send mission completion notification
+      const sendMissionNotification = (result) => {
+        if (result && result.completed && missionChannel) {
+          const xpReward = result.reward?.xp || 0;
+          const multiplier = result.reward?.multiplier || 0;
+          const levelsReward = result.reward?.levels || 0;
+          
+          let rewardText = '';
+          if (xpReward > 0) rewardText += `+${xpReward} XP`;
+          if (multiplier > 0) rewardText += (rewardText ? ', ' : '') + `+${Math.round(multiplier * 100)}% boost`;
+          if (levelsReward > 0) rewardText += (rewardText ? ', ' : '') + `+${levelsReward} nivel${levelsReward > 1 ? 'es' : ''}`;
+          
+          missionChannel.send({
+            content: `🏆 ¡Misión Completada!\n<@${message.author.id}> completó **${result.title}** y ganó ${rewardText}`
+          }).catch(err => console.error('Error sending mission complete:', err));
+        }
+      };
+      
       // Saludador - di hola
       if ((msgLower.includes('hola') || msgLower.includes('hello') || msgLower.includes('hi')) && mentions > 0) {
-        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 1);
+        const result = await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 1);
+        sendMissionNotification(result);
       }
       
       // Preguntón - pregunta cómo están
       if ((msgLower.includes('¿cómo estás') || msgLower.includes('como estas') || msgLower.includes('how are you')) && mentions > 0) {
-        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 2);
+        const result = await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 2);
+        sendMissionNotification(result);
       }
       
       // Socializador - participa
       if (msgLower.length > 10) {
-        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 3);
+        const result = await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 3);
+        sendMissionNotification(result);
       }
       
       // Ayudante - ofrece ayuda
       if ((msgLower.includes('ayuda') || msgLower.includes('help') || msgLower.includes('puedo')) && mentions > 0) {
-        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 4);
+        const result = await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 4);
+        sendMissionNotification(result);
       }
       
       // Visitante - envía en canales
-      await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 5, 0.1);
+      const result5 = await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 5, 0.1);
+      sendMissionNotification(result5);
       
       // Comunicador - envía mensajes
-      await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 7);
+      const result7 = await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 7);
+      sendMissionNotification(result7);
       
       // Comentarista - responde preguntas
       if ((msgLower.includes('?') && msgLower.length > 5) || msgLower.includes('respuesta')) {
-        await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 9, 0.2);
+        const result = await updateMissionProgress(message.guild.id, message.author.id, weekNumber, year, 9, 0.2);
+        sendMissionNotification(result);
       }
     } catch (error) {
       console.error('Error procesando misiones:', error);
