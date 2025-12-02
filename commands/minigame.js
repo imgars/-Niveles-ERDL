@@ -311,11 +311,12 @@ async function playTrivia(interaction) {
         
         if (i.customId === 'trivia_reward_boost') {
           db.addBoost('user', interaction.user.id, 0.2, 12 * 60 * 60 * 1000, 'Boost de trivia 20% por 12h');
+          await addUserLagcoins(interaction.guild.id, interaction.user.id, 300, 'trivia_boost');
           await i.update({
             embeds: [{
               color: 0x43B581,
               title: '✅ Recompensa Recibida',
-              description: '¡Has recibido un boost de 20% durante 12 horas!'
+              description: '¡Has recibido un boost de 20% durante 12 horas!\n💰 +300 Lagcoins'
             }],
             components: []
           });
@@ -324,12 +325,13 @@ async function playTrivia(interaction) {
           userData.totalXp = addLevels(userData.totalXp, 1.5);
           userData.level = calculateLevel(userData.totalXp);
           db.saveUser(interaction.guild.id, interaction.user.id, userData);
+          await addUserLagcoins(interaction.guild.id, interaction.user.id, 400, 'trivia_levels');
           
           await i.update({
             embeds: [{
               color: 0x43B581,
               title: '✅ Recompensa Recibida',
-              description: `¡Has subido 1.5 niveles! Ahora estás en el nivel ${userData.level}`
+              description: `¡Has subido 1.5 niveles! Ahora estás en el nivel ${userData.level}\n💰 +400 Lagcoins`
             }],
             components: []
           });
@@ -527,6 +529,7 @@ async function startRPSGame(interaction, player1, player2, hasReward) {
     
     if (hasReward) {
       db.addBoost('user', winner.id, 0.3, 2 * 60 * 60 * 1000, 'Boost de RPS 30% por 2h');
+      await addUserLagcoins(interaction.guild.id, winner.id, 500, 'rps_win');
       db.setCooldown('minigame_rps', player1.id, 12 * 60 * 60 * 1000);
       db.setCooldown('minigame_rps', player2.id, 12 * 60 * 60 * 1000);
     }
@@ -535,7 +538,7 @@ async function startRPSGame(interaction, player1, player2, hasReward) {
       embeds: [{
         color: 0xFFD700,
         title: '🏆 ¡Juego Terminado!',
-        description: `**Ganador:** <@${winner.id}>\n\n**Puntuación Final:**\n<@${player1.id}>: ${p1Wins}\n<@${player2.id}>: ${p2Wins}${hasReward ? `\n\n✨ <@${winner.id}> ha ganado un boost de 30% durante 2 horas!` : ''}`,
+        description: `**Ganador:** <@${winner.id}>\n\n**Puntuación Final:**\n<@${player1.id}>: ${p1Wins}\n<@${player2.id}>: ${p2Wins}${hasReward ? `\n\n✨ <@${winner.id}> ha ganado un boost de 30% durante 2 horas!\n💰 +500 Lagcoins` : ''}`,
       }],
       components: []
     });
@@ -686,6 +689,9 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
       db.saveUser(interaction.guild.id, winner.id, winnerData);
       db.saveUser(interaction.guild.id, loser.id, loserData);
       
+      await addUserLagcoins(interaction.guild.id, winner.id, 800, 'roulette_win');
+      await addUserLagcoins(interaction.guild.id, loser.id, -300, 'roulette_loss');
+      
       db.setCooldown('minigame_roulette', player1.id, 24 * 60 * 60 * 1000);
       db.setCooldown('minigame_roulette', player2.id, 24 * 60 * 60 * 1000);
     }
@@ -694,7 +700,7 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
       embeds: [{
         color: 0xFFD700,
         title: '🏆 ¡Juego Terminado!',
-        description: `**Ganador:** <@${winner.id}>\n**Perdedor:** <@${loser.id}>${hasReward ? `\n\n✨ <@${winner.id}> ha ganado **2.5 niveles**\n💔 <@${loser.id}> ha perdido **3 niveles**` : ''}`,
+        description: `**Ganador:** <@${winner.id}>\n**Perdedor:** <@${loser.id}>${hasReward ? `\n\n✨ <@${winner.id}> ha ganado **2.5 niveles**\n💚 +800 Lagcoins\n💔 <@${loser.id}> ha perdido **3 niveles**\n💚 -300 Lagcoins` : ''}`,
       }],
       components: []
     });
@@ -827,7 +833,8 @@ async function playSoloHangman(interaction) {
     if (roundsWon === 3) {
       const boostId = `hangman_${interaction.user.id}_${Date.now()}`;
       db.addBoost(boostId, 'Hangman Victory', 0.25, 24 * 60 * 60 * 1000, { userId: interaction.user.id });
-      reward = '🎉 ¡Ganaste 3/3 rondas! **+25% boost por 24 horas**';
+      await addUserLagcoins(interaction.guild.id, interaction.user.id, 600, 'hangman_perfect');
+      reward = '🎉 ¡Ganaste 3/3 rondas! **+25% boost por 24 horas**\n💰 +600 Lagcoins';
       rewardGiven = true;
     }
     
