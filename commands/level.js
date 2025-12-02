@@ -38,19 +38,14 @@ export default {
         
         const row = new ActionRowBuilder().addComponents(rewardBtn);
         
-        const embeds = [];
-        
+        let content = '';
         if (boostsText) {
-          embeds.push({
-            color: 0xFFD700,
-            title: '🚀 Boosts Activos',
-            description: boostsText
-          });
+          content = `🚀 **Boosts Activos:**\n${boostsText}`;
         }
         
         return await interaction.reply({ 
+          content: content,
           files: [attachment], 
-          embeds: embeds,
           components: [row] 
         });
       } catch (error) {
