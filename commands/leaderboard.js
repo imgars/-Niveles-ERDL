@@ -55,7 +55,6 @@ export default {
           embeds: [{
             color: 0xFFD700,
             title: '🏆 Tabla de Clasificación',
-            description: `Top ${sortedUsers.length} usuarios por experiencia`,
             image: { url: 'attachment://leaderboard.png' },
             footer: { text: '⭐ ¡Sigue chateando para subir en el ranking!' }
           }],

@@ -37,62 +37,18 @@ export default {
       
       const row = new ActionRowBuilder().addComponents(viewFullButton);
       
-      if (isSuperActive) {
-        // Solo imagen para Super Activos
-        await interaction.editReply({
-          embeds: [{
-            color: 0xFFD700,
-            title: '🏆 Tabla de Clasificación',
-            image: { url: 'attachment://leaderboard.png' },
-            footer: { text: `Total de usuarios activos: ${allUsers.length}` },
-            timestamp: new Date()
-          }],
-          files: [attachment],
-          components: [row]
-        });
-      } else {
-        // Imagen + fields para usuarios normales
-        const fields = [];
-        
-        for (let i = 0; i < sortedUsers.length; i++) {
-          const user = sortedUsers[i];
-          let rankEmoji = '';
-          
-          if (i === 0) rankEmoji = '🥇';
-          else if (i === 1) rankEmoji = '🥈';
-          else if (i === 2) rankEmoji = '🥉';
-          
-          try {
-            const targetMember = await interaction.guild.members.fetch(user.userId);
-            const username = targetMember.user.username;
-            
-            fields.push({
-              name: `${rankEmoji} #${i + 1} - ${username}`,
-              value: `**Nivel:** ${user.level} | **XP Total:** ${Math.floor(user.totalXp)}`,
-              inline: false
-            });
-          } catch (error) {
-            fields.push({
-              name: `${rankEmoji} #${i + 1} - Usuario Desconocido`,
-              value: `**Nivel:** ${user.level} | **XP Total:** ${Math.floor(user.totalXp)}`,
-              inline: false
-            });
-          }
-        }
-        
-        await interaction.editReply({
-          embeds: [{
-            color: 0x00BFFF,
-            title: '🏆 Tabla de Clasificación',
-            description: `Top ${sortedUsers.length} usuarios del servidor`,
-            fields: fields,
-            footer: { text: `Total de usuarios activos: ${allUsers.length}` },
-            timestamp: new Date()
-          }],
-          files: [attachment],
-          components: [row]
-        });
-      }
+      // Solo imagen para todos
+      await interaction.editReply({
+        embeds: [{
+          color: 0xFFD700,
+          title: '🏆 Tabla de Clasificación',
+          image: { url: 'attachment://leaderboard.png' },
+          footer: { text: `Total de usuarios activos: ${allUsers.length}` },
+          timestamp: new Date()
+        }],
+        files: [attachment],
+        components: [row]
+      });
     } catch (error) {
       console.error('Error in lb command:', error);
       await interaction.editReply('❌ Error al generar la tabla de clasificación.');
