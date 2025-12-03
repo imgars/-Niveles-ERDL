@@ -1,0 +1,95 @@
+Error en dados: CastError: Cast to string failed for value "{
+  type: 'dados_ext_loss',
+  amount: -100,
+  description: 'Dados: Perdiste 100 Lagcoins',
+  date: '2025-12-03T21:27:43.479Z'
+}" (type Object) at path "transactions"
+    at SchemaString.cast (/opt/render/project/src/node_modules/mongoose/lib/schema/string.js:609:11)
+    at SchemaType.applySetters (/opt/render/project/src/node_modules/mongoose/lib/schemaType.js:1280:12)
+    at Proxy._cast (/opt/render/project/src/node_modules/mongoose/lib/types/array/methods/index.js:257:55)
+    at Proxy._mapCast (/opt/render/project/src/node_modules/mongoose/lib/types/array/methods/index.js:270:17)
+    at Arguments.map (<anonymous>)
+    at Proxy.push (/opt/render/project/src/node_modules/mongoose/lib/types/array/methods/index.js:704:21)
+    at Object.execute (file:///opt/render/project/src/commands/casinoextendido.js:164:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:674:5) {
+  stringValue: '"{\n' +
+    "  type: 'dados_ext_loss',\n" +
+    '  amount: -100,\n' +
+    "  description: 'Dados: Perdiste 100 Lagcoins',\n" +
+    "  date: '2025-12-03T21:27:43.479Z'\n" +
+    '}"',
+  messageFormat: undefined,
+  kind: 'string',
+  value: {
+    type: 'dados_ext_loss',
+    amount: -100,
+    description: 'Dados: Perdiste 100 Lagcoins',
+    date: '2025-12-03T21:27:43.479Z'
+  },
+  path: 'transactions',
+  reason: null,
+  valueType: 'Object'
+}
+Error executing casino_juegos: DiscordAPIError[10062]: Unknown interaction
+    at handleErrors (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:762:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:866:23)
+    at async _REST.request (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:1307:22)
+    at async ChatInputCommandInteraction.reply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:193:22)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:674:5) {
+  requestBody: { files: [], json: { type: 4, data: [Object] } },
+  rawError: { message: 'Unknown interaction', code: 10062 },
+  code: 10062,
+  status: 404,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1445889261625806858/aW50ZXJhY3Rpb246MTQ0NTg4OTI2MTYyNTgwNjg1ODpnWGNYTkpVdklzaVZ0dFBWQVViRkFSUlJZUG9rN0kyUnlMbDZSVFNKclRHVGZ3ajloTGZpQmk2WUxpV2FvNEFmb1V2TzRuSzlWYU16R0ZqZ2ROTmdMMTh5YmFzUmt6Mmk1bURjM04wN25IQkR1Ump2OUo5UmlZb24yY0tnZGZoeQ/callback?with_response=false'
+}
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+DiscordAPIError[40060]: Interaction has already been acknowledged.
+    at handleErrors (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:762:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:866:23)
+    at async _REST.request (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:1307:22)
+    at async ChatInputCommandInteraction.reply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:193:22)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:679:7)
+Emitted 'error' event on Client instance at:
+    at emitUnhandledRejectionOrErr (node:events:401:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:92:21) {
+  requestBody: {
+    files: [],
+    json: {
+      type: 4,
+      data: {
+        content: '❌ Hubo un error al ejecutar este comando.',
+        tts: false,
+        nonce: undefined,
+        enforce_nonce: false,
+        embeds: undefined,
+        components: undefined,
+        username: undefined,
+        avatar_url: undefined,
+        allowed_mentions: undefined,
+        flags: 64,
+        message_reference: undefined,
+        attachments: undefined,
+        sticker_ids: undefined,
+        thread_name: undefined,
+        applied_tags: undefined,
+        poll: undefined
+      }
+    }
+  },
+  rawError: {
+    message: 'Interaction has already been acknowledged.',
+    code: 40060
+  },
+  code: 40060,
+  status: 400,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1445889261625806858/aW50ZXJhY3Rpb246MTQ0NTg4OTI2MTYyNTgwNjg1ODpnWGNYTkpVdklzaVZ0dFBWQVViRkFSUlJZUG9rN0kyUnlMbDZSVFNKclRHVGZ3ajloTGZpQmk2WUxpV2FvNEFmb1V2TzRuSzlWYU16R0ZqZ2ROTmdMMTh5YmFzUmt6Mmk1bURjM04wN25IQkR1Ump2OUo5UmlZb24yY0tnZGZoeQ/callback?with_response=false'
+}
+Node.js v22.16.0
+==> Running 'node index.js'

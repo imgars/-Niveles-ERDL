@@ -2,7 +2,7 @@
   "1212886282645147768-1032482231677108224": {
     "guildId": "1212886282645147768",
     "userId": "1032482231677108224",
-    "lagcoins": 587,
+    "lagcoins": 787,
     "bankBalance": 500,
     "lastWorkTime": "2025-12-03T02:58:58.193Z",
     "lastRobTime": null,
@@ -37,12 +37,19 @@
         "amount": 91,
         "description": "Trabajo: Trabajo Básico",
         "date": "2025-12-03T02:58:58.193Z"
+      },
+      {
+        "type": "dados_ext_win",
+        "amount": 200,
+        "description": "Dados: Ganaste 200 Lagcoins",
+        "date": "2025-12-03T21:27:43.370Z"
       }
     ],
     "createdAt": "2025-12-02T06:32:20.604Z",
     "casinoStats": {
-      "plays": 10,
-      "wins": 7
+      "plays": 11,
+      "wins": 8,
+      "totalWon": 200
     },
     "lastDailyReward": "Tue Dec 02 2025",
     "items": [
