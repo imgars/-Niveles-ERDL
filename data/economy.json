@@ -2,7 +2,7 @@
   "1212886282645147768-1032482231677108224": {
     "guildId": "1212886282645147768",
     "userId": "1032482231677108224",
-    "lagcoins": 787,
+    "lagcoins": 2326,
     "bankBalance": 500,
     "lastWorkTime": "2025-12-03T02:58:58.193Z",
     "lastRobTime": null,
@@ -43,19 +43,25 @@
         "amount": 200,
         "description": "Dados: Ganaste 200 Lagcoins",
         "date": "2025-12-03T21:27:43.370Z"
+      },
+      {
+        "type": "Regalo del Staff",
+        "amount": 1000,
+        "description": "Staff añadió 1000 Lagcoins",
+        "date": "2025-12-03T21:40:48.476Z"
       }
     ],
     "createdAt": "2025-12-02T06:32:20.604Z",
     "casinoStats": {
-      "plays": 11,
-      "wins": 8,
-      "totalWon": 200
+      "plays": 12,
+      "wins": 9,
+      "totalWon": 739
     },
     "lastDailyReward": "Tue Dec 02 2025",
     "items": [
       "cana_pesca"
     ],
-    "totalEarned": 91,
+    "totalEarned": 1091,
     "jobStats": {
       "totalJobs": 1,
       "favoriteJob": "basico"
