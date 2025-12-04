@@ -2,7 +2,7 @@
 
 ## Descripcion General
 
-Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino, minijuegos y tarjetas de rango personalizadas. Este proyecto esta listo para ejecutarse en Replit y ser desplegado a Render u otras plataformas de hosting.
+Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino, minijuegos, power-ups, seguros, nacionalidades, subastas y tarjetas de rango personalizadas. Este proyecto esta listo para ejecutarse en Replit y ser desplegado a Render u otras plataformas de hosting.
 
 ## Funcionalidades Principales
 
@@ -13,36 +13,78 @@ Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino,
 - Recompensas automaticas de roles en niveles especificos
 - Persistencia de datos en JSON y MongoDB
 
-### Sistema de Economia (Lagcoins) - NUEVO
+### Sistema de Economia (Lagcoins)
 - Moneda virtual: Lagcoins
 - Banco para depositar y proteger dinero
-- 13 trabajos diferentes con herramientas requeridas
-- Tienda con 19+ items en 10 categorias
-- Sistema de robos entre usuarios
+- 20+ trabajos diferentes con herramientas requeridas
+- Tienda con 40+ items en 14 categorias
+- Sistema de robos entre usuarios (con seguros anti-robo)
 - Estadisticas detalladas de economia
 - Rachas de recompensas diarias
 
-### Sistema de Casino - NUEVO
+### Sistema de Power-Ups (NUEVO)
+- 12 power-ups diferentes en 4 categorias
+- Boosts de trabajo: +25%, +50%, +100%
+- Boosts de casino: +15%, +30%, +50%
+- Boosts de robo: +20%, +40%, +60%
+- Boosts de XP: +25%, +50%, +100%
+- Power-ups temporales con duracion limitada
+
+### Sistema de Seguros Anti-Robo (NUEVO)
+- 4 niveles de proteccion: 50%, 75%, 90%, 100%
+- Proteccion temporal contra robos
+- Sistema de activacion y desactivacion
+
+### Sistema de Nacionalidades (NUEVO)
+- 30+ paises disponibles
+- Probabilidades diferentes por pais (mas raro = mejor economia)
+- Multiplicadores de trabajo por pais
+- Sistema de viajes (requiere pasaporte)
+- Paises desarrollados requieren visa de trabajo
+
+### Sistema de Subastas (NUEVO)
+- Crear subastas de items
+- Ofertar en subastas activas
+- Sistema de notificaciones
+- Historial de subastas
+
+### Sistema de Casino
 - /casino - Ruleta clasica (hasta x3)
 - /slots - Tragamonedas con jackpot (x10)
 - /blackjack - Juega al 21 contra el dealer
 - /coinflip - Lanza moneda 50/50
-- /dice - Dados con predicciones (alto/bajo/exacto/dobles)
-- Estadisticas de casino por usuario
+- /dice - Dados con predicciones
+- /casinomulti carreras - Carreras de caballos
+- /casinomulti poker - Poker simplificado
+- /casinomulti ruleta - Ruleta con multiples apuestas
+- /casinomulti duelo - Desafios entre usuarios
 
-### Comandos de Staff para Economia - NUEVO
+### Comandos de Staff para Economia
 - /addcoins - Anadir Lagcoins a usuarios
 - /removecoins - Quitar Lagcoins a usuarios
 - /setcoins - Establecer Lagcoins exactos
-- /giveitem - Dar items a usuarios
-- /removeitem - Quitar items a usuarios
+- /admin abuse - Impulsar TODOS los sistemas del bot
+- /staffeconomy - Comandos avanzados de economia
+
+### Easter Eggs (NUEVO)
+- !Lagcoin - Muestra imagen de bolivares venezolanos
+- !Mzingerkai - +777 XP (una vez)
+- !SirgioBOT - Imagen especial
+- !Arepa - Imagen de arepas
+- !Dinnerbone - Tu avatar al reves
+- !casin0 - +500% suerte casino por 30min (una vez)
+- !gars, !timeoutt, !pelotocino, !uno
+
+### Leaderboards con Imagenes (NUEVO)
+- /lbeconomia - Leaderboards de economia con imagen generada
+- 4 tipos: Lagcoins, Casino, Minijuegos, Trades
 
 ### Sistema de Boosts
 - Boosts acumulables (se suman entre si)
 - Boost automatico de 200% para Boosters y VIPs
 - Boost nocturno de 25% (18:00-06:00 Venezuela)
 - Boosts personalizados por usuario, canal o globales
-- Gestion completa via comandos
+- Admin Abuse: Boost global temporal para todos
 
 ### Minijuegos
 - **Trivia**: 5 preguntas, recompensas de boost o niveles
@@ -50,7 +92,6 @@ Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino,
 - **Ruleta Rusa**: Riesgoso! Ganador +2.5 niveles, perdedor -3 niveles
 - **Ahorcado Solo**: 3 rondas, 25% boost o 1 nivel, cooldown 48h
 - **Ahorcado Multi**: Host vs Adivinador, +0.5 niveles, cooldown 30min
-- Sistema de cooldowns para cada minijuego
 
 ### Tarjetas Personalizadas
 - Generacion dinamica con Canvas
@@ -58,8 +99,7 @@ Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino,
 - Temas especiales para boosters, VIPs y usuario especial
 
 ### Dashboard Web
-- Pagina web con tema retro pixel art (Pokemon, Zelda, Mario)
-- Secciones: Inicio, Caracteristicas, Comandos, Minijuegos, Tarjetas, Leaderboard
+- Pagina web con tema retro pixel art
 - Leaderboard completo con hasta 500 usuarios
 - API REST para obtener datos
 
@@ -91,156 +131,133 @@ NO_XP_CHANNELS: ['1313723272290111559', '1258524941289263254']
 
 ## Como Ejecutar
 
-### En Replit (Configurado)
-Este proyecto esta completamente configurado para Replit:
+### En Replit (Desarrollo)
+1. **Variables de entorno**: Configurar DISCORD_BOT_TOKEN y MONGODB_URI en Secrets
+2. **Workflow**: Ejecutar npm start
+3. **Puerto**: Servidor web en puerto 5000 con Dashboard
 
-1. **Variables de entorno**: DISCORD_BOT_TOKEN y MONGODB_URI configurados en Secrets
-2. **Workflow**: Configurado para ejecutar npm start automaticamente
-3. **Dependencias**: Instaladas automaticamente con npm
-4. **Puerto**: Servidor web en puerto 5000 con Dashboard
-5. **MongoDB**: Sincronizacion automatica de datos
-
-### URLs del Dashboard
-- `/` - Pagina principal con todas las secciones
-- `/api/leaderboard` - API JSON con hasta 500 usuarios
-- `/api/stats` - Estadisticas generales
-- `/health` - Health check para Uptime Robot
+### En Render (Produccion)
+- Repository: https://github.com/imgars/-Niveles.git
+- Dashboard URL: https://niveles-wul5.onrender.com
+- Build Command: npm install
+- Start Command: node index.js
 
 ## Estructura del Proyecto
 
 ```
 ├── index.js              # Bot principal
 ├── config.js             # Configuracion
-├── commands/             # Comandos slash (35+ archivos)
+├── commands/             # Comandos slash (45+ archivos)
 │   ├── level.js          # Comandos de niveles
 │   ├── balance.js        # Comandos de economia
 │   ├── casino.js         # Juegos de casino
-│   ├── slots.js          # Tragamonedas
-│   ├── blackjack.js      # Blackjack
-│   ├── coinflip.js       # Lanzar moneda
-│   ├── dice.js           # Dados
-│   ├── tienda.js         # Tienda de items
-│   ├── trabajar.js       # Sistema de trabajos
-│   ├── addcoins.js       # Staff: dar Lagcoins
-│   ├── removecoins.js    # Staff: quitar Lagcoins
-│   ├── giveitem.js       # Staff: dar items
+│   ├── casinomulti.js    # Casino multijugador (NUEVO)
+│   ├── powerups.js       # Sistema de power-ups (NUEVO)
+│   ├── seguro.js         # Seguros anti-robo (NUEVO)
+│   ├── nacionalidad.js   # Nacionalidades (NUEVO)
+│   ├── subasta.js        # Subastas (NUEVO)
+│   ├── adminabuse.js     # Admin Abuse (NUEVO)
+│   ├── staffeconomy.js   # Staff Economy (NUEVO)
+│   ├── lbeconomia.js     # Leaderboards imagen (NUEVO)
+│   ├── profile.js        # Perfil mejorado (NUEVO)
 │   └── ...               # Mas comandos
 ├── utils/                # Utilidades
 │   ├── database.js       # Persistencia JSON
 │   ├── mongoSync.js      # Sincronizacion MongoDB
-│   ├── economyDB.js      # Sistema de economia
+│   ├── economyDB.js      # Sistema de economia (MEJORADO)
+│   ├── easterEggs.js     # Easter Eggs (NUEVO)
 │   ├── xpSystem.js       # Sistema de XP
 │   ├── cardGenerator.js  # Generacion de imagenes
-│   ├── timeBoost.js      # Boost nocturno
 │   └── helpers.js        # Funciones auxiliares
 ├── public/               # Dashboard web
-│   ├── index.html        # Pagina principal
-│   ├── css/style.css     # Estilos
-│   └── js/main.js        # JavaScript
 └── data/                 # Datos persistentes
     ├── users.json        # Datos de usuarios
     ├── economy.json      # Datos de economia
-    └── boosts.json       # Datos de boosts
+    ├── powerups.json     # Power-ups activos (NUEVO)
+    ├── insurance.json    # Seguros activos (NUEVO)
+    ├── nationalities.json # Nacionalidades (NUEVO)
+    ├── auctions.json     # Subastas (NUEVO)
+    └── adminboost.json   # Boost admin (NUEVO)
 ```
 
 ## Comandos Disponibles
 
-### Comandos de Niveles (8)
-- /level, /nivel, /rank - Ver nivel con tarjeta
-- /leaderboard, /lb - Tabla de clasificacion
-- /rewards list - Ver recompensas
-- /boost list, /boost status - Ver boosts
-- /help - Ayuda
-
-### Comandos de Economia (12)
+### Comandos de Economia (20+)
 - /balance - Ver saldo
-- /perfil - Ver perfil completo
-- /estadisticas - Estadisticas detalladas
+- /perfil - Ver perfil completo con stats
 - /daily - Recompensa diaria
 - /trabajar - Trabajar para ganar Lagcoins
-- /work - Trabajo rapido
-- /tienda - Comprar items
+- /tienda - Comprar items (40+ items, 14 categorias)
 - /inventario - Ver items
-- /depositar - Depositar en banco
-- /retirar - Retirar del banco
+- /depositar, /retirar - Banco
 - /robar - Robar a usuarios
-- /trade - Intercambiar Lagcoins
+- /powerups - Ver y comprar power-ups
+- /seguro - Seguros anti-robo
+- /nacionalidad - Sistema de paises
+- /subasta - Sistema de subastas
+- /lbeconomia - Leaderboards con imagen
 
-### Comandos de Casino (5)
-- /casino - Ruleta clasica
-- /slots - Tragamonedas
-- /blackjack - 21
-- /coinflip - Lanzar moneda
-- /dice - Dados
+### Comandos de Casino (10+)
+- /casino, /slots, /blackjack, /coinflip, /dice
+- /casinomulti carreras - Carreras de caballos
+- /casinomulti poker - Poker simplificado
+- /casinomulti ruleta - Ruleta avanzada
+- /casinomulti duelo - Desafios 1v1
 
-### Minijuegos de XP (5)
-- /minigame trivia - Trivia
-- /minigame rps - Piedra, Papel, Tijeras
-- /minigame roulette - Ruleta Rusa
-- /ahorcado solo - Ahorcado solitario
-- /ahorcado multi - Ahorcado multijugador
+### Staff - Economia (15+)
+- /addcoins, /removecoins, /setcoins
+- /admin abuse - Boost global todos los sistemas
+- /admin status - Ver boost activo
+- /admin stop - Detener boost
+- /staffeconomy daritem, quitaritem
+- /staffeconomy darpowerup
+- /staffeconomy darseguro, quitarseguro
+- /staffeconomy darnacionalidad
+- /staffeconomy verusuario
+- /staffeconomy resetusuario
 
-### Staff - Niveles (11)
-- /addlevel, /removelevel, /setlevel - Gestion de niveles
-- /xp add/remove/reset - Gestion de XP
-- /boost add, /globalboost, /removeglobalboost - Gestion de boosts
-- /banxp, /unbanxp - Sistema de bans
-- /resettemporada - Resetear temporada
-- /clearlevelroles - Limpiar roles
+## Items de la Tienda (40+)
 
-### Staff - Economia (5)
-- /addcoins - Dar Lagcoins
-- /removecoins - Quitar Lagcoins
-- /setcoins - Establecer Lagcoins
-- /giveitem - Dar items
-- /removeitem - Quitar items
+### Categorias
+1. Herramientas (desbloquean trabajos)
+2. Tecnologia (laptops, camaras, etc)
+3. Vehiculos (moto, taxi, etc)
+4. Profesional (estetoscopio, licencias)
+5. Instrumentos
+6. Cocina
+7. Armas (arco de caza)
+8. Granja
+9. Consumibles
+10. Coleccionables
+11. Viajes (pasaporte, visa)
+12. Power-Ups (12 tipos)
+13. Seguros (4 niveles)
 
-## Items de la Tienda
+## Trabajos Disponibles (20+)
 
-### Herramientas (Desbloquean trabajos)
-- Cana de Pesca (500) - Pescador
-- Hacha (600) - Lenador
-- Pico (800) - Minero
-- Pala (700) - Albanil
+| Trabajo | Ganancia | Multiplicador Pais |
+|---------|----------|--------------------|
+| Basico | 50-120 | x1.0 |
+| Pescador | 100-250 | x1.0 |
+| Programador | 200-500 | x1.5 |
+| Medico | 300-700 | x1.8 |
+| Piloto | 400-900 | x2.0 |
+| Futbolista | 500-1500 | x2.5 |
+| YouTuber | 150-800 | x1.4 |
+| Influencer | 100-600 | x1.3 |
 
-### Tecnologia
-- Laptop Gaming (2000) - Programador
-- Camara HD (1500) - Streaming
+## Paises y Multiplicadores
 
-### Vehiculos
-- Moto de Reparto (1200) - Repartidor
-- Bicicleta (300)
+### Latinoamerica
+- Venezuela: x0.6 (65% prob)
+- Mexico, Argentina: x0.7-0.8 (40%)
+- Chile: x0.95 (28%)
 
-### Instrumentos
-- Guitarra Electrica (1800) - Musico
-
-### Consumibles
-- Bebida Energetica (150) - Reduce cooldown
-- Trebol de la Suerte (500) - +20% casino
-- Escudo Anti-Robo (800) - Proteccion
-
-### Coleccionables
-- Corona Dorada (10000)
-- Diamante Brillante (5000)
-- Trofeo de Oro (3000)
-
-## Trabajos Disponibles (13)
-
-| Trabajo | Ganancia | Herramienta | Cooldown |
-|---------|----------|-------------|----------|
-| Basico | 50-120 | Ninguna | 60s |
-| Pescador | 100-250 | Cana Pesca | 45s |
-| Lenador | 120-300 | Hacha | 45s |
-| Minero | 150-400 | Pico | 45s |
-| Albanil | 180-450 | Pala | 45s |
-| Programador | 200-500 | Laptop | 40s |
-| Chef | 150-350 | Utensilios | 50s |
-| Repartidor | 80-200 | Moto | 30s |
-| Streamer | 100-600 | Camara+Laptop | 120s |
-| Musico | 120-400 | Guitarra | 60s |
-| Artista | 100-450 | Kit Arte | 90s |
-| Cazador | 180-500 | Arco | 60s |
-| Granjero | 130-350 | Semillas | 45s |
+### Primer Mundo (requiere Visa)
+- Espana: x1.3 (14%)
+- Estados Unidos: x2.0 (5%)
+- Canada: x1.8 (7%)
+- Japon: x1.6 (9%)
 
 ## Variables de Entorno Requeridas
 
@@ -249,42 +266,35 @@ DISCORD_BOT_TOKEN=tu_token_de_discord
 MONGODB_URI=tu_connection_string_mongodb
 ```
 
-## Despliegue
-
-### Render (Recomendado)
-El bot esta configurado para desplegarse en Render:
-- Repository: https://github.com/imgars/-Niveles.git
-- Dashboard URL: https://niveles-wul5.onrender.com
-- Build Command: npm install
-- Start Command: node index.js
-
-### Subir cambios a GitHub
-```bash
-git add .
-git commit -m "Descripcion de cambios"
-git push origin main
-```
-
 ## Cambios Recientes
 
+### 4 de Diciembre 2025 - v2.5.0
+- NUEVO: Sistema de Power-Ups completo (12 tipos)
+- NUEVO: Sistema de Seguros Anti-Robo (4 niveles)
+- NUEVO: Sistema de Nacionalidades (30+ paises)
+- NUEVO: Sistema de Subastas
+- NUEVO: Admin Abuse (boost global temporal)
+- NUEVO: Easter Eggs (10 comandos secretos)
+- NUEVO: Casino Multijugador (carreras, poker, ruleta, duelos)
+- NUEVO: Leaderboards con imagen generada
+- NUEVO: 10+ nuevos trabajos (medico, piloto, futbolista, etc)
+- NUEVO: 20+ nuevos items en tienda
+- MEJORADO: Perfil con stats completos
+- MEJORADO: Sistema de economia mas robusto
+- MEJORADO: Manejo de errores mejorado
+- FIX: Errores de MongoDB con fallback a JSON
+
 ### 3 de Diciembre 2025 - v2.0.0
-- NUEVO: Sistema de economia completo con Lagcoins
-- NUEVO: 5 juegos de casino (ruleta, slots, blackjack, coinflip, dados)
-- NUEVO: Tienda con 19+ items en 10 categorias
-- NUEVO: 13 trabajos diferentes con herramientas
-- NUEVO: Sistema de banco (depositar/retirar)
-- NUEVO: Sistema de robos entre usuarios
-- NUEVO: Comandos de staff para economia
-- NUEVO: Estadisticas detalladas de casino y trabajos
-- FIX: Lagcoins y items ahora se guardan correctamente en MongoDB
-- FIX: Sincronizacion completa de economia con MongoDB
-- UPDATE: Dashboard web actualizado con nuevos comandos
-- UPDATE: Link del leaderboard actualizado a nueva URL
+- Sistema de economia completo con Lagcoins
+- 5 juegos de casino
+- Tienda con 19+ items
+- 13 trabajos diferentes
+- Sistema de banco y robos
 
 ---
 
-**Ultima actualizacion**: 3 de Diciembre de 2025
-**Estado**: COMPLETO - Economia y Casino implementados
-**Version**: 2.0.0 - Sistema de economia completo
-**Entorno**: Replit + MongoDB Atlas
-**MongoDB**: Conectado - Sincronizacion automatica
+**Ultima actualizacion**: 4 de Diciembre de 2025
+**Estado**: COMPLETO - Todos los sistemas implementados
+**Version**: 2.5.0 - Power-Ups, Seguros, Nacionalidades, Subastas
+**Entorno**: Replit (desarrollo) + Render (produccion)
+**MongoDB**: Sincronizacion con fallback a JSON

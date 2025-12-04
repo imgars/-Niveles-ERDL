@@ -343,6 +343,15 @@ client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
   if (!message.guild) return;
   
+  // Manejar Easter Eggs
+  try {
+    const { handleEasterEgg } = await import('./utils/easterEggs.js');
+    const eggResult = await handleEasterEgg(message, client);
+    if (eggResult) return; // Si fue un Easter Egg, no procesar XP
+  } catch (error) {
+    // Easter eggs no disponibles, continuar
+  }
+  
   if (CONFIG.NO_XP_CHANNELS.includes(message.channel.id)) return;
   
   if (db.isChannelBanned(message.channel.id)) return;

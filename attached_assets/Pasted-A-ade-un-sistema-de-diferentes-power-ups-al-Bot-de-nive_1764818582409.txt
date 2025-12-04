@@ -1,0 +1,82 @@
+Añade un sistema de diferentes "power ups" al Bot de niveles para hacer que ciertas cosas tengan mas probabilidades durante un cierto periodo de tiempo por ejemplo hacer que algunos trabajos den mas Lagcoins (moneda del sistema de economia), el casino tenga mas probabilidades de ganar, mas probabilidades de robar el bacon etc etc etc. Que estos se puedan comprar en la tienda del sistema de economia pero que no sean tan baratos y que entre mas tiempo duren o mas suban las probabilidades mas caros sean.
+
+Añade un comando, /admin abuse que sirva para impulsar TODO los sistemas del bot, economia, casino, boost de niveles etc, por ejemplo /admin abuse (porcentaje) 100% (duración) 1 hora *opcional* (porcentajes de sistemas), comando que solo pueda usar el staff, (staff role: 1230949715127042098)
+
+Añade un sistema anti robos (economia) que se compre con monedas del mismo sistema, por ejemplo comprar un seguro anti robos durante dos horas que se active con un comando, que no sea 100% efectivo, pero si que si suba las probabilidades de que no te roben,  si alguien compra un seguro anti robos del 100% de efectividad solo duraria un breve momento y ademas seria muy caro, se activaria con un comando como /activar anti robos 
+y tambien uno para desactivarlo, cuando se acabe el tiempo del sistema anti robos se le avisaria al usuario (el canal para avisos de este estilo seria: 1441276918916710501), con cooldowns para volver a activar el sistema de anti robos.
+
+Extiende el sistema de economia, Añade un sistema de subastas a este mismo donde los usuarios puedan subastar items por dinero y añade comandos para ver las subastas, info etc etc, añade mas items y trabajos, Extiende el sistema de robos y trades,  mejora y extiende el sistema de casino haciendo que el usuario tenga mas libertades al elegir en algunos minijuegos por ejemplo y añade minijuegos multijugador del casino como poker, carreras de caballos etc etc. 
+
+Añade Leaderboards en imagenes (como el leaderboard de niveles) para Leaderboards de Lagcoins osea ver los usuarios con mas Lagcoins del servidor osea los mas exitosos, Tambien  uno para ver los mejores usuarios en el casino y otro para ver los usuarios que mas minijuegos han ganado, Uno para los usuarios que mas negocian en el servidor osea hacen mas trades y subastas exitosas y por ultimo uno general con información sobre los mejores en todos los aspectos del servidor. Todo esto en un comando aparte para no opacar al /leaderboard principal que es el de niveles.
+
+Añade un sistema de nacionalidades extenso. Te explico,
+el sistema incluiria cosas como el comando /nacionalidad el cual le daria una nacionalidad aleatoria al usuario, pero siempre seria de latinoamerica o españa aunque habria MUY poca probabilidad pero tambien incluiria Estados Unidos, Japon y Reino unido, se podria viajar a otros paises y dependiendo del pais habrian mas o menos probabilidades de obtener trabajo y estos mismo darian mas o menos Lagcoins como sueldo dependiendo del pais, los usuarios tendrian que comprar un pasaporte y dependiendo del pais de donde sean seria mas o menos caro, ademas que tambien dentria que pagar la forma para viajar a otro pais como por ejemplo en autobus o avion y dependiendo del transporte seria mas o menos caro, al momento de llegar a otro pais tendrian que cambiar la moneda de su pais por la del nuevo, Si por ejemplo alguien viaja de venezuela a Mexico ahora tendria mas oportunidades de conseguir trabajo y el sueldo seria mayor. inmigración, se podria inmigrar de forma ilegal a paises como estados unidos aunque el proceso seria caro y complicado (tambien podrian a canada y no seria tan dificil), si el usuario logra llegar a Estados unidos ahora tendria Muchas mas probabilidades de conseguir trabajo y el sueldo seria mucho mayor, Si hay un usuario que es de nacionalidad Estadounidense y se encuentra con uno de Latinoamerica estos podrian casarse y asi el usuario de Latioamerica podria conseguir papeles estadounidenses y dejar de ser inmigrante, Si el usuario un dia no tiene suerte podria ser encontrado y deportado.
+
+Algunas probabilidades de nacionalidades:
+
+Venezuela: 65%
+
+Mexico: 40%
+
+Argentina: 40%
+
+Colombia: 43%
+
+Brasil: 24%
+
+Ecuador: 30%
+
+Japon: 9%
+
+Canada: 7%
+
+España: 14%
+
+Estados Unidos: 5%
+
+Reino Unido: 6%
+
+El Salvador: 30%
+
+Uruguay 31%
+
+(incluye mas paises)
+
+
+Añade mas personalización a los usuarios.
+
+Soluciona unos errores que hay al momento de hacer /trabajar, /addcoins (y sus variantes como /removecoins y /setcoins, tambien hay uno al hacer /tienda intentar comprar un item y hay otro error al hacer /Daily (Hay otro error al intentar jugar algunos juegos del casino como /blackjack), y tambien investiga si hay mas errores y areclalos. (primera imagen adjuntada)
+
+Integra la mayoria de cambios a comandos ya existentes como /inventario /perfil /balance etc etc y tambien haz que sobrevivan a reinicios con MongoDB que ya lo tengo configurado en Render como Secret.
+
+Haz que las personas del Staff tenga comandos para administrar todos los sistemas, activarlos y desactivarlos, dar objetos o quitarlos, cambiar cosas etc etc etc.
+
+Añade un sistema de easter eggs, tanto en discord como en la pagina web, en discord añade los siguentes:
+
+!Lagcoin (muestra una imagen random de bolivares venezolanos)
+
+!Mzingerkai (añade 777 puntos de XP de niveles)
+
+!SirgioBOT (Muestra la segunda imagen adjuntada)
+
+!Arepa (muestra una imagen random de arepas venezolanas)
+
+!Dinnerbone (muestra la imagen del usuario de cabeza)
+
+!casin0 (le da un boost de suerte del 500% al usuario por 30 minutos)
+
+!gars (Manda un mensaje de texto que dice "-Niveles programado por Imgars")
+
+!timeoutt (Manda un mensaje de texto que dice "No deberias auto mutearte :( )
+
+!pelotocino (Manda un mensaje de texto que dice "Idea del Sistema de misiones por pelotocino")
+
+!uno (Responde diciendo "Dos")
+
+los easter eggs con recompensas solo se podrian reclamar una vez, los que no tienen recompensa se podrian mandar una vez cada 12 horas.
+
+añade easter eggs a la pagina web a tu gusto, pero que no sean faciles de descubrir (tambien puedes añadir mas easters eggs a discord si quieres).
+
+Integra los cambios a la pagina web y tambien integra las cosas que aun no esta en ella manteniendo el estilo de la misma, pero no incluyas los nuevos leaderboards y easter eggs de discord.
+
+No quiero desplegar el bot aqui en Replit porqeu El bot esta desplegado en Render  con mi Repo de github: https://github.com/imgars/-Niveles.git y quiero que me ayudes a subir los cambios.
