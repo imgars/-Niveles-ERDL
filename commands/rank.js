@@ -37,10 +37,7 @@ export default {
 
         const row = new ActionRowBuilder().addComponents(rewardBtn);
 
-        let content = boostsText || undefined;
-
         return await interaction.reply({
-          content: content,
           files: [attachment],
           components: [row]
         });
