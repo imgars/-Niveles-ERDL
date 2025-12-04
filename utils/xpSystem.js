@@ -127,22 +127,34 @@ export function removeLevels(currentTotalXp, levelsToRemove) {
 export function getActiveBoostsText(boosts) {
   if (!boosts || boosts.length === 0) return '';
   
-  let boostText = '\n';
-  const uniqueBoosts = new Map();
-  
-  for (const boost of boosts) {
-    const key = `${boost.target || 'global'}-${Math.round(boost.multiplier * 100)}`;
-    if (!uniqueBoosts.has(key)) {
-      uniqueBoosts.set(key, boost);
-    }
-  }
-  
-  for (const boost of uniqueBoosts.values()) {
+  const boostLines = boosts.map(boost => {
     const percentage = Math.round(boost.multiplier * 100);
-    const timeLeft = boost.expiresAt ? Math.ceil((boost.expiresAt - Date.now()) / 1000 / 60) : null;
-    const timeStr = timeLeft ? ` (${timeLeft}min)` : '';
-    boostText += `🚀 **+${percentage}% boost**${timeStr}\n`;
-  }
+    
+    let remaining = '';
+    if (boost.expiresAt) {
+      const now = Date.now();
+      const expiresAt = new Date(boost.expiresAt).getTime();
+      const diff = expiresAt - now;
+      
+      if (diff > 0) {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if (hours > 0) {
+          remaining = ` (${hours}h ${minutes}m)`;
+        } else {
+          remaining = ` (${minutes}m)`;
+        }
+      }
+    }
+    
+    return `+${percentage}%${remaining}`;
+  });
   
-  return boostText;
+  return boostLines.join('\n');
+}
+
+export function formatBoostMultiplier(multiplier) {
+  const percentage = Math.round(multiplier * 100);
+  return `+${percentage}%`;
 }

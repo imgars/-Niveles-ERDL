@@ -5,7 +5,8 @@ import { calculateLevel, getXPProgress, getRandomXP, calculateBoostMultiplier, a
 import { generateRankCard } from './utils/cardGenerator.js';
 import { initializeNightBoost, getNightBoostMultiplier } from './utils/timeBoost.js';
 import { isStaff } from './utils/helpers.js';
-import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getStreakBetween, saveStreakToMongo, updateStreakDate, getAllStreaksFromMongo, getUserMissions, updateMissionProgress, getEconomy, addLagcoins } from './utils/mongoSync.js';
+import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getAllStreaksFromMongo, getUserMissions, updateMissionProgress, getEconomy, addLagcoins } from './utils/mongoSync.js';
+import { checkAndBreakExpiredStreaks, acceptStreakRequest, rejectStreakRequest, recordMessage, deleteStreak, getStreakBetween } from './utils/streakService.js';
 import express from 'express';
 import cron from 'node-cron';
 
@@ -337,6 +338,24 @@ client.once('ready', async () => {
   } catch (error) {
     console.error('❌ Error registering commands:', error);
   }
+  
+  cron.schedule('0 0 * * *', async () => {
+    console.log('🔄 Verificando rachas expiradas...');
+    try {
+      const brokenStreaks = await checkAndBreakExpiredStreaks(client);
+      if (brokenStreaks.length > 0) {
+        console.log(`💔 Se rompieron ${brokenStreaks.length} rachas`);
+      } else {
+        console.log('✅ No hay rachas expiradas');
+      }
+    } catch (error) {
+      console.error('Error verificando rachas:', error);
+    }
+  }, {
+    timezone: 'America/Caracas'
+  });
+  
+  console.log('⏰ Cron job para verificar rachas configurado (diario a medianoche)');
 });
 
 client.on('messageCreate', async (message) => {
@@ -390,35 +409,18 @@ client.on('messageCreate', async (message) => {
     await handleLevelUp(message, member, userData, oldLevel);
   }
   
-  // Sistema de Rachas
+  // Sistema de Rachas (usando nuevo streakService)
   if (isMongoConnected()) {
     try {
       const mentions = message.mentions.users.filter(u => !u.bot);
       for (const mentionedUser of mentions.values()) {
-        const streak = await updateStreakDate(message.guild.id, message.author.id, mentionedUser.id);
-        if (streak) {
-          if (streak.updated) {
-            const streakChannel = message.guild.channels.cache.get(CONFIG.LEVEL_UP_CHANNEL_ID);
-            const missionChannel = message.guild.channels.cache.get(CONFIG.MISSION_COMPLETE_CHANNEL_ID);
-            
-            if (streakChannel) {
-              streakChannel.send({
-                content: `🔥 ${streak.message}\n<@${message.author.id}> y <@${mentionedUser.id}>`
-              }).catch(err => console.error('Error sending streak update:', err));
-            }
-            
-            if (missionChannel) {
-              missionChannel.send({
-                content: `🔥 ¡Racha Mantenida!\n<@${message.author.id}> y <@${mentionedUser.id}> ${streak.message}`
-              }).catch(err => console.error('Error sending streak update to mission channel:', err));
-            }
-          } else if (streak.broken) {
-            const missionChannel = message.guild.channels.cache.get(CONFIG.MISSION_COMPLETE_CHANNEL_ID);
-            if (missionChannel) {
-              missionChannel.send({
-                content: `💔 ¡Racha Rota!\n<@${message.author.id}> y <@${mentionedUser.id}> rompieron su racha de ${streak.streakCount} días`
-              }).catch(err => console.error('Error sending streak broken:', err));
-            }
+        const result = await recordMessage(message.guild.id, message.author.id, mentionedUser.id);
+        if (result && result.extended) {
+          const missionChannel = message.guild.channels.cache.get(CONFIG.MISSION_COMPLETE_CHANNEL_ID);
+          if (missionChannel) {
+            missionChannel.send({
+              content: `🔥 **Racha Extendida!**\n<@${message.author.id}> y <@${mentionedUser.id}> - ${result.message}`
+            }).catch(err => console.error('Error sending streak update:', err));
           }
         }
       }
@@ -576,45 +578,97 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.reply({ content: '🎮 Elige un minijuego para jugar:', components: [row], flags: 64 });
     }
     
-    if (interaction.customId.startsWith('accept_streak_')) {
-      const [, proposerId, targetUserId] = interaction.customId.split('_');
+    if (interaction.customId.startsWith('streak_accept_')) {
+      const parts = interaction.customId.split('_');
+      const proposerId = parts[2];
+      const targetUserId = parts[3];
       
       if (interaction.user.id !== targetUserId) {
         return interaction.reply({ content: '❌ Solo el usuario etiquetado puede aceptar esta racha', flags: 64 });
       }
       
-      if (isMongoConnected()) {
-        const { EmbedBuilder } = await import('discord.js');
-        
-        await saveStreakToMongo({
-          guildId: interaction.guildId,
-          user1Id: proposerId,
-          user2Id: interaction.user.id,
-          streakCount: 1,
-          status: 'active'
-        });
-        
-        const embed = new EmbedBuilder()
-          .setColor('#39FF14')
-          .setTitle('🔥 ¡Racha iniciada!')
-          .setDescription(`¡Felicidades! <@${proposerId}> y <@${interaction.user.id}> comenzaron una racha de 1 día`)
-          .addFields({ name: 'Regla', value: 'Mensajeen con menciones todos los días para mantenerla' });
-        
-        await interaction.reply({ embeds: [embed] });
-        console.log(`✅ Racha creada entre ${proposerId} y ${interaction.user.id}`);
+      const { EmbedBuilder } = await import('discord.js');
+      const result = await acceptStreakRequest(interaction.guildId, proposerId, interaction.user.id);
+      
+      if (result.error) {
+        const errorMessages = {
+          'database_unavailable': '❌ Base de datos no disponible',
+          'no_pending_request': '❌ No hay solicitud pendiente',
+          'system_error': '❌ Error del sistema'
+        };
+        return interaction.reply({ content: errorMessages[result.error] || '❌ Error', flags: 64 });
       }
+      
+      const embed = new EmbedBuilder()
+        .setColor('#39FF14')
+        .setTitle('🔥 Racha Iniciada!')
+        .setDescription(`Felicidades! <@${proposerId}> y <@${interaction.user.id}> comenzaron una racha!`)
+        .addFields({ 
+          name: '📋 Reglas', 
+          value: 'Ambos deben enviarse al menos un mensaje cada dia para mantener la racha. Si pasa un dia sin que ambos hablen, la racha se rompe.' 
+        })
+        .setFooter({ text: 'Racha actual: 1 dia' })
+        .setTimestamp();
+      
+      await interaction.update({ embeds: [embed], components: [] });
+      console.log(`✅ Racha creada entre ${proposerId} y ${interaction.user.id}`);
     }
     
-    if (interaction.customId.startsWith('reject_streak_')) {
-      const [, proposerId, targetUserId] = interaction.customId.split('_');
+    if (interaction.customId.startsWith('streak_reject_')) {
+      const parts = interaction.customId.split('_');
+      const proposerId = parts[2];
+      const targetUserId = parts[3];
       
       if (interaction.user.id !== targetUserId) {
         return interaction.reply({ content: '❌ Solo el usuario etiquetado puede rechazar esta racha', flags: 64 });
       }
       
-      await interaction.reply({ content: '❌ Se rechazó la propuesta de racha', flags: 64 });
+      const result = await rejectStreakRequest(interaction.guildId, proposerId, interaction.user.id);
+      
+      const { EmbedBuilder } = await import('discord.js');
+      const embed = new EmbedBuilder()
+        .setColor('#FF4444')
+        .setTitle('❌ Propuesta Rechazada')
+        .setDescription(`<@${interaction.user.id}> ha rechazado la propuesta de racha.`);
+      
+      await interaction.update({ embeds: [embed], components: [] });
       console.log(`❌ Racha rechazada por ${interaction.user.id}`);
     }
+    
+    if (interaction.customId.startsWith('streak_end_confirm_')) {
+      const parts = interaction.customId.split('_');
+      const userId = parts[3];
+      const targetUserId = parts[4];
+      
+      if (interaction.user.id !== userId) {
+        return interaction.reply({ content: '❌ Solo quien ejecuto el comando puede confirmar', flags: 64 });
+      }
+      
+      const result = await deleteStreak(interaction.guildId, userId, targetUserId);
+      
+      if (result.error) {
+        return interaction.reply({ content: '❌ Error al terminar la racha', flags: 64 });
+      }
+      
+      const { EmbedBuilder } = await import('discord.js');
+      const embed = new EmbedBuilder()
+        .setColor('#FF4444')
+        .setTitle('💔 Racha Terminada')
+        .setDescription(`La racha entre <@${userId}> y <@${targetUserId}> ha sido terminada.`);
+      
+      await interaction.update({ embeds: [embed], components: [] });
+    }
+    
+    if (interaction.customId === 'streak_end_cancel') {
+      const { EmbedBuilder } = await import('discord.js');
+      const embed = new EmbedBuilder()
+        .setColor('#7289DA')
+        .setTitle('✅ Cancelado')
+        .setDescription('No se termino la racha.');
+      
+      await interaction.update({ embeds: [embed], components: [] });
+    }
+    
   } catch (error) {
     console.error('Error manejando botón:', error);
     if (!interaction.replied && !interaction.deferred) {

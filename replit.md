@@ -2,7 +2,15 @@
 
 ## Descripcion General
 
-Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino, minijuegos, power-ups, seguros, nacionalidades, subastas y tarjetas de rango personalizadas. Este proyecto esta listo para ejecutarse en Replit y ser desplegado a Render u otras plataformas de hosting.
+Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino, minijuegos, power-ups, seguros, nacionalidades, subastas, rachas de usuarios y tarjetas de rango personalizadas. Este proyecto esta diseñado para desplegarse en **Render desde GitHub** (https://github.com/imgars/-Niveles.git) - NO ejecutar en Replit para evitar conflictos.
+
+## Deployment
+
+**IMPORTANTE:** El bot se despliega en Render, no en Replit. Los secretos (DISCORD_BOT_TOKEN, MONGODB_URI) deben configurarse en Render.
+
+### Secretos Requeridos (en Render):
+- `DISCORD_BOT_TOKEN` - Token del bot de Discord
+- `MONGODB_URI` - URI de conexion a MongoDB
 
 ## Funcionalidades Principales
 
@@ -48,6 +56,21 @@ Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino,
 - Sistema de notificaciones
 - Historial de subastas
 
+### Sistema de Rachas (ACTUALIZADO)
+- Nueva arquitectura con streakService.js
+- Crear rachas entre usuarios con /racha crear @usuario
+- Ver rachas activas con /racha ver
+- Ver estadisticas con /racha estadisticas
+- Ranking de rachas con /racha ranking
+- Terminar rachas con /racha terminar @usuario
+- Notificaciones automaticas de rachas rotas en canal 1441276918916710501
+- Verificacion diaria automatica a medianoche (cron job)
+
+### Sistema de Cooldowns del Casino (NUEVO)
+- Cooldowns por juego: slots (30s), blackjack (45s), coinflip (20s), etc.
+- Modificadores de probabilidad por nacionalidad
+- Sistema de powerups de suerte
+
 ### Sistema de Casino
 - /casino - Ruleta clasica (hasta x3)
 - /slots - Tragamonedas con jackpot (x10)
@@ -65,15 +88,30 @@ Bot de Discord completo con sistema de niveles, XP, economia (Lagcoins), casino,
 - /setcoins - Establecer Lagcoins exactos
 - /admin abuse - Impulsar TODOS los sistemas del bot
 - /staffeconomy - Comandos avanzados de economia
+- /resettempeconomy - Eliminar TODOS los datos de economia/casino (Staff Role: 1212891335929897030)
+- /resettemporada - Resetear niveles/XP del servidor (elimina datos de MongoDB)
 
-### Easter Eggs (NUEVO)
+### Easter Eggs (ACTUALIZADO)
 - !Lagcoin - Muestra imagen de bolivares venezolanos
 - !Mzingerkai - +777 XP (una vez)
 - !SirgioBOT - Imagen especial
-- !Arepa - Imagen de arepas
-- !Dinnerbone - Tu avatar al reves
+- !Arepa - Imagen de arepas venezolanas
+- !Dinnerbone - Tu avatar al reves (Minecraft reference)
 - !casin0 - +500% suerte casino por 30min (una vez)
-- !gars, !timeoutt, !pelotocino, !uno
+- !gars - Creditos del desarrollador
+- !timeoutt - Mensaje especial
+- !pelotocino - Creditos idea de misiones
+- !uno - Responde "Dos"
+- !secreto - +500 Lagcoins (una vez)
+- !dato - Dato curioso aleatorio
+- !chiste - Chiste del dia
+- !hola - Saludo amigable
+- !suerte - Loteria de suerte (5% super suerte, 30% suerte normal)
+- !tesoro - +1500 XP y +750 Lagcoins (una vez)
+- !pixel - Tu avatar pixelado
+- !invertir - Tu avatar con colores invertidos
+- !motivacion - Mensaje motivacional
+- !8ball - Bola 8 magica
 
 ### Leaderboards con Imagenes (NUEVO)
 - /lbeconomia - Leaderboards de economia con imagen generada
