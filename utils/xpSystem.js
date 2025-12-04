@@ -154,6 +154,19 @@ export function getActiveBoostsText(boosts) {
   return boostLines.join('\n');
 }
 
+export function getSimplifiedBoostsText(boosts) {
+  if (!boosts || boosts.length === 0) return '';
+  
+  // Calcular el multiplicador total
+  let totalMultiplier = 0;
+  for (const boost of boosts) {
+    totalMultiplier += boost.multiplier;
+  }
+  
+  const totalPercentage = Math.round(totalMultiplier * 100);
+  return `🚀 +${totalPercentage}%`;
+}
+
 export function formatBoostMultiplier(multiplier) {
   const percentage = Math.round(multiplier * 100);
   return `+${percentage}%`;
