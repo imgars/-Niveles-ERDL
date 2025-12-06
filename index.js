@@ -229,6 +229,51 @@ app.get('/api/stats', (req, res) => {
   }
 });
 
+app.get('/api/boosts', (req, res) => {
+  try {
+    const now = Date.now();
+    
+    const allActiveBoosts = db.getActiveBoosts(null, null);
+    
+    const globalBoosts = allActiveBoosts
+      .filter(b => !b.userId && !b.channelId)
+      .map(boost => ({
+        type: 'global',
+        multiplier: boost.multiplier,
+        expiresAt: boost.expiresAt,
+        timeLeft: boost.expiresAt ? Math.max(0, boost.expiresAt - now) : null,
+        addedBy: boost.addedBy || 'Sistema'
+      }));
+    
+    let userBoostCount = 0;
+    let channelBoostCount = 0;
+    
+    if (db.boosts && db.boosts.users) {
+      for (const userId in db.boosts.users) {
+        const userBoosts = db.boosts.users[userId].filter(b => !b.expiresAt || b.expiresAt > now);
+        userBoostCount += userBoosts.length;
+      }
+    }
+    
+    if (db.boosts && db.boosts.channels) {
+      for (const channelId in db.boosts.channels) {
+        const channelBoosts = db.boosts.channels[channelId].filter(b => !b.expiresAt || b.expiresAt > now);
+        channelBoostCount += channelBoosts.length;
+      }
+    }
+    
+    res.json({
+      globalBoosts,
+      userBoostCount,
+      channelBoostCount,
+      totalActive: globalBoosts.length + userBoostCount + channelBoostCount
+    });
+  } catch (error) {
+    console.error('Error getting boosts:', error);
+    res.status(500).json({ error: 'Error al obtener boosts' });
+  }
+});
+
 // API para Preguntas y Respuestas
 app.get('/api/questions', async (req, res) => {
   try {
@@ -308,12 +353,31 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`   - http://localhost:${PORT}/api/leaderboard  (API)`);
 });
 
-const commandFolders = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for (const file of commandFolders) {
-  const command = await import(`./commands/${file}`);
-  if (command.default && command.default.data && command.default.execute) {
-    client.commands.set(command.default.data.name, command.default);
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+console.log(`📂 Encontrados ${commandFiles.length} archivos de comandos`);
+
+let loadedCount = 0;
+let failedCount = 0;
+
+for (const file of commandFiles) {
+  try {
+    const command = await import(`./commands/${file}`);
+    if (command.default && command.default.data && command.default.execute) {
+      client.commands.set(command.default.data.name, command.default);
+      loadedCount++;
+    } else {
+      console.warn(`⚠️ Comando ${file} no tiene la estructura correcta (data/execute)`);
+      failedCount++;
+    }
+  } catch (error) {
+    console.error(`❌ Error cargando comando ${file}:`, error.message);
+    failedCount++;
   }
+}
+
+console.log(`✅ Comandos cargados: ${loadedCount}/${commandFiles.length}`);
+if (failedCount > 0) {
+  console.log(`⚠️ Comandos fallidos: ${failedCount}`);
 }
 
 client.once('ready', async () => {
@@ -325,16 +389,18 @@ client.once('ready', async () => {
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
   
   try {
-    console.log('📝 Registering slash commands...');
+    console.log(`📝 Registrando ${commands.length} comandos slash...`);
     
     for (const guild of client.guilds.cache.values()) {
+      console.log(`   📍 Registrando en servidor: ${guild.name} (${guild.id})`);
       await rest.put(
         Routes.applicationGuildCommands(client.user.id, guild.id),
         { body: commands }
       );
     }
     
-    console.log('✅ Slash commands registered successfully!');
+    console.log(`✅ ${commands.length} comandos registrados exitosamente!`);
+    console.log(`📋 Comandos: ${commands.map(c => c.name).join(', ')}`);
   } catch (error) {
     console.error('❌ Error registering commands:', error);
   }

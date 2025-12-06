@@ -1,7 +1,14 @@
 import { SlashCommandBuilder, AttachmentBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import db from '../utils/database.js';
 import { getXPProgress, getSimplifiedBoostsText, getBoostTextForCard } from '../utils/xpSystem.js';
-import { generateRankCard, getCardTheme } from '../utils/cardGenerator.js';
+import { generateRankCard, getCardTheme, getThemeButtonColor } from '../utils/cardGenerator.js';
+
+const buttonStyleMap = {
+  'Primary': ButtonStyle.Primary,
+  'Secondary': ButtonStyle.Secondary,
+  'Success': ButtonStyle.Success,
+  'Danger': ButtonStyle.Danger
+};
 
 export default {
   data: new SlashCommandBuilder()
@@ -24,6 +31,10 @@ export default {
       const boostsText = getSimplifiedBoostsText(boosts);
       const boostCardText = getBoostTextForCard(boosts);
 
+      const theme = await getCardTheme(member, userData.level, userData.selectedCardTheme);
+      const buttonColor = getThemeButtonColor(theme);
+      const buttonStyle = buttonStyleMap[buttonColor] || ButtonStyle.Primary;
+
       try {
         const cardBuffer = await generateRankCard(member, userData, progress, boostCardText);
         const attachment = new AttachmentBuilder(cardBuffer, { name: 'rank.png' });
@@ -31,7 +42,7 @@ export default {
         const rewardBtn = new ButtonBuilder()
           .setCustomId('earn_rewards')
           .setLabel('🎮 Gana Recompensas')
-          .setStyle(ButtonStyle.Secondary);
+          .setStyle(buttonStyle);
 
         const row = new ActionRowBuilder().addComponents(rewardBtn);
 
@@ -42,10 +53,10 @@ export default {
         const rewardBtn = new ButtonBuilder()
           .setCustomId('earn_rewards')
           .setLabel('🎮 Gana Recompensas')
-          .setStyle(ButtonStyle.Secondary);
+          .setStyle(buttonStyle);
 
         const embed = {
-          color: 0x7289DA,
+          color: 0x5865F2,
           title: `📊 Nivel de ${targetUser.username}`,
           fields: [
             { name: 'Nivel', value: `${userData.level}`, inline: true },

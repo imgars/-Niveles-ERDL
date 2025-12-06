@@ -7,7 +7,7 @@ const CARD_HEIGHT = 250;
 export async function getAvailableThemes(member, level) {
   const userId = member.user.id;
   let roles;
-  const themes = ['pixel'];
+  const themes = ['discord', 'pixel'];
   
   try {
     const freshMember = await member.guild.members.fetch(userId);
@@ -18,7 +18,7 @@ export async function getAvailableThemes(member, level) {
   }
   
   if (userId === CONFIG.SPECIAL_USER_ID) {
-    return ['roblox', 'minecraft', 'zelda', 'fnaf', 'geometrydash', 'pixel'];
+    return ['discord', 'roblox', 'minecraft', 'zelda', 'fnaf', 'geometrydash', 'pixel'];
   }
   
   if (roles && roles.has(CONFIG.VIP_ROLE_ID)) {
@@ -88,7 +88,12 @@ export async function getCardTheme(member, level, selectedTheme = null) {
     return 'ocean';
   }
   
-  return 'pixel';
+  return 'discord';
+}
+
+export function getThemeButtonColor(theme) {
+  const colors = getPixelArtThemeColors(theme);
+  return colors.buttonColor || 'Primary';
 }
 
 export function getThemeButtonStyle(theme) {
@@ -121,6 +126,20 @@ function drawPixelatedRect(ctx, x, y, width, height, pixelSize = 4) {
 
 function getPixelArtThemeColors(theme) {
   const themes = {
+    discord: {
+      gradient: [
+        { pos: 0, color: '#36393F' },
+        { pos: 0.5, color: '#2F3136' },
+        { pos: 1, color: '#202225' }
+      ],
+      border: '#5865F2',
+      accent: '#5865F2',
+      text: '#FFFFFF',
+      textShadow: '#000000',
+      barBg: '#202225',
+      barFill: ['#5865F2', '#7289DA'],
+      buttonColor: 'Primary'
+    },
     pixel: {
       gradient: [
         { pos: 0, color: '#00CED1' },
@@ -130,8 +149,10 @@ function getPixelArtThemeColors(theme) {
       border: '#00FFFF',
       accent: '#40E0D0',
       text: '#FFFFFF',
+      textShadow: '#004444',
       barBg: '#1a3a3a',
-      barFill: ['#00CED1', '#40E0D0']
+      barFill: ['#00CED1', '#40E0D0'],
+      buttonColor: 'Primary'
     },
     ocean: {
       gradient: [
@@ -142,8 +163,10 @@ function getPixelArtThemeColors(theme) {
       border: '#00BFFF',
       accent: '#00CED1',
       text: '#FFFFFF',
+      textShadow: '#003366',
       barBg: '#002244',
-      barFill: ['#00BFFF', '#87CEEB']
+      barFill: ['#00BFFF', '#87CEEB'],
+      buttonColor: 'Primary'
     },
     zelda: {
       gradient: [
@@ -154,8 +177,10 @@ function getPixelArtThemeColors(theme) {
       border: '#FFD700',
       accent: '#98FB98',
       text: '#FFFFFF',
+      textShadow: '#2F4F2F',
       barBg: '#2F4F2F',
-      barFill: ['#FFD700', '#90EE90']
+      barFill: ['#FFD700', '#90EE90'],
+      buttonColor: 'Success'
     },
     pokemon: {
       gradient: [
@@ -166,8 +191,10 @@ function getPixelArtThemeColors(theme) {
       border: '#FF0000',
       accent: '#FFD700',
       text: '#FFFFFF',
+      textShadow: '#8B0000',
       barBg: '#4A0000',
-      barFill: ['#FF4500', '#FFD700']
+      barFill: ['#FF4500', '#FFD700'],
+      buttonColor: 'Danger'
     },
     geometrydash: {
       gradient: [
@@ -180,8 +207,10 @@ function getPixelArtThemeColors(theme) {
       border: '#00FF00',
       accent: '#FF00FF',
       text: '#FFFFFF',
+      textShadow: '#330033',
       barBg: '#1a0033',
-      barFill: ['#00FF00', '#FF00FF', '#00FFFF']
+      barFill: ['#00FF00', '#FF00FF', '#00FFFF'],
+      buttonColor: 'Success'
     },
     night: {
       gradient: [
@@ -191,10 +220,12 @@ function getPixelArtThemeColors(theme) {
       ],
       border: '#4169E1',
       accent: '#FFD700',
-      text: '#E0E0E0',
+      text: '#FFFFFF',
+      textShadow: '#000022',
       barBg: '#0a0a1a',
       barFill: ['#9370DB', '#4169E1'],
-      stars: true
+      stars: true,
+      buttonColor: 'Secondary'
     },
     roblox: {
       gradient: [
@@ -205,8 +236,10 @@ function getPixelArtThemeColors(theme) {
       border: '#FF0000',
       accent: '#00A2FF',
       text: '#FFFFFF',
+      textShadow: '#4A0000',
       barBg: '#2a0a0a',
-      barFill: ['#00A2FF', '#00FFFF']
+      barFill: ['#00A2FF', '#00FFFF'],
+      buttonColor: 'Danger'
     },
     minecraft: {
       gradient: [
@@ -217,8 +250,10 @@ function getPixelArtThemeColors(theme) {
       border: '#8B4513',
       accent: '#55FF55',
       text: '#FFFFFF',
+      textShadow: '#1A2F1A',
       barBg: '#2F4F2F',
-      barFill: ['#55FF55', '#00FF00']
+      barFill: ['#55FF55', '#00FF00'],
+      buttonColor: 'Success'
     },
     fnaf: {
       gradient: [
@@ -229,12 +264,14 @@ function getPixelArtThemeColors(theme) {
       border: '#8B0000',
       accent: '#FFD700',
       text: '#FFFFFF',
+      textShadow: '#000000',
       barBg: '#1a0a0a',
-      barFill: ['#FFD700', '#FF6347']
+      barFill: ['#FFD700', '#FF6347'],
+      buttonColor: 'Danger'
     }
   };
   
-  return themes[theme] || themes.pixel;
+  return themes[theme] || themes.discord;
 }
 
 function drawPixelBorder(ctx, x, y, width, height, color, thickness = 4) {
@@ -365,21 +402,32 @@ export async function generateRankCard(member, userData, progress, boostsText = 
   }
   
   const textX = 210;
+  const shadowOffset = 2;
+  const shadowColor = colors.textShadow || '#000000';
   
-  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.fillRect(textX - 5, 35, 560, 35);
   
-  ctx.fillStyle = colors.text;
+  // Username with shadow
   ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.fillStyle = shadowColor;
+  ctx.fillText(member.user.username, textX + shadowOffset, 60 + shadowOffset);
+  ctx.fillStyle = colors.text;
   ctx.fillText(member.user.username, textX, 60);
   
-  ctx.fillStyle = colors.accent;
+  // Level with shadow
   ctx.font = 'bold 22px Arial, sans-serif';
+  ctx.fillStyle = shadowColor;
+  ctx.fillText(`NIVEL ${userData.level}`, textX + shadowOffset, 100 + shadowOffset);
+  ctx.fillStyle = colors.accent;
   ctx.fillText(`NIVEL ${userData.level}`, textX, 100);
   
+  // XP text with shadow
   const xpText = `XP: ${Math.floor(progress.current)} / ${Math.floor(progress.needed)}`;
-  ctx.fillStyle = colors.text;
   ctx.font = '18px Arial, sans-serif';
+  ctx.fillStyle = shadowColor;
+  ctx.fillText(xpText, textX + 1, 130 + 1);
+  ctx.fillStyle = colors.text;
   ctx.fillText(xpText, textX, 130);
   
   const barX = textX;
@@ -442,6 +490,7 @@ export async function generateRankCard(member, userData, progress, boostsText = 
 
 function getThemeLabel(theme) {
   const labels = {
+    discord: '💬 DISCORD',
     pixel: '🎮 PIXEL',
     ocean: '🌊 OCEAN',
     zelda: '⚔️ ZELDA',
@@ -455,7 +504,7 @@ function getThemeLabel(theme) {
   return labels[theme] || theme.toUpperCase();
 }
 
-export async function generateLeaderboardImage(topUsers, guild, theme = 'pixel') {
+export async function generateLeaderboardImage(topUsers, guild, theme = 'discord') {
   const canvas = createCanvas(700, 760);
   const ctx = canvas.getContext('2d');
   

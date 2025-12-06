@@ -369,7 +369,72 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    async function loadBoosts() {
+        const container = document.getElementById('active-boosts-container');
+        if (!container) return;
+
+        try {
+            const response = await fetch('/api/boosts');
+            const data = await response.json();
+            
+            let html = '';
+            
+            if (data.globalBoosts && data.globalBoosts.length > 0) {
+                data.globalBoosts.forEach(boost => {
+                    const timeLeft = boost.timeLeft ? formatTime(boost.timeLeft) : 'Permanente';
+                    html += `
+                        <div class="boost-card global">
+                            <div class="boost-multiplier">+${Math.round((boost.multiplier - 1) * 100)}%</div>
+                            <div class="boost-type">BOOST GLOBAL</div>
+                            <div class="boost-timer">${timeLeft}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (data.totalActive === 0) {
+                html = '<p class="no-boosts">No hay boosts activos en este momento</p>';
+            } else {
+                html += `
+                    <div class="boost-summary">
+                        <div class="boost-stat">
+                            <div class="boost-stat-value">${data.globalBoosts?.length || 0}</div>
+                            <div class="boost-stat-label">Globales</div>
+                        </div>
+                        <div class="boost-stat">
+                            <div class="boost-stat-value">${data.userBoostCount || 0}</div>
+                            <div class="boost-stat-label">Usuario</div>
+                        </div>
+                        <div class="boost-stat">
+                            <div class="boost-stat-value">${data.channelBoostCount || 0}</div>
+                            <div class="boost-stat-label">Canal</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading boosts:', error);
+            container.innerHTML = '<p class="no-boosts">Error cargando boosts</p>';
+        }
+    }
+
+    function formatTime(ms) {
+        const seconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        if (days > 0) return `${days}d ${hours % 24}h`;
+        if (hours > 0) return `${hours}h ${minutes % 60}m`;
+        if (minutes > 0) return `${minutes}m`;
+        return `${seconds}s`;
+    }
+
     loadStats();
+    loadBoosts();
+    setInterval(loadBoosts, 60000);
 
     const heroTitle = document.querySelector('.hero-title');
     if (heroTitle) {

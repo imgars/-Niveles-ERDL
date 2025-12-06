@@ -805,8 +805,9 @@ body {
     transform: scale(1.05);
 }
 
-.normal-theme { border-color: #7289DA; }
-.ocean-theme { border-color: #00CED1; }
+.discord-theme { border-color: #5865F2; }
+.normal-theme { border-color: #00CED1; }
+.ocean-theme { border-color: #0077BE; }
 .zelda-theme-card { border-color: var(--zelda-gold); }
 .pokemon-theme-card { border-color: var(--pokemon-red); }
 .gd-theme { border-color: var(--neon-pink); }
@@ -835,8 +836,12 @@ body {
     image-rendering: pixelated;
 }
 
+.pixel-art-preview.discord {
+    background: linear-gradient(135deg, #36393F 0%, #2F3136 50%, #5865F2 100%);
+}
+
 .pixel-art-preview.normal {
-    background: linear-gradient(135deg, #7289DA 0%, #99AAB5 100%);
+    background: linear-gradient(135deg, #00CED1 0%, #20B2AA 50%, #008B8B 100%);
 }
 
 .pixel-art-preview.ocean {
@@ -1557,4 +1562,100 @@ body {
     .questions-grid {
         max-height: 400px;
     }
+}
+
+/* Active Boosts Section */
+.active-boosts-section {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 3px solid var(--neon-green);
+    border-radius: 0;
+}
+
+.boosts-title {
+    text-align: center;
+    color: var(--neon-green);
+    font-size: 14px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--neon-green);
+}
+
+.boosts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.boost-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0a0a1a 100%);
+    border: 2px solid var(--neon-green);
+    padding: 15px;
+    min-width: 200px;
+    text-align: center;
+    animation: boostPulse 2s infinite;
+}
+
+.boost-card.global {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 15px rgba(255, 16, 240, 0.3);
+}
+
+@keyframes boostPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+.boost-multiplier {
+    font-size: 24px;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green);
+}
+
+.boost-type {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin: 8px 0;
+}
+
+.boost-timer {
+    font-size: 12px;
+    color: var(--neon-blue);
+}
+
+.no-boosts {
+    color: var(--text-dim);
+    font-size: 10px;
+    text-align: center;
+    padding: 20px;
+}
+
+.loading-boosts {
+    color: var(--text-dim);
+    font-size: 10px;
+    text-align: center;
+}
+
+.boost-summary {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.boost-stat {
+    text-align: center;
+}
+
+.boost-stat-value {
+    font-size: 16px;
+    color: var(--primary);
+}
+
+.boost-stat-label {
+    font-size: 8px;
+    color: var(--text-dim);
 }
