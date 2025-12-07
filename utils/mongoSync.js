@@ -239,7 +239,7 @@ export async function saveStreakToMongo(streakData) {
     const users = [streakData.user1Id, streakData.user2Id].sort();
     query.user1Id = users[0];
     query.user2Id = users[1];
-    
+
     const updated = await Streak.findOneAndUpdate(
       query,
       streakData,
@@ -278,20 +278,20 @@ export async function updateStreakDate(guildId, user1Id, user2Id) {
       user2Id: users[1],
       status: 'active'
     });
-    
+
     if (!streak) return null;
-    
+
     const lastDate = new Date(streak.lastMessageDate);
     const today = new Date();
     lastDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
-    
+
     if (lastDate.getTime() === today.getTime()) {
       return streak;
     }
-    
+
     const daysDiff = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
-    
+
     if (daysDiff === 1) {
       streak.streakCount += 1;
       streak.lastMessageDate = new Date();
@@ -302,7 +302,7 @@ export async function updateStreakDate(guildId, user1Id, user2Id) {
       await streak.save();
       return { streak, broken: true, message: `¡Se perdió la racha! 😢 Llevaban ${streak.streakCount} días` };
     }
-    
+
     return streak;
   } catch (error) {
     console.error('Error actualizando fecha de racha:', error.message);
@@ -358,7 +358,7 @@ export async function createUserMissions(guildId, userId) {
   try {
     const weekNumber = Math.ceil((new Date().getDate()) / 7);
     const year = new Date().getFullYear();
-    
+
     const missionTemplates = [
       { id: 1, title: 'Saludador', description: 'Di hola a 5 personas', type: 'greeting', target: 5, difficulty: 1, reward: { xp: 100, multiplier: 0.1, levels: 0 } },
       { id: 2, title: 'Preguntón', description: 'Pregunta cómo están a 3 personas', type: 'question', target: 3, difficulty: 1, reward: { xp: 150, multiplier: 0.15, levels: 0 } },
@@ -371,7 +371,7 @@ export async function createUserMissions(guildId, userId) {
       { id: 9, title: 'Comentarista', description: 'Responde a 7 preguntas en el chat', type: 'answers', target: 7, difficulty: 3, reward: { xp: 350, multiplier: 0.35, levels: 2 } },
       { id: 10, title: 'Leyenda', description: 'Completa 9 misiones en la semana', type: 'meta', target: 9, difficulty: 3, reward: { xp: 500, multiplier: 0.5, levels: 3 } }
     ];
-    
+
     const newMissions = new Mission({
       guildId,
       userId,
@@ -379,7 +379,7 @@ export async function createUserMissions(guildId, userId) {
       year,
       missions: missionTemplates
     });
-    
+
     await newMissions.save();
     return newMissions;
   } catch (error) {
@@ -397,18 +397,18 @@ export async function updateMissionProgress(guildId, userId, weekNumber, year, m
       weekNumber,
       year
     });
-    
+
     if (!missions) return null;
-    
+
     const mission = missions.missions.find(m => m.id === missionId);
     if (!mission || mission.completed) return null;
-    
+
     mission.progress = Math.min(mission.progress + increment, mission.target);
     if (mission.progress >= mission.target) {
       mission.completed = true;
       missions.completedCount += 1;
     }
-    
+
     await missions.save();
     return { mission, completed: mission.completed, reward: mission.reward, title: mission.title };
   } catch (error) {
@@ -451,18 +451,18 @@ export async function getEconomy(guildId, userId) {
 export async function addLagcoins(guildId, userId, amount, reason = 'work') {
   if (!isConnected) return null;
   try {
-    const updateData = { 
-      $inc: { lagcoins: amount },
-      $push: { transactions: { type: reason, amount, date: new Date() } }
-    };
-    
-    if (amount > 0) {
-      updateData.$inc.totalEarned = amount;
-    }
-    
     const economy = await Economy.findOneAndUpdate(
       { guildId, userId },
-      updateData,
+      { 
+        $inc: { lagcoins: amount, totalEarned: amount },
+        $push: { 
+          transactions: { 
+            type: String(reason), 
+            amount: Number(amount), 
+            date: new Date() 
+          } 
+        }
+      },
       { upsert: true, new: true }
     );
     return economy;
@@ -477,10 +477,10 @@ export async function removeLagcoins(guildId, userId, amount, reason = 'spend') 
   try {
     const economy = await Economy.findOne({ guildId, userId });
     if (!economy || economy.lagcoins < amount) return null;
-    
+
     economy.lagcoins -= amount;
     economy.totalSpent = (economy.totalSpent || 0) + amount;
-    economy.transactions.push({ type: reason, amount: -amount, date: new Date() });
+    economy.transactions.push({ type: String(reason), amount: Number(-amount), date: new Date() });
     await economy.save();
     return economy;
   } catch (error) {
@@ -494,20 +494,20 @@ export async function transferLagcoins(guildId, fromUserId, toUserId, amount) {
   try {
     const from = await Economy.findOne({ guildId, userId: fromUserId });
     if (!from || from.lagcoins < amount) return null;
-    
+
     from.lagcoins -= amount;
-    from.transactions.push({ type: 'transfer', amount: -amount, to: toUserId, date: new Date() });
+    from.transactions.push({ type: 'transfer', amount: Number(-amount), to: toUserId, date: new Date() });
     await from.save();
-    
+
     const to = await Economy.findOneAndUpdate(
       { guildId, userId: toUserId },
       { 
         $inc: { lagcoins: amount },
-        $push: { transactions: { type: 'transfer', amount, from: fromUserId, date: new Date() } }
+        $push: { transactions: { type: 'transfer', amount: Number(amount), from: fromUserId, date: new Date() } }
       },
       { upsert: true, new: true }
     );
-    
+
     return { from, to };
   } catch (error) {
     console.error('Error transferindo lagcoins:', error.message);
@@ -539,15 +539,15 @@ export async function saveEconomyToMongo(guildId, userId, economyData) {
       items: economyData.items || [],
       inventory: economyData.inventory || []
     };
-    
+
     if (economyData.casinoStats) {
       updateData.casinoStats = economyData.casinoStats;
     }
-    
+
     if (economyData.jobStats) {
       updateData.jobStats = economyData.jobStats;
     }
-    
+
     const economy = await Economy.findOneAndUpdate(
       { guildId, userId },
       { $set: updateData },
@@ -592,7 +592,7 @@ export async function giveItemToUser(guildId, userId, itemId, quantity = 1) {
       await newEconomy.save();
       return newEconomy;
     }
-    
+
     if (!economy.items.includes(itemId)) {
       economy.items.push(itemId);
     }
@@ -615,14 +615,14 @@ export async function updateCasinoStats(guildId, userId, won, amount) {
         'casinoStats.plays': 1
       }
     };
-    
+
     if (won) {
       updateData.$inc['casinoStats.wins'] = 1;
       updateData.$inc['casinoStats.totalWon'] = amount;
     } else {
       updateData.$inc['casinoStats.totalLost'] = Math.abs(amount);
     }
-    
+
     const economy = await Economy.findOneAndUpdate(
       { guildId, userId },
       updateData,
@@ -641,10 +641,10 @@ export async function depositToBank(guildId, userId, amount) {
   try {
     const economy = await Economy.findOne({ guildId, userId });
     if (!economy || economy.lagcoins < amount) return null;
-    
+
     economy.lagcoins -= amount;
     economy.bankBalance = (economy.bankBalance || 0) + amount;
-    economy.transactions.push({ type: 'deposit', amount: -amount, description: 'Depósito al banco', date: new Date() });
+    economy.transactions.push({ type: 'deposit', amount: Number(-amount), description: 'Depósito al banco', date: new Date() });
     await economy.save();
     return economy;
   } catch (error) {
@@ -659,10 +659,10 @@ export async function withdrawFromBank(guildId, userId, amount) {
   try {
     const economy = await Economy.findOne({ guildId, userId });
     if (!economy || (economy.bankBalance || 0) < amount) return null;
-    
+
     economy.bankBalance -= amount;
     economy.lagcoins = (economy.lagcoins || 0) + amount;
-    economy.transactions.push({ type: 'withdraw', amount: amount, description: 'Retiro del banco', date: new Date() });
+    economy.transactions.push({ type: 'withdraw', amount: Number(amount), description: 'Retiro del banco', date: new Date() });
     await economy.save();
     return economy;
   } catch (error) {
