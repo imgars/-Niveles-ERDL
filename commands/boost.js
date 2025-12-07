@@ -17,11 +17,11 @@ export default {
       subcommand
         .setName('add')
         .setDescription('[Staff] Añade un boost')
-        .addNumberOption(option =>
+        .addIntegerOption(option =>
           option.setName('multiplicador')
-            .setDescription('Multiplicador (0.25 = 25%)')
+            .setDescription('Valor del multiplicador (100=x1, 150=x1.5, 200=x2)')
             .setRequired(true)
-            .setMinValue(0.01)
+            .setMinValue(101)
         )
         .addIntegerOption(option =>
           option.setName('duracion')
@@ -61,7 +61,7 @@ export default {
       
       const user = interaction.options.getUser('usuario');
       const channel = interaction.options.getChannel('canal');
-      const multiplier = interaction.options.getNumber('multiplicador');
+      const multiplier = interaction.options.getInteger('multiplicador');
       const duration = interaction.options.getInteger('duracion');
       
       if (!user && !channel) {
@@ -69,7 +69,8 @@ export default {
       }
       
       const durationMs = duration > 0 ? duration * 60 * 1000 : null;
-      const description = `Boost de ${Math.floor(multiplier * 100)}%${duration > 0 ? ` por ${duration} minutos` : ' permanente'}`;
+      const boostPercent = multiplier - 100;
+      const description = `Boost de ${boostPercent}%${duration > 0 ? ` por ${duration} minutos` : ' permanente'}`;
       
       if (user) {
         db.addBoost('user', user.id, multiplier, durationMs, description);
@@ -77,7 +78,7 @@ export default {
           embeds: [{
             color: 0xFFD700,
             title: '✅ Boost Añadido',
-            description: `Boost de **${Math.floor(multiplier * 100)}%** añadido a <@${user.id}>`,
+            description: `Boost de **${boostPercent}%** (x${(multiplier/100).toFixed(2)}) añadido a <@${user.id}>`,
             fields: [{ name: 'Duración', value: duration > 0 ? `${duration} minutos` : 'Permanente' }]
           }]
         });
@@ -89,7 +90,7 @@ export default {
           embeds: [{
             color: 0xFFD700,
             title: '✅ Boost Añadido',
-            description: `Boost de **${Math.floor(multiplier * 100)}%** añadido a <#${channel.id}>`,
+            description: `Boost de **${boostPercent}%** (x${(multiplier/100).toFixed(2)}) añadido a <#${channel.id}>`,
             fields: [{ name: 'Duración', value: duration > 0 ? `${duration} minutos` : 'Permanente' }]
           }]
         });

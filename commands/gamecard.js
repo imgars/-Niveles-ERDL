@@ -199,6 +199,78 @@ async function generateMinecraftCard(profile) {
   return canvas.toBuffer('image/png');
 }
 
+async function generateBrawlStarsCard(tag) {
+  const width = 600;
+  const height = 300;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext('2d');
+  
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, '#1a1a2e');
+  gradient.addColorStop(0.5, '#16213e');
+  gradient.addColorStop(1, '#0f3460');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+  
+  ctx.fillStyle = 'rgba(255, 204, 0, 0.1)';
+  for (let i = 0; i < 20; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const size = Math.random() * 20 + 5;
+    ctx.beginPath();
+    const spikes = 5;
+    const outerRadius = size;
+    const innerRadius = size / 2;
+    for (let j = 0; j < spikes * 2; j++) {
+      const radius = j % 2 === 0 ? outerRadius : innerRadius;
+      const angle = (j * Math.PI) / spikes - Math.PI / 2;
+      if (j === 0) {
+        ctx.moveTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
+      } else {
+        ctx.lineTo(x + radius * Math.cos(angle), y + radius * Math.sin(angle));
+      }
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  ctx.strokeStyle = '#FFCC00';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(15, 15, width - 30, height - 30);
+  
+  ctx.strokeStyle = '#FF6600';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(25, 25, width - 50, height - 50);
+  
+  ctx.fillStyle = '#FFCC00';
+  ctx.font = 'bold 42px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('BRAWL STARS', width / 2, 80);
+  
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.fillText(`#${tag}`, width / 2, 130);
+  
+  ctx.fillStyle = '#FF6600';
+  ctx.font = 'bold 18px Arial, sans-serif';
+  ctx.fillText('⭐ Player Tag ⭐', width / 2, 170);
+  
+  ctx.fillStyle = '#AAAAAA';
+  ctx.font = '14px Arial, sans-serif';
+  ctx.fillText('Consulta estadísticas en:', width / 2, 210);
+  
+  ctx.fillStyle = '#00BFFF';
+  ctx.font = 'bold 14px Arial, sans-serif';
+  ctx.fillText(`brawlify.com/stats/profile/${tag}`, width / 2, 235);
+  
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '10px Arial, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('Generado por - Niveles Bot', width - 30, height - 20);
+  
+  return canvas.toBuffer('image/png');
+}
+
 export default {
   data: new SlashCommandBuilder()
     .setName('gamecard')
@@ -285,13 +357,17 @@ export default {
       if (subcommand === 'brawlstars') {
         const tag = interaction.options.getString('tag').toUpperCase().replace('#', '');
         
+        const imageBuffer = await generateBrawlStarsCard(tag);
+        const attachment = new AttachmentBuilder(imageBuffer, { name: 'brawlstars_profile.png' });
+        
         return interaction.editReply({
           embeds: [{
             color: 0xFFCC00,
-            title: '🌟 Brawl Stars',
-            description: `Para ver tu perfil de Brawl Stars, visita:\n\n**https://brawlify.com/stats/profile/${tag}**\n\n*La API pública de Brawl Stars requiere una key de desarrollador.*`,
-            footer: { text: `Tag: #${tag}` }
-          }]
+            title: `🌟 Brawl Stars: #${tag}`,
+            description: `Consulta estadísticas completas en:\n**https://brawlify.com/stats/profile/${tag}**`,
+            image: { url: 'attachment://brawlstars_profile.png' }
+          }],
+          files: [attachment]
         });
       }
       

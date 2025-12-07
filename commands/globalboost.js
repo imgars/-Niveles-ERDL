@@ -6,11 +6,11 @@ export default {
   data: new SlashCommandBuilder()
     .setName('globalboost')
     .setDescription('[Staff] Añade un boost global al servidor')
-    .addNumberOption(option =>
+    .addIntegerOption(option =>
       option.setName('multiplicador')
-        .setDescription('Multiplicador (0.5 = 50%)')
+        .setDescription('Valor del multiplicador (100=x1, 150=x1.5, 200=x2, 1000=x10)')
         .setRequired(true)
-        .setMinValue(0.01)
+        .setMinValue(101)
     )
     .addIntegerOption(option =>
       option.setName('duracion')
@@ -24,10 +24,11 @@ export default {
       return interaction.reply({ content: '❌ No tienes permisos para usar este comando.', ephemeral: true });
     }
     
-    const multiplier = interaction.options.getNumber('multiplicador');
+    const multiplier = interaction.options.getInteger('multiplicador');
     const duration = interaction.options.getInteger('duracion');
     const durationMs = duration > 0 ? duration * 60 * 1000 : null;
-    const description = `Boost global de ${Math.floor(multiplier * 100)}%`;
+    const boostPercent = multiplier - 100;
+    const description = `Boost global de ${boostPercent}%`;
     
     db.addBoost('global', null, multiplier, durationMs, description);
     
@@ -35,7 +36,7 @@ export default {
       embeds: [{
         color: 0xFFD700,
         title: '🌍 Boost Global Activado',
-        description: `Boost de **${Math.floor(multiplier * 100)}%** para todo el servidor`,
+        description: `Boost de **${boostPercent}%** (x${(multiplier/100).toFixed(2)}) para todo el servidor`,
         fields: [{ name: 'Duración', value: duration > 0 ? `${duration} minutos` : 'Permanente' }]
       }]
     });

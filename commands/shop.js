@@ -5,17 +5,20 @@ import db from '../utils/database.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('shop')
-    .setDescription('Compra XP, niveles y boosts con Lagcoins')
+    .setDescription('Compra XP, niveles, boosts y tarjetas con Lagcoins')
     .addStringOption(option =>
       option.setName('item')
         .setDescription('Qué quieres comprar')
         .setChoices(
-          { name: '100 XP - 50 Lagcoins', value: 'xp100' },
-          { name: '500 XP - 200 Lagcoins', value: 'xp500' },
-          { name: '1 Nivel - 300 Lagcoins', value: 'level1' },
-          { name: '5 Niveles - 1200 Lagcoins', value: 'level5' },
-          { name: 'Boost 50% 24h - 400 Lagcoins', value: 'boost24' },
-          { name: 'Boost 100% 48h - 800 Lagcoins', value: 'boost48' }
+          { name: '100 XP - 150 Lagcoins', value: 'xp100' },
+          { name: '500 XP - 600 Lagcoins', value: 'xp500' },
+          { name: '1 Nivel - 800 Lagcoins', value: 'level1' },
+          { name: '5 Niveles - 3500 Lagcoins', value: 'level5' },
+          { name: 'Boost 50% 24h - 1200 Lagcoins', value: 'boost24' },
+          { name: 'Boost 100% 48h - 2500 Lagcoins', value: 'boost48' },
+          { name: 'Tarjeta Minecraft - 5000 Lagcoins', value: 'card_minecraft' },
+          { name: 'Tarjeta FNAF - 4500 Lagcoins', value: 'card_fnaf' },
+          { name: 'Tarjeta Roblox - 7000 Lagcoins', value: 'card_roblox' }
         )
         .setRequired(true)
     ),
@@ -31,12 +34,15 @@ export default {
     }
 
     const items = {
-      xp100: { price: 50, xp: 100, name: '100 XP' },
-      xp500: { price: 200, xp: 500, name: '500 XP' },
-      level1: { price: 300, levels: 1, name: '1 Nivel' },
-      level5: { price: 1200, levels: 5, name: '5 Niveles' },
-      boost24: { price: 400, boost: 0.5, hours: 24, name: 'Boost 50% 24h' },
-      boost48: { price: 800, boost: 1, hours: 48, name: 'Boost 100% 48h' }
+      xp100: { price: 150, xp: 100, name: '100 XP' },
+      xp500: { price: 600, xp: 500, name: '500 XP' },
+      level1: { price: 800, levels: 1, name: '1 Nivel' },
+      level5: { price: 3500, levels: 5, name: '5 Niveles' },
+      boost24: { price: 1200, boost: 150, hours: 24, name: 'Boost 50% 24h' },
+      boost48: { price: 2500, boost: 200, hours: 48, name: 'Boost 100% 48h' },
+      card_minecraft: { price: 5000, card: 'minecraft', name: 'Tarjeta Minecraft' },
+      card_fnaf: { price: 4500, card: 'fnaf', name: 'Tarjeta FNAF' },
+      card_roblox: { price: 7000, card: 'roblox', name: 'Tarjeta Roblox' }
     };
 
     const itemData = items[item];
@@ -61,8 +67,14 @@ export default {
     }
 
     if (itemData.boost) {
-      const expiresAt = new Date(Date.now() + itemData.hours * 60 * 60 * 1000);
-      db.addBoost('global', itemData.boost, expiresAt);
+      const durationMs = itemData.hours * 60 * 60 * 1000;
+      const boostPercent = itemData.boost - 100;
+      db.addBoost('user', interaction.user.id, itemData.boost, durationMs, `Boost de tienda ${boostPercent}% por ${itemData.hours}h`);
+    }
+
+    if (itemData.card) {
+      user.selectedCardTheme = itemData.card;
+      db.saveUser(interaction.guildId, interaction.user.id, user);
     }
 
     const embed = new EmbedBuilder()

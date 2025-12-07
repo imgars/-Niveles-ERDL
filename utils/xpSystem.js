@@ -69,13 +69,19 @@ export function getRandomXP() {
 }
 
 export function calculateBoostMultiplier(boosts) {
-  let totalMultiplier = 1.0;
+  if (!boosts || boosts.length === 0) return 1.0;
+  
+  let totalMultiplier = 100;
   
   for (const boost of boosts) {
-    totalMultiplier += boost.multiplier;
+    if (boost.multiplier >= 1) {
+      totalMultiplier += (boost.multiplier - 100);
+    } else {
+      totalMultiplier += (boost.multiplier * 100);
+    }
   }
   
-  return totalMultiplier;
+  return Math.max(1, totalMultiplier / 100);
 }
 
 export function addLevels(currentTotalXp, levelsToAdd) {
@@ -128,7 +134,7 @@ export function getActiveBoostsText(boosts) {
   if (!boosts || boosts.length === 0) return '';
   
   const boostLines = boosts.map(boost => {
-    const percentage = Math.round(boost.multiplier * 100);
+    const percentage = boost.multiplier >= 1 ? Math.round(boost.multiplier - 100) : Math.round(boost.multiplier * 100);
     
     let remaining = '';
     if (boost.expiresAt) {
@@ -157,28 +163,34 @@ export function getActiveBoostsText(boosts) {
 export function getSimplifiedBoostsText(boosts) {
   if (!boosts || boosts.length === 0) return '';
   
-  let totalMultiplier = 0;
+  let totalPercentage = 0;
   for (const boost of boosts) {
-    totalMultiplier += boost.multiplier;
+    if (boost.multiplier >= 1) {
+      totalPercentage += (boost.multiplier - 100);
+    } else {
+      totalPercentage += (boost.multiplier * 100);
+    }
   }
   
-  const totalPercentage = Math.round(totalMultiplier * 100);
-  return `🚀 +${totalPercentage}%`;
+  return `🚀 +${Math.round(totalPercentage)}%`;
 }
 
 export function getBoostTextForCard(boosts) {
   if (!boosts || boosts.length === 0) return '';
   
-  let totalMultiplier = 0;
+  let totalPercentage = 0;
   for (const boost of boosts) {
-    totalMultiplier += boost.multiplier;
+    if (boost.multiplier >= 1) {
+      totalPercentage += (boost.multiplier - 100);
+    } else {
+      totalPercentage += (boost.multiplier * 100);
+    }
   }
   
-  const totalPercentage = Math.round(totalMultiplier * 100);
-  return `Boost activo del ${totalPercentage}%`;
+  return `Boost activo del ${Math.round(totalPercentage)}%`;
 }
 
 export function formatBoostMultiplier(multiplier) {
-  const percentage = Math.round(multiplier * 100);
+  const percentage = multiplier >= 1 ? Math.round(multiplier - 100) : Math.round(multiplier * 100);
   return `+${percentage}%`;
 }

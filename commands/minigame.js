@@ -310,7 +310,7 @@ async function playTrivia(interaction) {
         }
         
         if (i.customId === 'trivia_reward_boost') {
-          db.addBoost('user', interaction.user.id, 0.2, 12 * 60 * 60 * 1000, 'Boost de trivia 20% por 12h');
+          db.addBoost('user', interaction.user.id, 120, 12 * 60 * 60 * 1000, 'Boost de trivia 20% por 12h');
           await addUserLagcoins(interaction.guild.id, interaction.user.id, 300, 'trivia_boost');
           await i.update({
             embeds: [{
@@ -528,7 +528,7 @@ async function startRPSGame(interaction, player1, player2, hasReward) {
     const winner = p1Wins === 3 ? player1 : player2;
     
     if (hasReward) {
-      db.addBoost('user', winner.id, 0.3, 2 * 60 * 60 * 1000, 'Boost de RPS 30% por 2h');
+      db.addBoost('user', winner.id, 130, 2 * 60 * 60 * 1000, 'Boost de RPS 30% por 2h');
       await addUserLagcoins(interaction.guild.id, winner.id, 500, 'rps_win');
       db.setCooldown('minigame_rps', player1.id, 12 * 60 * 60 * 1000);
       db.setCooldown('minigame_rps', player2.id, 12 * 60 * 60 * 1000);
@@ -831,8 +831,7 @@ async function playSoloHangman(interaction) {
     let rewardGiven = false;
     
     if (roundsWon === 3) {
-      const boostId = `hangman_${interaction.user.id}_${Date.now()}`;
-      db.addBoost(boostId, 'Hangman Victory', 0.25, 24 * 60 * 60 * 1000, { userId: interaction.user.id });
+      db.addBoost('user', interaction.user.id, 125, 24 * 60 * 60 * 1000, 'Victoria Hangman +25% por 24h');
       await addUserLagcoins(interaction.guild.id, interaction.user.id, 600, 'hangman_perfect');
       reward = '🎉 ¡Ganaste 3/3 rondas! **+25% boost por 24 horas**\n💰 +600 Lagcoins';
       rewardGiven = true;
