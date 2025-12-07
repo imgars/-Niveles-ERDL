@@ -1,4 +1,4 @@
-# Discord Leveling Bot
+# -Niveles
 
 Un bot de Discord completo con sistema de niveles, XP, minijuegos y tarjetas de rango personalizadas con pixel art.
 
