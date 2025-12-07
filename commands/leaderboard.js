@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, AttachmentBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { CONFIG } from '../config.js';
 import db from '../utils/database.js';
-import { generateLeaderboardImage, generateMinecraftLeaderboard } from '../utils/cardGenerator.js';
+import { generateLeaderboardImage, generateMinecraftLeaderboard, generatePokemonLeaderboard, generateZeldaLeaderboard } from '../utils/cardGenerator.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,7 +12,8 @@ export default {
         .setDescription('Tipo de leaderboard')
         .addChoices(
           { name: '🏆 General', value: 'general' },
-          { name: '⚔️ Top 100+ (Minecraft Style)', value: 'elite' }
+          { name: '⚔️ Top 100+ (Elite)', value: 'elite' },
+          { name: '⚔️ Zelda (Super Activos)', value: 'zelda' }
         )
     ),
   
@@ -23,6 +24,7 @@ export default {
       const tipo = interaction.options.getString('tipo') || 'general';
       const member = await interaction.guild.members.fetch(interaction.user.id);
       const allUsers = db.getAllUsers(interaction.guild.id);
+      const userData = db.getUser(interaction.guild.id, interaction.user.id);
       
       let sortedUsers;
       let imageBuffer;
@@ -38,8 +40,33 @@ export default {
           return interaction.editReply('⚔️ No hay usuarios nivel 100+ todavía. ¡Sé el primero en llegar!');
         }
         
-        imageBuffer = await generateMinecraftLeaderboard(sortedUsers, interaction.guild);
-        title = '⚔️ Top Leyendas (100+)';
+        const userLevel = userData.level || 0;
+        const selectedTheme = userData.selectedLeaderboardTheme || 'minecraft';
+        
+        if (userLevel >= 100 && selectedTheme === 'pokemon') {
+          imageBuffer = await generatePokemonLeaderboard(sortedUsers, interaction.guild);
+          title = '🔥 Pokemon Masters (100+)';
+        } else {
+          imageBuffer = await generateMinecraftLeaderboard(sortedUsers, interaction.guild);
+          title = '⚔️ Top Leyendas (100+)';
+        }
+      } else if (tipo === 'zelda') {
+        const isSuperActive = member.roles.cache.has(CONFIG.LEVEL_ROLES[35]);
+        if (!isSuperActive) {
+          return interaction.editReply('❌ Necesitas el rol Super Activo (nivel 35+) para ver este leaderboard.');
+        }
+        
+        sortedUsers = allUsers
+          .filter(u => u.totalXp && u.totalXp > 0 && u.level && u.level > 0)
+          .sort((a, b) => (b.totalXp || 0) - (a.totalXp || 0))
+          .slice(0, 10);
+        
+        if (sortedUsers.length === 0) {
+          return interaction.editReply('📊 No hay usuarios en la tabla de clasificación todavía.');
+        }
+        
+        imageBuffer = await generateZeldaLeaderboard(sortedUsers, interaction.guild);
+        title = '⚔️ Heroes of Hyrule';
       } else {
         sortedUsers = allUsers
           .filter(u => u.totalXp && u.totalXp > 0 && u.level && u.level > 0)
@@ -68,7 +95,7 @@ export default {
       
       await interaction.editReply({
         embeds: [{
-          color: tipo === 'elite' ? 0x55FF55 : 0xFFD700,
+          color: tipo === 'elite' ? 0xFF4500 : (tipo === 'zelda' ? 0x90EE90 : 0xFFD700),
           title: title,
           image: { url: 'attachment://leaderboard.png' },
           footer: { text: `Total de usuarios activos: ${allUsers.length}` }

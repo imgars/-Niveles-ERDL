@@ -73,6 +73,12 @@ export default {
     }
 
     if (itemData.card) {
+      if (!user.purchasedCards) {
+        user.purchasedCards = [];
+      }
+      if (!user.purchasedCards.includes(itemData.card)) {
+        user.purchasedCards.push(itemData.card);
+      }
       user.selectedCardTheme = itemData.card;
       db.saveUser(interaction.guildId, interaction.user.id, user);
     }

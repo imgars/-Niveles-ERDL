@@ -34,7 +34,46 @@ const triviaQuestions = [
   { question: '¿En qué país está la Torre de Pisa?', options: ['Francia', 'Alemania', 'Italia', 'España'], correct: 2 },
   { question: '¿Cuántas letras tiene el alfabeto español?', options: ['26', '27', '28', '29'], correct: 1 },
   { question: '¿Quién fue Napoleón Bonaparte?', options: ['Pintor', 'Militar francés', 'Filósofo', 'Científico'], correct: 1 },
-  { question: '¿Cuál es el deporte más popular en el mundo?', options: ['Baloncesto', 'Fútbol', 'Tenis', 'Cricket'], correct: 1 }
+  { question: '¿Cuál es el deporte más popular en el mundo?', options: ['Baloncesto', 'Fútbol', 'Tenis', 'Cricket'], correct: 1 },
+  { question: '¿Cuál es la capital de Argentina?', options: ['Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza'], correct: 0 },
+  { question: '¿Quién descubrió América?', options: ['Américo Vespucio', 'Cristóbal Colón', 'Fernando de Magallanes', 'Hernán Cortés'], correct: 1 },
+  { question: '¿Cuál es el país más grande del mundo?', options: ['Estados Unidos', 'China', 'Rusia', 'Canadá'], correct: 2 },
+  { question: '¿En qué año llegó el hombre a la Luna?', options: ['1965', '1967', '1969', '1971'], correct: 2 },
+  { question: '¿Cuál es el símbolo químico del agua?', options: ['O2', 'H2O', 'CO2', 'NaCl'], correct: 1 },
+  { question: '¿Quién escribió Romeo y Julieta?', options: ['Dante', 'Shakespeare', 'Molière', 'Goethe'], correct: 1 },
+  { question: '¿Cuál es la montaña más alta del mundo?', options: ['K2', 'Everest', 'Aconcagua', 'Monte Blanco'], correct: 1 },
+  { question: '¿En qué continente está Egipto?', options: ['Asia', 'Europa', 'África', 'Oceanía'], correct: 2 },
+  { question: '¿Cuántos planetas tiene el sistema solar?', options: ['7', '8', '9', '10'], correct: 1 },
+  { question: '¿Cuál es la capital de Colombia?', options: ['Medellín', 'Cali', 'Bogotá', 'Cartagena'], correct: 2 },
+  { question: '¿Quién inventó el teléfono?', options: ['Thomas Edison', 'Alexander Graham Bell', 'Nikola Tesla', 'Samuel Morse'], correct: 1 },
+  { question: '¿Cuál es el animal terrestre más grande?', options: ['Rinoceronte', 'Elefante', 'Hipopótamo', 'Jirafa'], correct: 1 },
+  { question: '¿En qué año comenzó la Primera Guerra Mundial?', options: ['1912', '1914', '1916', '1918'], correct: 1 },
+  { question: '¿Cuál es la capital de México?', options: ['Guadalajara', 'Monterrey', 'Ciudad de México', 'Cancún'], correct: 2 },
+  { question: '¿Quién desarrolló la teoría de la relatividad?', options: ['Newton', 'Einstein', 'Hawking', 'Galileo'], correct: 1 },
+  { question: '¿Cuál es el país más poblado del mundo?', options: ['Estados Unidos', 'India', 'China', 'Indonesia'], correct: 1 },
+  { question: '¿En qué país está el Machu Picchu?', options: ['Bolivia', 'Ecuador', 'Perú', 'Chile'], correct: 2 },
+  { question: '¿Cuál es la capital de Brasil?', options: ['São Paulo', 'Río de Janeiro', 'Brasilia', 'Salvador'], correct: 2 },
+  { question: '¿Quién compuso la Quinta Sinfonía?', options: ['Mozart', 'Beethoven', 'Bach', 'Chopin'], correct: 1 },
+  { question: '¿Cuántos días tiene un año bisiesto?', options: ['364', '365', '366', '367'], correct: 2 },
+  { question: '¿Cuál es el órgano más grande del cuerpo humano?', options: ['Hígado', 'Cerebro', 'Piel', 'Corazón'], correct: 2 },
+  { question: '¿En qué país está la Gran Muralla?', options: ['Japón', 'Corea', 'China', 'Mongolia'], correct: 2 },
+  { question: '¿Cuál es el gas más abundante en la atmósfera?', options: ['Oxígeno', 'Nitrógeno', 'CO2', 'Argón'], correct: 1 },
+  { question: '¿Quién fue el libertador de Venezuela?', options: ['San Martín', 'Bolívar', 'Sucre', 'Miranda'], correct: 1 },
+  { question: '¿Cuál es la capital de Chile?', options: ['Valparaíso', 'Concepción', 'Santiago', 'Viña del Mar'], correct: 2 },
+  { question: '¿En qué año se fundó Google?', options: ['1996', '1998', '2000', '2002'], correct: 1 },
+  { question: '¿Cuál es el planeta más cercano al Sol?', options: ['Venus', 'Mercurio', 'Marte', 'Tierra'], correct: 1 },
+  { question: '¿Quién pintó El Grito?', options: ['Munch', 'Picasso', 'Dalí', 'Van Gogh'], correct: 0 },
+  { question: '¿Cuál es la capital de España?', options: ['Barcelona', 'Sevilla', 'Madrid', 'Valencia'], correct: 2 },
+  { question: '¿Cuántos jugadores hay en un equipo de fútbol?', options: ['9', '10', '11', '12'], correct: 2 },
+  { question: '¿Cuál es la capital de Italia?', options: ['Milán', 'Venecia', 'Roma', 'Florencia'], correct: 2 },
+  { question: '¿Quién creó Facebook?', options: ['Steve Jobs', 'Bill Gates', 'Mark Zuckerberg', 'Elon Musk'], correct: 2 },
+  { question: '¿Cuál es el animal más grande del mundo?', options: ['Elefante', 'Ballena Azul', 'Tiburón Ballena', 'Jirafa'], correct: 1 },
+  { question: '¿En qué país está el Taj Mahal?', options: ['Pakistán', 'India', 'Bangladesh', 'Nepal'], correct: 1 },
+  { question: '¿Cuál es la capital de Alemania?', options: ['Múnich', 'Hamburgo', 'Berlín', 'Frankfurt'], correct: 2 },
+  { question: '¿Cuántas notas musicales hay?', options: ['5', '6', '7', '8'], correct: 2 },
+  { question: '¿Quién escribió Cien años de soledad?', options: ['Borges', 'García Márquez', 'Cortázar', 'Vargas Llosa'], correct: 1 },
+  { question: '¿Cuál es la moneda de Reino Unido?', options: ['Euro', 'Dólar', 'Libra', 'Franco'], correct: 2 },
+  { question: '¿En qué continente está Australia?', options: ['Asia', 'Oceanía', 'América', 'Europa'], correct: 1 }
 ];
 
 export default {
@@ -827,24 +866,33 @@ async function playSoloHangman(interaction) {
   
   async function endHangmanGame() {
     const userData = db.getUser(interaction.guild.id, interaction.user.id);
-    let reward = '❌ No ganaste.';
+    let reward = '❌ No ganaste esta vez.';
     let rewardGiven = false;
+    let footerText = '';
     
     if (roundsWon === 3) {
       db.addBoost('user', interaction.user.id, 125, 24 * 60 * 60 * 1000, 'Victoria Hangman +25% por 24h');
       await addUserLagcoins(interaction.guild.id, interaction.user.id, 600, 'hangman_perfect');
       reward = '🎉 ¡Ganaste 3/3 rondas! **+25% boost por 24 horas**\n💰 +600 Lagcoins';
       rewardGiven = true;
+    } else {
+      footerText = '¡Puedes volver a intentarlo cuando termine el cooldown!';
     }
     
     db.setCooldown('minigame_hangman', interaction.user.id, 48 * 60 * 60 * 1000);
     
+    const embed = {
+      color: rewardGiven ? 0x4CAF50 : 0xF04747,
+      title: rewardGiven ? '🏆 ¡Juego Terminado!' : '😔 ¡Perdiste!',
+      description: `**Puntuación:** ${roundsWon}/3\n\n${reward}`
+    };
+    
+    if (footerText) {
+      embed.footer = { text: footerText };
+    }
+    
     await interaction.editReply({
-      embeds: [{
-        color: rewardGiven ? 0x4CAF50 : 0xF04747,
-        title: '🏆 ¡Juego Terminado!',
-        description: `**Puntuación:** ${roundsWon}/3\n\n${reward}`
-      }],
+      embeds: [embed],
       components: []
     });
   }

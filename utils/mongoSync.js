@@ -124,6 +124,23 @@ const economySchema = new mongoose.Schema({
 
 const Economy = mongoose.model('Economy', economySchema);
 
+const nationalitySchema = new mongoose.Schema({
+  guildId: { type: String, required: true },
+  userId: { type: String, required: true },
+  country: { type: String, required: true },
+  currentCountry: String,
+  assignedAt: { type: Date, default: Date.now },
+  travelHistory: [{
+    country: String,
+    date: { type: Date, default: Date.now },
+    _id: false
+  }]
+}, { timestamps: true });
+
+nationalitySchema.index({ guildId: 1, userId: 1 }, { unique: true });
+
+const Nationality = mongoose.model('Nationality', nationalitySchema);
+
 let isConnected = false;
 
 export async function connectMongoDB() {
@@ -687,5 +704,69 @@ export async function updateJobStats(guildId, userId, jobName) {
   } catch (error) {
     console.error('Error actualizando stats trabajo:', error.message);
     return null;
+  }
+}
+
+// Nacionalidad functions
+export async function getNationalityFromMongo(guildId, userId) {
+  if (!isConnected) return null;
+  try {
+    const nationality = await Nationality.findOne({ guildId, userId });
+    return nationality;
+  } catch (error) {
+    console.error('Error obteniendo nacionalidad:', error.message);
+    return null;
+  }
+}
+
+export async function saveNationalityToMongo(guildId, userId, nationalityData) {
+  if (!isConnected) return null;
+  try {
+    const nationality = await Nationality.findOneAndUpdate(
+      { guildId, userId },
+      {
+        guildId,
+        userId,
+        country: nationalityData.country,
+        currentCountry: nationalityData.currentCountry || nationalityData.country,
+        assignedAt: nationalityData.assignedAt || new Date(),
+        travelHistory: nationalityData.travelHistory || []
+      },
+      { upsert: true, new: true }
+    );
+    return nationality;
+  } catch (error) {
+    console.error('Error guardando nacionalidad:', error.message);
+    return null;
+  }
+}
+
+export async function updateNationalityTravelHistory(guildId, userId, newCountry) {
+  if (!isConnected) return null;
+  try {
+    const nationality = await Nationality.findOneAndUpdate(
+      { guildId, userId },
+      {
+        $set: { currentCountry: newCountry },
+        $push: { travelHistory: { country: newCountry, date: new Date() } }
+      },
+      { new: true }
+    );
+    return nationality;
+  } catch (error) {
+    console.error('Error actualizando historial de viaje:', error.message);
+    return null;
+  }
+}
+
+export async function getAllNationalitiesFromMongo(guildId = null) {
+  if (!isConnected) return [];
+  try {
+    const query = guildId ? { guildId } : {};
+    const nationalities = await Nationality.find(query).lean();
+    return nationalities || [];
+  } catch (error) {
+    console.error('Error obteniendo nacionalidades:', error.message);
+    return [];
   }
 }

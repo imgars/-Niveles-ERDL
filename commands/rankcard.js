@@ -31,7 +31,8 @@ export default {
       if (subcommand === 'select') {
         const member = await interaction.guild.members.fetch(interaction.user.id);
         const userData = db.getUser(interaction.guild.id, interaction.user.id);
-        const available = await getAvailableThemes(member, userData.level);
+        const purchasedCards = userData.purchasedCards || [];
+        const available = await getAvailableThemes(member, userData.level, purchasedCards);
 
         if (available.length === 1) {
           return interaction.reply({

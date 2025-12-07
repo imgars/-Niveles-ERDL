@@ -4,7 +4,7 @@ import { CONFIG } from '../config.js';
 const CARD_WIDTH = 800;
 const CARD_HEIGHT = 250;
 
-export async function getAvailableThemes(member, level) {
+export async function getAvailableThemes(member, level, purchasedCards = []) {
   const userId = member.user.id;
   let roles;
   const themes = ['discord', 'pixel'];
@@ -39,6 +39,14 @@ export async function getAvailableThemes(member, level) {
   
   if (roles && roles.has(CONFIG.LEVEL_ROLES[25])) {
     themes.push('ocean');
+  }
+  
+  if (purchasedCards && purchasedCards.length > 0) {
+    for (const card of purchasedCards) {
+      if (!themes.includes(card)) {
+        themes.push(card);
+      }
+    }
   }
   
   return [...new Set(themes)];
@@ -766,6 +774,202 @@ export async function generateMinecraftLeaderboard(topUsers, guild) {
   ctx.font = '12px Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('Minecraft 1.12 Style - Elite Players', 350, 740);
+  ctx.textAlign = 'left';
+  
+  return canvas.toBuffer('image/png');
+}
+
+export async function generatePokemonLeaderboard(topUsers, guild) {
+  const canvas = createCanvas(700, 760);
+  const ctx = canvas.getContext('2d');
+  
+  const pokemonColors = ['#FF6B35', '#FF4500', '#FFD700', '#FF8C00'];
+  const pixelSize = 16;
+  
+  for (let y = 0; y < 760; y += pixelSize) {
+    for (let x = 0; x < 700; x += pixelSize) {
+      ctx.fillStyle = pokemonColors[Math.floor(Math.random() * pokemonColors.length)];
+      ctx.fillRect(x, y, pixelSize, pixelSize);
+    }
+  }
+  
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+  ctx.fillRect(20, 20, 660, 720);
+  
+  ctx.fillStyle = '#FF0000';
+  ctx.fillRect(18, 18, 664, 724);
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(20, 20, 660, 720);
+  
+  ctx.fillStyle = '#FFD700';
+  ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🔥 POKEMON MASTERS 🔥', 350, 55);
+  ctx.textAlign = 'left';
+  
+  ctx.fillStyle = '#FF4500';
+  ctx.fillRect(40, 70, 620, 2);
+  
+  for (let i = 0; i < Math.min(10, topUsers.length); i++) {
+    const user = topUsers[i];
+    const y = 90 + (i * 62);
+    
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(255, 100, 50, 0.15)' : 'rgba(255, 215, 0, 0.1)';
+    ctx.fillRect(30, y, 640, 56);
+    
+    let rankColor;
+    if (i === 0) rankColor = '#FFD700';
+    else if (i === 1) rankColor = '#C0C0C0';
+    else if (i === 2) rankColor = '#CD7F32';
+    else rankColor = '#FF4500';
+    
+    ctx.fillStyle = rankColor;
+    ctx.fillRect(30, y, 4, 56);
+    
+    try {
+      const member = await guild.members.fetch(user.userId).catch(() => null);
+      if (member) {
+        const avatarURL = member.user.displayAvatarURL({ extension: 'png', size: 64 });
+        const avatar = await loadImage(avatarURL);
+        
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(42, y + 6, 46, 46);
+        ctx.drawImage(avatar, 44, y + 8, 42, 42);
+      }
+    } catch (error) {
+      console.error('Error loading avatar:', error);
+    }
+    
+    const medals = ['🏆', '⚡', '🌟'];
+    ctx.fillStyle = rankColor;
+    ctx.font = 'bold 20px Arial, sans-serif';
+    if (i < 3) {
+      ctx.fillText(medals[i], 100, y + 36);
+    } else {
+      ctx.fillText(`#${i + 1}`, 100, y + 36);
+    }
+    
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '16px Arial, sans-serif';
+    let username = 'Trainer';
+    try {
+      const member = await guild.members.fetch(user.userId).catch(() => null);
+      if (member) {
+        username = member.user.username;
+      }
+    } catch (e) {}
+    ctx.fillText(username.substring(0, 18), 150, y + 36);
+    
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.fillText(`LVL ${user.level}`, 530, y + 28);
+    ctx.fillStyle = '#FF8C00';
+    ctx.font = '12px Arial, sans-serif';
+    ctx.fillText(`${(user.totalXp || 0).toLocaleString()} XP`, 530, y + 46);
+  }
+  
+  ctx.fillStyle = '#FF4500';
+  ctx.font = '12px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Pokemon Style - Elite Trainers 100+', 350, 740);
+  ctx.textAlign = 'left';
+  
+  return canvas.toBuffer('image/png');
+}
+
+export async function generateZeldaLeaderboard(topUsers, guild) {
+  const canvas = createCanvas(700, 760);
+  const ctx = canvas.getContext('2d');
+  
+  const zeldaColors = ['#90EE90', '#228B22', '#FFD700', '#2F4F2F'];
+  const pixelSize = 16;
+  
+  for (let y = 0; y < 760; y += pixelSize) {
+    for (let x = 0; x < 700; x += pixelSize) {
+      ctx.fillStyle = zeldaColors[Math.floor(Math.random() * zeldaColors.length)];
+      ctx.fillRect(x, y, pixelSize, pixelSize);
+    }
+  }
+  
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+  ctx.fillRect(20, 20, 660, 720);
+  
+  ctx.fillStyle = '#FFD700';
+  ctx.fillRect(18, 18, 664, 724);
+  ctx.fillStyle = '#1a2f1a';
+  ctx.fillRect(20, 20, 660, 720);
+  
+  ctx.fillStyle = '#FFD700';
+  ctx.font = 'bold 28px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('⚔️ HEROES OF HYRULE ⚔️', 350, 55);
+  ctx.textAlign = 'left';
+  
+  ctx.fillStyle = '#98FB98';
+  ctx.fillRect(40, 70, 620, 2);
+  
+  for (let i = 0; i < Math.min(10, topUsers.length); i++) {
+    const user = topUsers[i];
+    const y = 90 + (i * 62);
+    
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(144, 238, 144, 0.15)' : 'rgba(255, 215, 0, 0.1)';
+    ctx.fillRect(30, y, 640, 56);
+    
+    let rankColor;
+    if (i === 0) rankColor = '#FFD700';
+    else if (i === 1) rankColor = '#C0C0C0';
+    else if (i === 2) rankColor = '#CD7F32';
+    else rankColor = '#98FB98';
+    
+    ctx.fillStyle = rankColor;
+    ctx.fillRect(30, y, 4, 56);
+    
+    try {
+      const member = await guild.members.fetch(user.userId).catch(() => null);
+      if (member) {
+        const avatarURL = member.user.displayAvatarURL({ extension: 'png', size: 64 });
+        const avatar = await loadImage(avatarURL);
+        
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(42, y + 6, 46, 46);
+        ctx.drawImage(avatar, 44, y + 8, 42, 42);
+      }
+    } catch (error) {
+      console.error('Error loading avatar:', error);
+    }
+    
+    const medals = ['🏆', '🗡️', '🛡️'];
+    ctx.fillStyle = rankColor;
+    ctx.font = 'bold 20px Arial, sans-serif';
+    if (i < 3) {
+      ctx.fillText(medals[i], 100, y + 36);
+    } else {
+      ctx.fillText(`#${i + 1}`, 100, y + 36);
+    }
+    
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '16px Arial, sans-serif';
+    let username = 'Hero';
+    try {
+      const member = await guild.members.fetch(user.userId).catch(() => null);
+      if (member) {
+        username = member.user.username;
+      }
+    } catch (e) {}
+    ctx.fillText(username.substring(0, 18), 150, y + 36);
+    
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.fillText(`LVL ${user.level}`, 530, y + 28);
+    ctx.fillStyle = '#98FB98';
+    ctx.font = '12px Arial, sans-serif';
+    ctx.fillText(`${(user.totalXp || 0).toLocaleString()} XP`, 530, y + 46);
+  }
+  
+  ctx.fillStyle = '#98FB98';
+  ctx.font = '12px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Zelda Style - Super Activos', 350, 740);
   ctx.textAlign = 'left';
   
   return canvas.toBuffer('image/png');
