@@ -1,61 +1,65 @@
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits
-} = require("discord.js");
+client.on("messageCreate", async (message) => {
+  // Ignorar bots
+  if (message.author.bot) return;
 
-const OWNER_ID = "1447415602825400381";
+  // Prefijo
+  const prefix = "!";
 
-module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("expulsarbot")
-    .setDescription("Expulsa el bot de todos los servidores excepto este.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  // Comando esperado
+  if (!message.content.startsWith(prefix)) return;
 
-  async execute(interaction) {
+  const args = message.content.slice(prefix.length).trim().split(/ +/);
+  const command = args.shift().toLowerCase();
 
-    // --- VERIFICAR QUE EL USUARIO SEA EL OWNER ---
-    if (interaction.user.id !== OWNER_ID) {
-      return interaction.reply({
-        content: "❌ **No tienes permiso** para usar este comando.",
-        ephemeral: true
-      });
+  // ================================
+  //  COMANDO: !expulsarbot
+  // ================================
+  if (command === "expulsarbot") {
+
+    // Verificar que solo tú puedas usarlo
+    const OWNER_ID = "1447415602825400381";
+
+    if (message.author.id !== OWNER_ID) {
+      return message.reply("❌ No tienes permiso para usar este comando.");
     }
 
-    await interaction.reply({
-      content: "🔄 **Ejecutando proceso...**\nEl bot comenzará a salir de todos los demás servidores.",
-      ephemeral: true
-    });
+    await message.reply("🔄 Ejecutando proceso, el bot empezará a salir de todos los servidores...");
 
-    const currentGuild = interaction.guild.id;
-    const client = interaction.client;
+    const client = message.client;
+    const currentGuildID = message.guild.id;
 
-    let count = 0;
+    let total = 0;
 
     for (const guild of client.guilds.cache.values()) {
-      if (guild.id === currentGuild) continue; // NO salir del servidor donde se ejecutó el comando
+
+      // No salir del servidor donde se ejecutó el comando
+      if (guild.id === currentGuildID) continue;
 
       try {
-        // Intentar enviar un mensaje al servidor ANTES de salir
+        // Buscar un canal donde el bot pueda enviar mensaje
         const channel =
           guild.systemChannel ||
-          guild.channels.cache.find(ch => ch.isTextBased() && ch.permissionsFor(guild.members.me).has("SendMessages"));
+          guild.channels.cache.find(
+            ch =>
+              ch.isTextBased() &&
+              ch.permissionsFor(guild.members.me)?.has("SendMessages")
+          );
 
+        // Enviar mensaje final antes de irse
         if (channel) {
-          await channel.send("👋 El bot ha sido expulsado automáticamente por decisión del propietario, Jose eres un asco.");
+          await channel.send("👋 El bot fue expulsado automáticamente por decisión del propietario, Jose eres un asco.");
         }
 
         // Salir del servidor
         await guild.leave();
-        count++;
+        total++;
+
         console.log(`Salió de: ${guild.name} (${guild.id})`);
-      } catch (error) {
-        console.error(`Error al salir de ${guild.name}:`, error);
+      } catch (err) {
+        console.error(`Error al salir de ${guild.name}:`, err);
       }
     }
 
-    await interaction.followUp({
-      content: `✅ **Proceso completado.**\nEl bot salió de **${count} servidores**.\nEste servidor fue preservado.`,
-      ephemeral: true
-    });
-  },
-};
+    await message.reply(`✅ El bot salió de **${total} servidores**.\nEste servidor fue excluido.`);
+  }
+});
