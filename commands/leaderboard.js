@@ -6,42 +6,32 @@ import { generateLeaderboardImage, generateMinecraftLeaderboard, generatePokemon
 export default {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription('Muestra la tabla de clasificación del servidor')
-    .addSubcommand(sub =>
-      sub.setName('ver')
-        .setDescription('Ver el leaderboard con tu tema seleccionado'))
-    .addSubcommand(sub =>
-      sub.setName('select')
-        .setDescription('Selecciona el tipo de leaderboard')
-        .addStringOption(option =>
-          option.setName('tipo')
-            .setDescription('Tipo de leaderboard')
-            .setRequired(true)
-            .addChoices(
-              { name: '🏆 General (Pixel)', value: 'pixel' },
-              { name: '⛏️ Minecraft', value: 'minecraft' },
-              { name: '🔥 Pokemon (Nivel 100+)', value: 'pokemon' },
-              { name: '⚔️ Zelda (Super Activos)', value: 'zelda' }
-            )
-        )),
+    .setDescription('Muestra la tabla de clasificación del servidor'),
   
   async execute(interaction) {
     await interaction.deferReply();
     
     try {
-      const subcommand = interaction.options.getSubcommand();
       const member = await interaction.guild.members.fetch(interaction.user.id);
       const allUsers = db.getAllUsers(interaction.guild.id);
-      const userData = db.getUser(interaction.guild.id, interaction.user.id);
       
-      let tipo;
+      let userData;
+      try {
+        userData = db.getUser(interaction.guild.id, interaction.user.id);
+      } catch (e) {
+        userData = null;
+      }
       
-      if (subcommand === 'select') {
-        tipo = interaction.options.getString('tipo');
-        userData.selectedLeaderboardTheme = tipo;
-        db.saveUser(interaction.guild.id, interaction.user.id, userData);
-      } else {
-        tipo = userData.selectedLeaderboardTheme || 'pixel';
+      const userLevel = (userData && userData.level) ? userData.level : 0;
+      const isSuperActive = member.roles.cache.has(CONFIG.LEVEL_ROLES[35]);
+      const hasLevel100Role = CONFIG.LEVEL_100_ROLE_ID && member.roles.cache.has(CONFIG.LEVEL_100_ROLE_ID);
+      const isLevel100 = userLevel >= 100 || hasLevel100Role;
+      
+      let tipo = 'pixel';
+      if (isLevel100) {
+        tipo = 'pokemon';
+      } else if (isSuperActive) {
+        tipo = 'zelda';
       }
       
       const sortedUsers = allUsers
@@ -63,24 +53,13 @@ export default {
       
       let imageBuffer;
       let title;
-      const isSuperActive = member.roles.cache.has(CONFIG.LEVEL_ROLES[35]);
-      const userLevel = userData.level || 0;
       
       if (tipo === 'pokemon') {
-        if (userLevel < 100) {
-          return interaction.editReply('❌ Necesitas nivel 100+ para ver el leaderboard Pokemon.');
-        }
         imageBuffer = await generatePokemonLeaderboard(sortedUsers, interaction.guild);
         title = '🔥 Pokemon Masters';
       } else if (tipo === 'zelda') {
-        if (!isSuperActive) {
-          return interaction.editReply('❌ Necesitas el rol Super Activo (nivel 35+) para ver el leaderboard Zelda.');
-        }
         imageBuffer = await generateZeldaLeaderboard(sortedUsers, interaction.guild);
         title = '⚔️ Heroes of Hyrule';
-      } else if (tipo === 'minecraft') {
-        imageBuffer = await generateMinecraftLeaderboard(sortedUsers, interaction.guild);
-        title = '⛏️ Minecraft Legends';
       } else {
         imageBuffer = await generateLeaderboardImage(sortedUsers, interaction.guild, 'pixel');
         title = '🏆 Tabla de Clasificación';
@@ -104,9 +83,8 @@ export default {
       
       await interaction.editReply({
         embeds: [{
-          color: tipo === 'pokemon' ? 0xFF4500 : (tipo === 'zelda' ? 0x90EE90 : (tipo === 'minecraft' ? 0x7CFC00 : 0xFFD700)),
+          color: tipo === 'pokemon' ? 0xFF4500 : (tipo === 'zelda' ? 0x90EE90 : 0xFFD700),
           title: title,
-          description: subcommand === 'select' ? `✅ Tema guardado: **${themeNames[tipo]}**` : null,
           image: { url: 'attachment://leaderboard.png' },
           footer: { text: `Total de usuarios activos: ${allUsers.length} | Tema: ${themeNames[tipo]}` }
         }],

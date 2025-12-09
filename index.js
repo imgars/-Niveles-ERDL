@@ -383,7 +383,7 @@ if (failedCount > 0) {
 client.once('ready', async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
   
-  client.user.setActivity('https://niveles-wul5.onrender.com/#inicio', { type: 0 });
+  client.user.setActivity('/info para ver mas información sobre el bot', { type: 0 });
   
   initializeNightBoost();
   

@@ -28,19 +28,21 @@ export default {
       return interaction.reply({ content: '❌ Solo el staff puede usar este comando', flags: 64 });
     }
 
+    await interaction.deferReply();
+
     const targetUser = interaction.options.getUser('usuario');
     const itemId = interaction.options.getString('item');
     const item = ITEMS[itemId];
 
     if (!item) {
-      return interaction.reply({ content: '❌ Item no encontrado', flags: 64 });
+      return interaction.editReply({ content: '❌ Item no encontrado' });
     }
 
     try {
       const result = await staffGiveItem(interaction.guildId, targetUser.id, itemId);
 
       if (!result) {
-        return interaction.reply({ content: '❌ Error al dar el item', flags: 64 });
+        return interaction.editReply({ content: '❌ Error al dar el item' });
       }
 
       const embed = new EmbedBuilder()
@@ -55,10 +57,10 @@ export default {
         .setFooter({ text: `Por: ${interaction.user.tag}` })
         .setTimestamp();
 
-      return interaction.reply({ embeds: [embed] });
+      return interaction.editReply({ embeds: [embed] });
     } catch (error) {
       console.error('Error en giveitem:', error);
-      return interaction.reply({ content: '❌ Error al dar item', flags: 64 });
+      return interaction.editReply({ content: '❌ Error al dar item' });
     }
   }
 };

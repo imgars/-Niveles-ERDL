@@ -28,19 +28,21 @@ export default {
       return interaction.reply({ content: '❌ Solo el staff puede usar este comando', flags: 64 });
     }
 
+    await interaction.deferReply();
+
     const targetUser = interaction.options.getUser('usuario');
     const itemId = interaction.options.getString('item');
     const item = ITEMS[itemId];
 
     if (!item) {
-      return interaction.reply({ content: '❌ Item no encontrado', flags: 64 });
+      return interaction.editReply({ content: '❌ Item no encontrado' });
     }
 
     try {
       const result = await staffRemoveItem(interaction.guildId, targetUser.id, itemId);
 
       if (!result) {
-        return interaction.reply({ content: '❌ El usuario no tiene ese item', flags: 64 });
+        return interaction.editReply({ content: '❌ El usuario no tiene ese item' });
       }
 
       const embed = new EmbedBuilder()
@@ -54,10 +56,10 @@ export default {
         .setFooter({ text: `Por: ${interaction.user.tag}` })
         .setTimestamp();
 
-      return interaction.reply({ embeds: [embed] });
+      return interaction.editReply({ embeds: [embed] });
     } catch (error) {
       console.error('Error en removeitem:', error);
-      return interaction.reply({ content: '❌ Error al quitar item', flags: 64 });
+      return interaction.editReply({ content: '❌ Error al quitar item' });
     }
   }
 };
