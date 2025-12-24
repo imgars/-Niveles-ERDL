@@ -1245,7 +1245,98 @@ client.on("messageCreate", async (message) => {
   }
 });
 
+// ===== ADMIN PANEL API =====
+const ADMIN_PASSWORD = "V7f!Qm9R$Zc2@Lw#A8Kx\"";
+const sessionTokens = new Map();
 
+// Middleware para verificar token
+function verifyAdminToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(' ')[1];
+  
+  if (!token || !sessionTokens.has(token)) {
+    return res.status(401).json({ message: 'No autorizado' });
+  }
+  
+  const session = sessionTokens.get(token);
+  if (Date.now() > session.expiry) {
+    sessionTokens.delete(token);
+    return res.status(401).json({ message: 'Sesión expirada' });
+  }
+  
+  next();
+}
+
+// Autenticación
+app.post('/api/admin/auth', express.json(), (req, res) => {
+  const { password } = req.body;
+  
+  if (!password) {
+    return res.status(400).json({ message: 'Contraseña requerida' });
+  }
+  
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ message: 'Contraseña incorrecta' });
+  }
+  
+  // Generar token
+  const token = require('crypto').randomBytes(32).toString('hex');
+  const expiry = Date.now() + 8 * 60 * 60 * 1000; // 8 horas
+  
+  sessionTokens.set(token, { expiry });
+  
+  res.json({
+    token,
+    expiry,
+    message: 'Autenticado correctamente'
+  });
+});
+
+// Dashboard API
+app.get('/api/admin/dashboard', verifyAdminToken, (req, res) => {
+  try {
+    const guildCount = client.guilds.cache.size;
+    const userCount = Object.keys(db.users).length;
+    const botVersion = '1.0.0';
+    const mongoStatus = isMongoConnected() ? 'Conectado' : 'Desconectado';
+    const nodeVersion = process.version;
+    
+    // Estadísticas del día
+    const today = new Date().toDateString();
+    let xpToday = 0;
+    let levelsToday = 0;
+    
+    for (const user of Object.values(db.users)) {
+      if (user.lastUpdate && new Date(user.lastUpdate).toDateString() === today) {
+        xpToday += user.lastDayXp || 0;
+        if (user.lastLevelUp && new Date(user.lastLevelUp).toDateString() === today) {
+          levelsToday++;
+        }
+      }
+    }
+    
+    const uptime = process.uptime() * 1000;
+    const botStatus = client.isReady() ? 'Online' : 'Offline';
+    
+    res.json({
+      botStatus,
+      uptime,
+      guildCount,
+      userCount,
+      xpToday,
+      levelsToday,
+      missionsToday: 0,
+      errorsToday: 0,
+      botVersion,
+      lastSync: Date.now(),
+      mongoStatus,
+      nodeVersion
+    });
+  } catch (error) {
+    console.error('Error en dashboard API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
 
 const token = process.env.DISCORD_BOT_TOKEN;
 if (!token) {

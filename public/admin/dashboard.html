@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Panel Admin</title>
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>⚙️ Panel Admin</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="#xp" class="nav-link" data-page="xp">
+                    <span>⭐</span> Sistema XP
+                </a>
+                <a href="#niveles" class="nav-link" data-page="niveles">
+                    <span>🏆</span> Niveles
+                </a>
+                <a href="#roles" class="nav-link" data-page="roles">
+                    <span>🎭</span> Roles por Nivel
+                </a>
+                <a href="#misiones" class="nav-link" data-page="misiones">
+                    <span>🎯</span> Misiones
+                </a>
+                <a href="#powerups" class="nav-link" data-page="powerups">
+                    <span>⚡</span> Power-ups
+                </a>
+                <a href="#estadisticas" class="nav-link" data-page="estadisticas">
+                    <span>📈</span> Estadísticas
+                </a>
+                <a href="#configuracion" class="nav-link" data-page="configuracion">
+                    <span>⚙️</span> Configuración
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn">🚪 Cerrar sesión</button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 id="pageTitle">Dashboard Principal</h1>
+                <div class="user-info">
+                    <span id="sessionTime">Sesión activa</span>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page active">
+                    <div class="dashboard-grid">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🤖</div>
+                                <div class="stat-content">
+                                    <h3>Estado del Bot</h3>
+                                    <p class="stat-value" id="botStatus">Conectando...</p>
+                                    <p class="stat-label">Online</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">⏱️</div>
+                                <div class="stat-content">
+                                    <h3>Uptime</h3>
+                                    <p class="stat-value" id="uptime">Cargando...</p>
+                                    <p class="stat-label">Tiempo activo</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">🌐</div>
+                                <div class="stat-content">
+                                    <h3>Servidores</h3>
+                                    <p class="stat-value" id="guildCount">0</p>
+                                    <p class="stat-label">Conectados</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-content">
+                                    <h3>Usuarios</h3>
+                                    <p class="stat-value" id="userCount">0</p>
+                                    <p class="stat-label">Registrados</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="events-section">
+                            <h2>📅 Eventos Hoy</h2>
+                            <div class="events-container">
+                                <div class="event-item">
+                                    <span class="event-icon">⭐</span>
+                                    <div class="event-content">
+                                        <p class="event-label">XP Generado</p>
+                                        <p class="event-value" id="xpToday">0</p>
+                                    </div>
+                                </div>
+                                <div class="event-item">
+                                    <span class="event-icon">🏆</span>
+                                    <div class="event-content">
+                                        <p class="event-label">Niveles Subidos</p>
+                                        <p class="event-value" id="levelsToday">0</p>
+                                    </div>
+                                </div>
+                                <div class="event-item">
+                                    <span class="event-icon">✅</span>
+                                    <div class="event-content">
+                                        <p class="event-label">Misiones Completadas</p>
+                                        <p class="event-value" id="missionsToday">0</p>
+                                    </div>
+                                </div>
+                                <div class="event-item">
+                                    <span class="event-icon">⚠️</span>
+                                    <div class="event-content">
+                                        <p class="event-label">Errores</p>
+                                        <p class="event-value" id="errorsToday">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <div class="info-card">
+                                <h3>ℹ️ Información del Sistema</h3>
+                                <div class="info-grid">
+                                    <div class="info-row">
+                                        <span class="info-label">Versión del Bot:</span>
+                                        <span class="info-value" id="botVersion">1.0.0</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Última sincronización:</span>
+                                        <span class="info-value" id="lastSync">Hace unos momentos</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">BD MongoDB:</span>
+                                        <span class="info-value" id="mongoStatus">Conectando...</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Node.js:</span>
+                                        <span class="info-value" id="nodeVersion">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- XP Page -->
+                <div id="xp-page" class="page">
+                    <h2>⭐ Sistema de XP</h2>
+                    <div class="section-content">
+                        <p>Próximamente: Gestión del sistema de XP</p>
+                    </div>
+                </div>
+                
+                <!-- Niveles Page -->
+                <div id="niveles-page" class="page">
+                    <h2>🏆 Sistema de Niveles</h2>
+                    <div class="section-content">
+                        <p>Próximamente: Gestión de niveles</p>
+                    </div>
+                </div>
+                
+                <!-- Roles Page -->
+                <div id="roles-page" class="page">
+                    <h2>🎭 Roles por Nivel</h2>
+                    <div class="section-content">
+                        <p>Próximamente: Asignación de roles por nivel</p>
+                    </div>
+                </div>
+                
+                <!-- Misiones Page -->
+                <div id="misiones-page" class="page">
+                    <h2>🎯 Misiones</h2>
+                    <div class="section-content">
+                        <p>Próximamente: Gestión de misiones</p>
+                    </div>
+                </div>
+                
+                <!-- Power-ups Page -->
+                <div id="powerups-page" class="page">
+                    <h2>⚡ Power-ups</h2>
+                    <div class="section-content">
+                        <p>Próximamente: Gestión de power-ups</p>
+                    </div>
+                </div>
+                
+                <!-- Estadísticas Page -->
+                <div id="estadisticas-page" class="page">
+                    <h2>📈 Estadísticas</h2>
+                    <div class="section-content">
+                        <p>Próximamente: Visualización de estadísticas</p>
+                    </div>
+                </div>
+                
+                <!-- Configuración Page -->
+                <div id="configuracion-page" class="page">
+                    <h2>⚙️ Configuración</h2>
+                    <div class="section-content">
+                        <p>Próximamente: Configuración del servidor</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/admin/js/admin.js"></script>
+</body>
+</html>
