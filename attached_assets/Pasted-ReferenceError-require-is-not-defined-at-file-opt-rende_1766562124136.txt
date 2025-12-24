@@ -1,0 +1,33 @@
+ReferenceError: require is not defined
+    at file:///opt/render/project/src/index.js:1283:17
+    at Layer.handle [as handle_request] (/opt/render/project/src/node_modules/express/lib/router/layer.js:95:5)
+    at next (/opt/render/project/src/node_modules/express/lib/router/route.js:149:13)
+    at /opt/render/project/src/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (/opt/render/project/src/node_modules/raw-body/index.js:238:16)
+    at done (/opt/render/project/src/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/opt/render/project/src/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:518:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+ReferenceError: require is not defined
+    at file:///opt/render/project/src/index.js:1283:17
+    at Layer.handle [as handle_request] (/opt/render/project/src/node_modules/express/lib/router/layer.js:95:5)
+    at next (/opt/render/project/src/node_modules/express/lib/router/route.js:149:13)
+    at /opt/render/project/src/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (/opt/render/project/src/node_modules/raw-body/index.js:238:16)
+    at done (/opt/render/project/src/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/opt/render/project/src/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:518:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+ReferenceError: require is not defined
+    at file:///opt/render/project/src/index.js:1283:17
+    at Layer.handle [as handle_request] (/opt/render/project/src/node_modules/express/lib/router/layer.js:95:5)
+    at next (/opt/render/project/src/node_modules/express/lib/router/route.js:149:13)
+    at /opt/render/project/src/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (/opt/render/project/src/node_modules/raw-body/index.js:238:16)
+    at done (/opt/render/project/src/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/opt/render/project/src/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:518:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)

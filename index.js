@@ -13,6 +13,7 @@ import cron from 'node-cron';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1280,7 +1281,7 @@ app.post('/api/admin/auth', express.json(), (req, res) => {
   }
   
   // Generar token
-  const token = require('crypto').randomBytes(32).toString('hex');
+  const token = crypto.randomBytes(32).toString('hex');
   const expiry = Date.now() + 8 * 60 * 60 * 1000; // 8 horas
   
   sessionTokens.set(token, { expiry });
