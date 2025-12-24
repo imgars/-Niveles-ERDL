@@ -1338,16 +1338,17 @@ app.get('/api/admin/dashboard', verifyAdminToken, (req, res) => {
   }
 });
 
+// Conectar a Discord SI hay token disponible
 const token = process.env.DISCORD_BOT_TOKEN;
-if (!token) {
+if (token) {
+  client.login(token);
+} else {
   console.error('❌ DISCORD_BOT_TOKEN is not set in environment variables!');
-  console.log('Please set your Discord bot token:');
+  console.log('⚠️  El panel admin funcionará, pero el bot no se conectará a Discord');
+  console.log('📝 Para conectar el bot:');
   console.log('1. Go to https://discord.com/developers/applications');
   console.log('2. Create or select your application');
   console.log('3. Go to the "Bot" section');
   console.log('4. Copy your bot token');
-  console.log('5. Add it as DISCORD_BOT_TOKEN in the Secrets (Environment Variables)');
-  process.exit(1);
+  console.log('5. Add it as DISCORD_BOT_TOKEN in environment variables\n');
 }
-
-client.login(token);
