@@ -250,6 +250,9 @@ NO_XP_CHANNELS: ['1313723272290111559', '1258524941289263254']
 - FIXED: Bug en /divorce - Ahora detecta correctamente cuando un usuario está casado
   - Añadido campo `marriedTo: null` a createNewEconomy en economyDB.js
   - /divorce ahora funciona sin errores
+- REMOVIDO: Apartado de Roleplay de la página web (public/index.html)
+  - Eliminado enlace del menú de navegación
+  - Eliminada toda la sección con ejemplos de comandos (180+ líneas)
 - Total de comandos: 76 (reducido de 103)
 
 ### 9 de Diciembre 2025 - v3.3.0 (STANDALONE COMMANDS UPDATE)
