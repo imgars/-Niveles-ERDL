@@ -439,9 +439,15 @@ client.on('messageCreate', async (message) => {
     authorData.afk.timestamp = null;
     db.saveUser(message.guild.id, message.author.id, authorData);
     
-    message.reply({ content: `👋 ¡Bienvenido de nuevo <@${message.author.id}>! He quitado tu estado AFK.`, ephemeral: false }).then(msg => {
-      setTimeout(() => msg.delete().catch(() => {}), 5000);
-    });
+    // Evitar respuestas dobles si el usuario también activó un comando
+    try {
+      await message.reply({ content: `👋 ¡Bienvenido de nuevo <@${message.author.id}>! He quitado tu estado AFK.`, ephemeral: false }).then(msg => {
+        setTimeout(() => msg.delete().catch(() => {}), 5000);
+      });
+    } catch (e) {
+      console.log('No se pudo responder al quitar AFK (posible comando simultáneo)');
+    }
+    return; // Detener procesamiento para este mensaje si acabamos de quitar AFK
   }
 
   // Manejar AFK - Avisar si mencionan a alguien AFK

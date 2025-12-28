@@ -13,6 +13,7 @@ export default {
     ),
   
   async execute(interaction) {
+    if (interaction.replied || interaction.deferred) return;
     const reason = interaction.options.getString('motivo') || 'No especificado';
     const userData = db.getUser(interaction.guild.id, interaction.user.id);
     
