@@ -450,11 +450,18 @@ client.on('messageCreate', async (message) => {
       const mentionedData = db.getUser(message.guild.id, user.id);
       if (mentionedData.afk && mentionedData.afk.status) {
         const timeAgo = Math.floor((Date.now() - mentionedData.afk.timestamp) / 1000 / 60);
+        
+        const afkEmbed = new EmbedBuilder()
+          .setColor(0xFFFF00) // Amarillo
+          .setAuthor({ name: user.username, iconURL: user.displayAvatarURL() })
+          .setDescription(`💤 **${user.username}** está AFK: ${mentionedData.afk.reason} (${timeAgo} minutos)`)
+          .setThumbnail(user.displayAvatarURL());
+
         message.reply({ 
-          content: `💤 **${user.username}** está AFK: ${mentionedData.afk.reason} (${timeAgo} minutos)`,
+          embeds: [afkEmbed],
           allowedMentions: { repliedUser: false }
         }).then(msg => {
-          setTimeout(() => msg.delete().catch(() => {}), 5000);
+          setTimeout(() => msg.delete().catch(() => {}), 10000);
         });
       }
     });

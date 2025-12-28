@@ -25,9 +25,11 @@ export default {
     db.saveUser(interaction.guild.id, interaction.user.id, userData);
     
     const embed = new EmbedBuilder()
-      .setColor(0x0099FF)
-      .setDescription(`✅ <@${interaction.user.id}>, ahora estás AFK: **${reason}**`)
-      .setFooter({ text: 'Se te quitará el AFK cuando envíes un mensaje.' });
+      .setColor(0xFFFF00) // Amarillo
+      .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
+      .setTitle('Estado ausente establecido.')
+      .setDescription(`**Motivo:** ${reason}\n\nAvisaré a quienes te mencionan. >w<`)
+      .setThumbnail(interaction.user.displayAvatarURL());
       
     return interaction.reply({ embeds: [embed] });
   }
