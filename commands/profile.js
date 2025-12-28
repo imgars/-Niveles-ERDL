@@ -71,7 +71,7 @@ export default {
         '🎴 Default';
       
       const embed = new EmbedBuilder()
-        .setColor(0x7289DA)
+        .setColor(0xFFD700)
         .setAuthor({ 
           name: member.displayName, 
           iconURL: targetUser.displayAvatarURL({ dynamic: true }) 
