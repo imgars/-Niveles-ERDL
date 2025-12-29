@@ -572,9 +572,21 @@ export async function generateLeaderboardImage(topUsers, guild, theme = 'discord
   for (let i = 0; i < userDataArray.length; i++) {
     const { user, username, avatar } = userDataArray[i];
     const y = 50 + (i * 65);
+    const isTop3 = i < 3;
     
-    ctx.fillStyle = lightBg;
-    ctx.fillRect(0, y, 700, 62);
+    // Draw background - special for top 3
+    if (isTop3) {
+      // Gradient effect for top 3
+      ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+      ctx.fillRect(0, y, 700, 62);
+      // Border on left
+      ctx.fillStyle = accent;
+      ctx.fillRect(0, y, 4, 62);
+    } else {
+      ctx.fillStyle = lightBg;
+      ctx.fillRect(0, y, 700, 62);
+    }
+    
     ctx.fillStyle = i % 2 === 0 ? accent : accentAlt;
     ctx.fillRect(0, y + 62, 700, 2);
     
@@ -587,18 +599,54 @@ export async function generateLeaderboardImage(topUsers, guild, theme = 'discord
       }
     }
     
-    ctx.fillStyle = textColor;
-    ctx.font = 'bold 18px Arial, sans-serif';
-    ctx.fillText(`#${i + 1}`, 68, y + 20);
+    // Medal for top 3
+    const medals = ['👑', '🥈', '🥉'];
+    ctx.fillStyle = accent;
+    ctx.font = 'bold 20px Arial, sans-serif';
+    if (isTop3) {
+      ctx.fillText(medals[i], 68, y + 25);
+    } else {
+      ctx.fillStyle = textColor;
+      ctx.font = 'bold 18px Arial, sans-serif';
+      ctx.fillText(`#${i + 1}`, 68, y + 20);
+    }
     
     ctx.fillStyle = textColor;
     ctx.font = 'bold 16px Arial, sans-serif';
     ctx.fillText(`@${username.substring(0, 20)}`, 108, y + 20);
     
-    ctx.fillStyle = i % 2 === 0 ? accent : accentAlt;
-    ctx.font = 'bold 16px Arial, sans-serif';
+    // Level - make it prominent
+    const levelColor = isTop3 ? accent : (i % 2 === 0 ? accent : accentAlt);
+    const levelSize = isTop3 ? '22px' : '18px';
+    ctx.fillStyle = levelColor;
+    ctx.font = `bold ${levelSize} Arial, sans-serif`;
     ctx.textAlign = 'right';
-    ctx.fillText(`LVL: ${user.level}`, 680, y + 20);
+    
+    // Draw level with background box for top 3
+    if (isTop3) {
+      const levelText = `LVL: ${user.level}`;
+      const levelMetrics = ctx.measureText(levelText);
+      const boxWidth = levelMetrics.width + 12;
+      const boxHeight = 28;
+      const boxX = 700 - boxWidth - 8;
+      const boxY = y + 5;
+      
+      // Box background
+      ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+      ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+      ctx.fillStyle = accent;
+      ctx.fillRect(boxX, boxY, boxWidth, 3);
+      
+      // Level text
+      ctx.fillStyle = accent;
+      ctx.font = `bold ${levelSize} Arial, sans-serif`;
+      ctx.fillText(levelText, 680, y + 23);
+    } else {
+      ctx.fillStyle = i % 2 === 0 ? accent : accentAlt;
+      ctx.font = `bold 16px Arial, sans-serif`;
+      ctx.fillText(`LVL: ${user.level}`, 680, y + 20);
+    }
+    
     ctx.textAlign = 'left';
   }
   
