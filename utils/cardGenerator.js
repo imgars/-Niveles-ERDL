@@ -521,9 +521,19 @@ export async function generateLeaderboardImage(topUsers, guild, theme = 'discord
   const accent = '#FFD700';
   const accentAlt = '#90EE90';
   const textColor = '#FFFFFF';
+  const gold = '#FFD700';
+  const silver = '#C0C0C0';
+  const bronze = '#CD7F32';
   
   ctx.fillStyle = darkBg;
   ctx.fillRect(0, 0, 700, canvas.height);
+  
+  // Yellow border around entire leaderboard
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, 700, 4);
+  ctx.fillRect(0, canvas.height - 4, 700, 4);
+  ctx.fillRect(0, 0, 4, canvas.height);
+  ctx.fillRect(696, 0, 4, canvas.height);
   
   ctx.fillStyle = '#1E1F22';
   ctx.fillRect(0, 0, 700, 50);
@@ -574,20 +584,35 @@ export async function generateLeaderboardImage(topUsers, guild, theme = 'discord
     const y = 50 + (i * 65);
     const isTop3 = i < 3;
     
+    // Define ranking colors
+    let rankColor, rankBgColor;
+    if (i === 0) {
+      rankColor = gold;
+      rankBgColor = 'rgba(255, 215, 0, 0.2)';
+    } else if (i === 1) {
+      rankColor = silver;
+      rankBgColor = 'rgba(192, 192, 192, 0.15)';
+    } else if (i === 2) {
+      rankColor = bronze;
+      rankBgColor = 'rgba(205, 127, 50, 0.15)';
+    } else {
+      rankColor = accent;
+      rankBgColor = lightBg;
+    }
+    
     // Draw background - special for top 3
     if (isTop3) {
-      // Gradient effect for top 3
-      ctx.fillStyle = 'rgba(255, 215, 0, 0.15)';
+      ctx.fillStyle = rankBgColor;
       ctx.fillRect(0, y, 700, 62);
-      // Border on left
-      ctx.fillStyle = accent;
-      ctx.fillRect(0, y, 4, 62);
+      // Border on left with ranking color
+      ctx.fillStyle = rankColor;
+      ctx.fillRect(0, y, 5, 62);
     } else {
-      ctx.fillStyle = lightBg;
+      ctx.fillStyle = rankBgColor;
       ctx.fillRect(0, y, 700, 62);
     }
     
-    ctx.fillStyle = i % 2 === 0 ? accent : accentAlt;
+    ctx.fillStyle = accent;
     ctx.fillRect(0, y + 62, 700, 2);
     
     // Draw avatar if loaded
@@ -601,7 +626,7 @@ export async function generateLeaderboardImage(topUsers, guild, theme = 'discord
     
     // Medal for top 3
     const medals = ['👑', '🥈', '🥉'];
-    ctx.fillStyle = accent;
+    ctx.fillStyle = rankColor;
     ctx.font = 'bold 20px Arial, sans-serif';
     if (isTop3) {
       ctx.fillText(medals[i], 68, y + 25);
@@ -616,10 +641,7 @@ export async function generateLeaderboardImage(topUsers, guild, theme = 'discord
     ctx.fillText(`@${username.substring(0, 20)}`, 108, y + 20);
     
     // Level - make it prominent
-    const levelColor = isTop3 ? accent : (i % 2 === 0 ? accent : accentAlt);
     const levelSize = isTop3 ? '22px' : '18px';
-    ctx.fillStyle = levelColor;
-    ctx.font = `bold ${levelSize} Arial, sans-serif`;
     ctx.textAlign = 'right';
     
     // Draw level with background box for top 3
@@ -631,18 +653,22 @@ export async function generateLeaderboardImage(topUsers, guild, theme = 'discord
       const boxX = 700 - boxWidth - 8;
       const boxY = y + 5;
       
-      // Box background
-      ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+      // Box background with ranking color
+      ctx.fillStyle = rankColor.replace(')', ', 0.3)').replace('#', 'rgba(');
+      if (rankColor.startsWith('#')) {
+        const rgb = hexToRgb(rankColor);
+        ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`;
+      }
       ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-      ctx.fillStyle = accent;
+      ctx.fillStyle = rankColor;
       ctx.fillRect(boxX, boxY, boxWidth, 3);
       
       // Level text
-      ctx.fillStyle = accent;
+      ctx.fillStyle = rankColor;
       ctx.font = `bold ${levelSize} Arial, sans-serif`;
       ctx.fillText(levelText, 680, y + 23);
     } else {
-      ctx.fillStyle = i % 2 === 0 ? accent : accentAlt;
+      ctx.fillStyle = accent;
       ctx.font = `bold 16px Arial, sans-serif`;
       ctx.fillText(`LVL: ${user.level}`, 680, y + 20);
     }
