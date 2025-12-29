@@ -9,7 +9,7 @@ const THEME_NAMES = {
   pokemon: '🔴 Pokémon',
   geometrydash: '⚡ Geometry Dash',
   night: '🌙 Noche Estrellada',
-  roblox: '🟥 Roblox',
+  roblox: '🟦 Roblox',
   minecraft: '⛏️ Minecraft',
   fnaf: '🐻 FNAF'
 };

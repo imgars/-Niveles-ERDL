@@ -237,17 +237,17 @@ function getPixelArtThemeColors(theme) {
     },
     roblox: {
       gradient: [
-        { pos: 0, color: '#E31C3D' },
-        { pos: 0.5, color: '#B31B31' },
-        { pos: 1, color: '#8B0000' }
+        { pos: 0, color: '#00A2FF' }, // Azul Roblox
+        { pos: 0.5, color: '#FFFFFF' }, // Blanco
+        { pos: 1, color: '#00A2FF' }  // Azul Roblox
       ],
-      border: '#FF0000',
+      border: '#FFFFFF',
       accent: '#00A2FF',
-      text: '#FFFFFF',
-      textShadow: '#4A0000',
-      barBg: '#2a0a0a',
-      barFill: ['#00A2FF', '#00FFFF'],
-      buttonColor: 'Danger'
+      text: '#00A2FF',
+      textShadow: '#FFFFFF',
+      barBg: '#005A8C',
+      barFill: ['#FFFFFF', '#00A2FF'],
+      buttonColor: 'Primary'
     },
     minecraft: {
       gradient: [
