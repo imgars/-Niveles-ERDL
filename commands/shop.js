@@ -52,6 +52,10 @@ export default {
 
     const updated = await removeUserLagcoins(interaction.guildId, interaction.user.id, itemData.price, 'shop');
 
+    if (!updated) {
+      return interaction.editReply('❌ Hubo un error al procesar el pago. Verifica si tienes suficientes Lagcoins.');
+    }
+
     const user = db.getUser(interaction.guildId, interaction.user.id);
     
     if (itemData.xp) {

@@ -113,17 +113,15 @@ const economySchema = new mongoose.Schema({
     totalJobs: { type: Number, default: 0 },
     favoriteJob: String
   },
-  transactions: {
-    type: [{
-      type: String,
-      amount: Number,
-      from: String,
-      to: String,
-      description: String,
-      date: { type: Date, default: Date.now }
-    }],
-    default: []
-  },
+  transactions: [{
+    type: String,
+    amount: Number,
+    from: String,
+    to: String,
+    description: String,
+    date: { type: Date, default: Date.now },
+    _id: false
+  }],
   createdAt: { type: Date, default: Date.now }
 });
 
