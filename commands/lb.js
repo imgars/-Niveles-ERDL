@@ -51,7 +51,7 @@ export default {
           color: 0xFFD700,
           title: '🏆 Tabla de Clasificación',
           image: { url: 'attachment://leaderboard.png' },
-          footer: { text: `Total de usuarios activos: ${allUsers.length}` },
+          footer: { text: `¡Chatea en el servidor para subir de nivel! 🏆` },
           timestamp: new Date()
         }],
         files: [attachment],

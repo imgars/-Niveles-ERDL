@@ -86,7 +86,7 @@ export default {
           color: tipo === 'pokemon' ? 0xFF4500 : (tipo === 'zelda' ? 0x90EE90 : 0xFFD700),
           title: title,
           image: { url: 'attachment://leaderboard.png' },
-          footer: { text: `Total de usuarios activos: ${allUsers.length} | Tema: ${themeNames[tipo]}` }
+          footer: { text: `¡Chatea en el servidor para subir de nivel! 🏆` }
         }],
         files: [attachment],
         components: [row]
