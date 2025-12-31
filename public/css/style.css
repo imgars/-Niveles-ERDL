@@ -856,8 +856,9 @@ body {
     margin: 50px auto;
     padding: 20px;
     background: var(--bg-card);
-    border: 4px solid var(--primary);
+    border: 4px solid var(--modal-border-color, var(--primary));
     box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    transition: border-color 0.3s ease;
 }
 
 .image-modal-layout {
@@ -880,7 +881,8 @@ body {
     gap: 20px;
     padding: 20px;
     background: rgba(0,0,0,0.3);
-    border: 2px dashed var(--accent);
+    border: 2px dashed var(--modal-border-color, var(--accent));
+    transition: border-color 0.3s ease;
 }
 
 .image-modal-content {
@@ -888,7 +890,8 @@ body {
     height: auto;
     display: block;
     image-rendering: pixelated;
-    border: 4px solid var(--primary);
+    border: 4px solid var(--modal-border-color, var(--primary));
+    transition: border-color 0.3s ease;
 }
 
 #image-modal-caption {

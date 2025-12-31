@@ -545,6 +545,24 @@ document.addEventListener('DOMContentLoaded', function() {
         "Geometry Dash": "Obtenla mejorando (**Boosteando**) el servidor de Discord."
     };
 
+    const cardColors = {
+        "Default": "#5865F2",
+        "Pixel": "#00CED1",
+        "Ocean": "#0077BE",
+        "Zelda": "#DAA520",
+        "Pokemon": "#FF0000",
+        "Minecraft": "#5A8D4D",
+        "FNAF": "#4a0000",
+        "Roblox": "#E2231A",
+        "Twitch VIP": "#9146FF",
+        "TikTok VIP": "#EE1D52",
+        "Boosters": "#FF73FA",
+        "Geometry Dash": "#FF10F0"
+    };
+
+    const imgModalContainer = document.querySelector('.image-modal-container');
+    const imgModalInfoSide = document.querySelector('.image-modal-info-side');
+
     document.querySelectorAll('.card-img-preview').forEach(img => {
         img.onclick = function() {
             imgModal.style.display = "block";
@@ -552,6 +570,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const cardName = this.alt;
             captionText.innerHTML = cardName;
             
+            // Cambiar color del borde
+            const borderColor = cardColors[cardName] || "#FFD700";
+            imgModalContainer.style.setProperty('--modal-border-color', borderColor);
+            imgModalInfoSide.style.setProperty('--modal-border-color', borderColor);
+            modalImg.style.setProperty('--modal-border-color', borderColor);
+
             // Mostrar tutorial
             if (tutorialContent) {
                 const tutorial = cardTutorials[cardName] || "Información no disponible.";
