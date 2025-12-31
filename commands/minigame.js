@@ -122,6 +122,10 @@ export default {
     ),
   
   async execute(interaction) {
+    const userData = db.getUser(interaction.guild.id, interaction.user.id);
+    if (userData.isInactive) {
+      return interaction.reply({ content: '❌ No puedes participar en minijuegos ni reclamar recompensas mientras tengas el rol de inactividad.', ephemeral: true });
+    }
     const subcommand = interaction.options.getSubcommand();
     
     if (subcommand === 'trivia') {
