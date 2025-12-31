@@ -493,6 +493,8 @@ client.once('ready', async () => {
             userData.inactivityMessages = 0;
             db.saveUser(guild.id, userData.userId, userData);
 
+            await sendAuditLog(client, { guild, user: member.user, channelId: notificationChannelId }, 'Usuario Inactivo', `El usuario ha sido marcado como inactivo por pasar más de 7 días sin mensajes.`);
+
             if (!member.roles.cache.has(inactiveRoleId)) {
               await member.roles.add(inactiveRoleId).catch(console.error);
             }
@@ -533,6 +535,8 @@ client.on('messageCreate', async (message) => {
     };
     
     db.saveUser(message.guild.id, message.author.id, userData);
+
+    await sendAuditLog(client, message, 'AFK Activado', `**Motivo:** ${reason}`);
 
     // Cambiar nombre a [AFK]
     if (message.member && message.member.manageable) {
@@ -636,6 +640,7 @@ client.on('messageCreate', async (message) => {
     
     // Evitar respuestas dobles si el usuario también activó un comando
     try {
+      await sendAuditLog(client, message, 'AFK Quitado', `El usuario volvió a estar activo.`);
       await message.reply({ content: `👋 ¡Bienvenido de nuevo <@${message.author.id}>! He quitado tu estado AFK.`, ephemeral: false }).then(msg => {
         setTimeout(() => msg.delete().catch(() => {}), 5000);
       });
@@ -1388,12 +1393,48 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
+// Auditoría
+const AUDIT_CHANNEL_ID = '1431416957160259764';
+
+async function sendAuditLog(client, interaction, actionType, details = '') {
+  try {
+    const guild = interaction.guild;
+    if (!guild) return;
+    
+    const channel = guild.channels.cache.get(AUDIT_CHANNEL_ID);
+    if (!channel) return;
+
+    const user = interaction.user || interaction.author;
+    const embed = new EmbedBuilder()
+      .setColor(0x5865F2)
+      .setTitle(`LOG: ${actionType}`)
+      .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
+      .addFields(
+        { name: 'Usuario', value: `<@${user.id}> (${user.id})`, inline: true },
+        { name: 'Canal', value: `<#${interaction.channelId || interaction.channel.id}>`, inline: true }
+      )
+      .setTimestamp();
+
+    if (details) {
+      embed.addFields({ name: 'Detalles', value: details });
+    }
+
+    await channel.send({ embeds: [embed] });
+  } catch (error) {
+    console.error('Error enviando log de auditoría:', error);
+  }
+}
+
 // Manejador de comandos
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   
   const command = client.commands.get(interaction.commandName);
   if (!command) return;
+
+  // Log de auditoría para comandos slash
+  const options = interaction.options.data.map(opt => `${opt.name}: ${opt.value}`).join(', ') || 'Sin opciones';
+  await sendAuditLog(client, interaction, 'Comando Slash Usado', `**Comando:** /${interaction.commandName}\n**Opciones:** ${options}`);
   
   try {
     await command.execute(interaction);
