@@ -1402,7 +1402,7 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 // Auditoría
-const AUDIT_CHANNEL_ID = '1431416957160259764';
+const AUDIT_CHANNEL_ID = '1438720716378996757';
 
 async function sendEconomyLog(client, interaction, type, amount, details = '') {
   try {
