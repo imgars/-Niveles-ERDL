@@ -25,6 +25,14 @@ export default {
     
     db.saveUser(interaction.guild.id, interaction.user.id, userData);
     
+    // Cambiar nombre a [AFK]
+    if (interaction.member && interaction.member.manageable) {
+      const oldNickname = interaction.member.nickname || interaction.user.username;
+      if (!oldNickname.startsWith('[AFK] ')) {
+        interaction.member.setNickname(`[AFK] ${oldNickname}`).catch(console.error);
+      }
+    }
+    
     const embed = new EmbedBuilder()
       .setColor(0xFFFF00) // Amarillo
       .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })

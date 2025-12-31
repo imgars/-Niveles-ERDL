@@ -533,6 +533,14 @@ client.on('messageCreate', async (message) => {
     };
     
     db.saveUser(message.guild.id, message.author.id, userData);
+
+    // Cambiar nombre a [AFK]
+    if (message.member && message.member.manageable) {
+      const oldNickname = message.member.nickname || message.author.username;
+      if (!oldNickname.startsWith('[AFK] ')) {
+        message.member.setNickname(`[AFK] ${oldNickname}`).catch(console.error);
+      }
+    }
     
     const embed = new EmbedBuilder()
       .setColor(0xFFFF00) // Amarillo
@@ -617,6 +625,14 @@ client.on('messageCreate', async (message) => {
     authorData.afk.reason = null;
     authorData.afk.timestamp = null;
     db.saveUser(message.guild.id, message.author.id, authorData);
+
+    // Quitar [AFK] del nombre
+    if (message.member && message.member.manageable) {
+      const currentNickname = message.member.nickname || '';
+      if (currentNickname.startsWith('[AFK] ')) {
+        message.member.setNickname(currentNickname.replace('[AFK] ', '')).catch(console.error);
+      }
+    }
     
     // Evitar respuestas dobles si el usuario también activó un comando
     try {
