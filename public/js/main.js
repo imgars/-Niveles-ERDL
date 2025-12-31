@@ -531,18 +531,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const tutorialContent = document.getElementById('card-tutorial-content');
 
     const cardTutorials = {
-        "Default": "Esta es la tarjeta básica. Se obtiene automáticamente al unirte al servidor.",
-        "FNAF": "Se desbloquea al alcanzar el **Nivel 40**. Un diseño terroríficamente pixelado.",
-        "Geometry Dash": "Se desbloquea al alcanzar el **Nivel 30**. Ideal para los amantes de los saltos.",
-        "Minecraft": "Se desbloquea al alcanzar el **Nivel 50**. Para los verdaderos constructores.",
-        "Night": "Se desbloquea al alcanzar el **Nivel 20**. Un diseño elegante y oscuro.",
-        "Ocean": "Se desbloquea al alcanzar el **Nivel 10**. Refrescante y azul.",
-        "Pixel": "Se desbloquea al alcanzar el **Nivel 5**. El origen de todo.",
-        "Pokemon": "Se desbloquea al alcanzar el **Nivel 60**. ¡Hazte con todos!",
-        "Roblox": "Se desbloquea al alcanzar el **Nivel 45**. Diversión asegurada.",
-        "Zelda": "Se desbloquea al alcanzar el **Nivel 75**. Una leyenda para leyendas.",
-        "Twitch VIP": "Para obtener esta tarjeta debes comprar una suscripción en el canal de **Twitch** de Sirgio.",
-        "TikTok VIP": "Para obtener esta tarjeta debes ser **VIP de TikTok** en el canal de Sirgio."
+        "Default": "Estilo predeterminado del Servidor. Se obtiene automáticamente al unirte.",
+        "Pixel": "¡Es totalmente **Gratuita**! Una opción clásica para empezar.",
+        "Ocean": "Requieres el rol **Miembro Activo** (Alcanza el **Nivel 25**).",
+        "Zelda": "Requieres el rol **Miembro Super Activo** (Alcanza el **Nivel 35**).",
+        "Pokemon": "Requieres el rol **Inmortal** (Alcanza el **Nivel 100**).",
+        "Minecraft": "Cómprala en la tienda con el comando `/shop` por **5,000 Lagcoins**.",
+        "FNAF": "Cómprala en la tienda con el comando `/shop` por **4,500 Lagcoins**.",
+        "Roblox": "Cómprala en la tienda con el comando `/shop` por **7,500 Lagcoins**.",
+        "Twitch VIP": "Obtenla comprando una suscripción en el canal de **Twitch** de Sirgio.",
+        "TikTok VIP": "Obtenla comprando una suscripción o siendo VIP en el canal de **TikTok** de Sirgio.",
+        "Boosters": "Obtenla mejorando (**Boosteando**) el servidor de Discord."
     };
 
     document.querySelectorAll('.card-img-preview').forEach(img => {
