@@ -484,6 +484,9 @@ client.once('ready', async () => {
         if (userData.isInactive) continue;
 
         const lastActivity = userData.lastActivity || 0;
+        // Solo procesar si el usuario tiene alguna actividad registrada
+        if (lastActivity === 0) continue;
+
         if (now - lastActivity > SEVEN_DAYS_MS) {
           try {
             const member = await guild.members.fetch(userData.userId).catch(() => null);
@@ -1548,6 +1551,45 @@ client.on('messageReactionAdd', async (reaction, user) => {
 client.on("messageCreate", async (message) => {
   // Ignorar mensajes de bots
   if (message.author.bot) return;
+
+  // Actualizar última actividad
+  const userData = db.getUser(message.guild.id, message.author.id);
+  userData.lastActivity = Date.now();
+
+  // Si el usuario estaba inactivo, contar mensajes para salir del estado
+  if (userData.isInactive) {
+    userData.inactivityMessages = (userData.inactivityMessages || 0) + 1;
+    if (userData.inactivityMessages >= 50) {
+      userData.isInactive = false;
+      userData.inactivityMessages = 0;
+      
+      const inactiveRoleId = '1455315291532693789';
+      const member = message.member;
+      if (member) {
+        if (member.roles.cache.has(inactiveRoleId)) {
+          await member.roles.remove(inactiveRoleId).catch(console.error);
+        }
+        if (member.manageable) {
+          const currentNickname = member.nickname || '';
+          if (currentNickname.startsWith('[Inactivo] ')) {
+            await member.setNickname(currentNickname.replace('[Inactivo] ', '')).catch(console.error);
+          }
+        }
+      }
+      
+      const channelId = '1441276918916710501';
+      const channel = message.guild.channels.cache.get(channelId);
+      if (channel) {
+        const welcomeBackEmbed = new EmbedBuilder()
+          .setColor(0x00FF00)
+          .setTitle('✅ ¡Bienvenido de vuelta!')
+          .setDescription(`El usuario <@${message.author.id}> ha salido del estado de inactividad tras enviar 50 mensajes.`)
+          .setTimestamp();
+        await channel.send({ content: `<@${message.author.id}>`, embeds: [welcomeBackEmbed] });
+      }
+    }
+  }
+  db.saveUser(message.guild.id, message.author.id, userData);
 
   const prefix = "!";
 
