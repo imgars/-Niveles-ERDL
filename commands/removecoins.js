@@ -23,8 +23,11 @@ export default {
     ),
   
   async execute(interaction) {
+    // Defer de inmediato para evitar el error "Unknown interaction" de 3 segundos
+    await interaction.deferReply();
+
     if (!isStaff(interaction.member)) {
-      return interaction.reply({ content: '❌ Solo el staff puede usar este comando', flags: 64 });
+      return interaction.editReply({ content: '❌ Solo el staff puede usar este comando' });
     }
 
     const targetUser = interaction.options.getUser('usuario');
@@ -32,8 +35,6 @@ export default {
     const reason = interaction.options.getString('razon') || 'Sanción del Staff';
 
     try {
-      await interaction.deferReply();
-      
       const result = await staffRemoveCoins(interaction.guildId, targetUser.id, amount, reason);
 
       if (!result) {

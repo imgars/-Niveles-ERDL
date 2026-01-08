@@ -1479,9 +1479,9 @@ client.on('interactionCreate', async (interaction) => {
   const command = client.commands.get(interaction.commandName);
   if (!command) return;
 
-  // Log de auditoría para comandos slash
+  // Log de auditoría para comandos slash (en segundo plano para no bloquear el comando)
   const options = interaction.options.data.map(opt => `${opt.name}: ${opt.value}`).join(', ') || 'Sin opciones';
-  await sendAuditLog(client, interaction, 'Comando Slash Usado', `**Comando:** /${interaction.commandName}\n**Opciones:** ${options}`);
+  sendAuditLog(client, interaction, 'Comando Slash Usado', `**Comando:** /${interaction.commandName}\n**Opciones:** ${options}`).catch(console.error);
   
   try {
     await command.execute(interaction);
