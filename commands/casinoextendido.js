@@ -72,7 +72,7 @@ export default {
         .addFields(
           { name: '🎰 Tragaperras', value: 'Alinea 3 símbolos iguales\nPremio: x1.5 a x5 tu apuesta' },
           { name: '🎲 Dados', value: 'Adivina la suma de 2 dados\nPremio: x2 tu apuesta si aciertas' },
-          { name: '🎡 Ruleta', value: 'Elige color: Rojo (1.9x) Negro (1.9x) Verde (14x!)\nPremio: Depende del color' },
+          { name: '🎡 Ruleta', value: 'Elige color: Rojo (1.9x) Negro (1.9x) Verde (x3-x4!)\nPremio: Depende del color' },
           { name: '🃏 Póker', value: 'Juega póker simple contra la máquina\nPremio: x3 tu apuesta si ganas' }
         );
 
@@ -199,7 +199,10 @@ export default {
 
         let multiplier = 0;
         if (colorRandom === 'Rojo' || colorRandom === 'Negro') multiplier = 1.9;
-        if (colorRandom === 'Verde') multiplier = 14;
+        if (colorRandom === 'Verde') {
+          // x3 base, con 10% de probabilidad de x4
+          multiplier = Math.random() < 0.1 ? 4 : 3;
+        }
 
         const won = multiplier > 0;
         const winnings = Math.floor(bet * multiplier) - bet;
