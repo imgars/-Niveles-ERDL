@@ -1486,14 +1486,29 @@ client.on('interactionCreate', async (interaction) => {
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.error(`Error executing ${interaction.commandName}:`, error);
+    console.error(`Error ejecutando ${interaction.commandName}:`, error);
     
-    if (!interaction.replied && !interaction.deferred) {
-      await interaction.reply({ content: '❌ Hubo un error al ejecutar este comando.', flags: 64 });
-    } else if (interaction.deferred && !interaction.replied) {
-      await interaction.editReply({ content: '❌ Hubo un error al ejecutar este comando.' });
+    const errorMessage = { content: '❌ Hubo un error al ejecutar este comando.', flags: 64 };
+    
+    try {
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply(errorMessage).catch(() => {});
+      } else {
+        await interaction.followUp(errorMessage).catch(() => {});
+      }
+    } catch (e) {
+      console.error('Error enviando mensaje de error:', e);
     }
   }
+});
+
+// Manejo de errores globales para evitar cierres inesperados
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
 });
 
 client.on('messageReactionAdd', async (reaction, user) => {

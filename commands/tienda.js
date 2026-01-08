@@ -118,10 +118,10 @@ export default {
             const canAfford = (economy.lagcoins || 0) >= item.price;
             
             return {
-              label: `${item.name} - ${item.price} LC`,
-              description: owned ? 'Ya tienes este item' : (canAfford ? 'Puedes comprarlo' : 'No tienes suficientes Lagcoins'),
+              label: `${item.name.slice(0, 50)} - ${item.price} LC`,
+              description: (owned ? 'Ya tienes este item' : (canAfford ? 'Puedes comprarlo' : 'No tienes suficientes Lagcoins')).slice(0, 100),
               value: id,
-              emoji: item.emoji
+              emoji: item.emoji && (item.emoji.includes(':') || /[\u{1F300}-\u{1F9FF}]/u.test(item.emoji)) ? item.emoji : undefined
             };
           })
         );

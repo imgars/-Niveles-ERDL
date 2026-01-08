@@ -1,0 +1,200 @@
+Error executing tienda: DiscordAPIError[50035]: Invalid Form Body
+data.components[0].components[0].options[1].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+      ^
+DiscordAPIError[40060]: Interaction has already been acknowledged.
+    at handleErrors (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:762:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:866:23)
+    at async _REST.request (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:1307:22)
+    at async ChatInputCommandInteraction.reply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:193:22)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:1492:7)
+Emitted 'error' event on Client instance at:
+    at emitUnhandledRejectionOrErr (node:events:401:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:92:21) {
+  requestBody: {
+    files: [],
+    json: {
+      type: 4,
+      data: {
+        content: '❌ Hubo un error al ejecutar este comando.',
+        tts: false,
+        nonce: undefined,
+        enforce_nonce: false,
+        embeds: undefined,
+        components: undefined,
+        username: undefined,
+        avatar_url: undefined,
+        allowed_mentions: undefined,
+        flags: 64,
+        message_reference: undefined,
+        attachments: undefined,
+        sticker_ids: undefined,
+        thread_name: undefined,
+        applied_tags: undefined,
+        poll: undefined
+      }
+    }
+  },
+  rawError: {
+    message: 'Interaction has already been acknowledged.',
+    code: 40060
+  },
+  code: 40060,
+  status: 400,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1456444367802859736/aW50ZXJhY3Rpb246MTQ1NjQ0NDM2NzgwMjg1OTczNjpISDBKdm5YdVZYNmNaSjZoRVpiSWhoYUxEMGlOSFZmbDB4WGZhbVZzZjdxRlJuMWlhMUdOVnZRWG5ENDBwb2phSzExWHlNZW1zdk5BaEdPam5YSEdOWXl5TmNhZVlKZ2oxYlY0R25jSG1WdFlRVG52WWFORzV2dk90OXNLTGdpUQ/callback?with_response=false'
+}
+Node.js v22.16.0
+==> Running 'node index.js'
+✅ MongoDB conectado
+✅ Cargados 118 usuarios desde MongoDB
+✅ Boosts cargados desde MongoDB
+✅ Cargadas 3 rachas desde MongoDB
+📂 Encontrados 77 archivos de comandos
+🌐 Servidor web escuchando en puerto 10000
+📍 URLs disponibles:
+   - http://localhost:10000/         (Dashboard)
+   - http://localhost:10000/health   (Uptime Robot)
+   - http://localhost:10000/api/leaderboard  (API)
+✅ Comandos cargados: 77/77
+✅ Logged in as -N̶i̶v̶e̶l̶e̶s̶#6751
+🌙 Night boost initialized: Active
+📝 Registrando 77 comandos slash...
+   📍 Registrando en servidor: El Reino del Lag (1212886282645147768)
+(node:50) DeprecationWarning: The ready event has been renamed to clientReady to distinguish it from the gateway READY event and will only emit under that name in v15. Please use clientReady instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✅ 77 comandos registrados exitosamente!
+📋 Comandos: 8ball, addcoins, addlevel, admin, afk, balance, bank, robar_banco, banxp, blackjack, boost, bored, casino_juegos, casinomulti, clearlevelroles, coinflip, cooldowns, daily, depositar, dice, divorce, economy, eliminarrankcards, embed, estadisticas, gamecard, gift, giftcard, giveitem, globalboost, help, inactividad, info, inventario, jumbo, lb, lbeconomia, leaderboard, level, marry, mensaje, minigame, mision, nacionalidad, nivel, pingrole, powerups, perfil, rank, rankcard, removecoins, removeglobalboost, removeitem, removelevel, resettempeconomy, resettemporada, retirar, rewards, rob, robar, seguro, setcoins, setlevel, shop, slots, staffeconomy, racha, subasta, sistema, impuestos, tienda, trabajar, trade, tradecard, unbanxp, work, xp
+⏰ Cron job para verificar rachas configurado (diario a medianoche)
+Error executing depositar: DiscordAPIError[10062]: Unknown interaction
+    at handleErrors (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:762:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:866:23)
+    at async _REST.request (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:1307:22)
+    at async ChatInputCommandInteraction.reply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:193:22)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:1487:5) {
+  requestBody: { files: [], json: { type: 4, data: [Object] } },
+  rawError: { message: 'Unknown interaction', code: 10062 },
+  code: 10062,
+  status: 404,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1456444447289114644/aW50ZXJhY3Rpb246MTQ1NjQ0NDQ0NzI4OTExNDY0NDoxblNzNFdGVWo0VDFTVlFCM2R6eGpmbkFtTk11SVo4VTVFdTJOZXRoOW4wODN3Nktnbml1ZTZ4WWo3a05WdnFDYkJncHpnSW92Q0ZNZHdSNUFSUTlJYTd2SUthQkFiRkxCMDhRWnROYVFvWk5vOFo3VjlhYkFwcHVLYnZOcURRTg/callback?with_response=false'
+}
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+DiscordAPIError[10062]: Unknown interaction
+    at handleErrors (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:762:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:866:23)
+    at async _REST.request (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:1307:22)
+    at async ChatInputCommandInteraction.reply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:193:22)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:1492:7)
+Emitted 'error' event on Client instance at:
+    at emitUnhandledRejectionOrErr (node:events:401:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:92:21) {
+  requestBody: {
+    files: [],
+    json: {
+      type: 4,
+      data: {
+        content: '❌ Hubo un error al ejecutar este comando.',
+        tts: false,
+        nonce: undefined,
+        enforce_nonce: false,
+        embeds: undefined,
+        components: undefined,
+        username: undefined,
+        avatar_url: undefined,
+        allowed_mentions: undefined,
+        flags: 64,
+        message_reference: undefined,
+        attachments: undefined,
+        sticker_ids: undefined,
+        thread_name: undefined,
+        applied_tags: undefined,
+        poll: undefined
+      }
+    }
+  },
+  rawError: { message: 'Unknown interaction', code: 10062 },
+  code: 10062,
+  status: 404,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1456444447289114644/aW50ZXJhY3Rpb246MTQ1NjQ0NDQ0NzI4OTExNDY0NDoxblNzNFdGVWo0VDFTVlFCM2R6eGpmbkFtTk11SVo4VTVFdTJOZXRoOW4wODN3Nktnbml1ZTZ4WWo3a05WdnFDYkJncHpnSW92Q0ZNZHdSNUFSUTlJYTd2SUthQkFiRkxCMDhRWnROYVFvWk5vOFo3VjlhYkFwcHVLYnZOcURRTg/callback?with_response=false'
+}
+Node.js v22.16.0
+==> Running 'node index.js'
+✅ MongoDB conectado
+✅ Cargados 118 usuarios desde MongoDB
+✅ Boosts cargados desde MongoDB
+✅ Cargadas 3 rachas desde MongoDB
+📂 Encontrados 77 archivos de comandos
+🌐 Servidor web escuchando en puerto 10000
+📍 URLs disponibles:
+   - http://localhost:10000/         (Dashboard)
+   - http://localhost:10000/health   (Uptime Robot)
+   - http://localhost:10000/api/leaderboard  (API)
+✅ Comandos cargados: 77/77
+✅ Logged in as -N̶i̶v̶e̶l̶e̶s̶#6751
+🌙 Night boost initialized: Active
+📝 Registrando 77 comandos slash...
+   📍 Registrando en servidor: El Reino del Lag (1212886282645147768)
+(node:68) DeprecationWarning: The ready event has been renamed to clientReady to distinguish it from the gateway READY event and will only emit under that name in v15. Please use clientReady instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✅ 77 comandos registrados exitosamente!
+📋 Comandos: 8ball, addcoins, addlevel, admin, afk, balance, bank, robar_banco, banxp, blackjack, boost, bored, casino_juegos, casinomulti, clearlevelroles, coinflip, cooldowns, daily, depositar, dice, divorce, economy, eliminarrankcards, embed, estadisticas, gamecard, gift, giftcard, giveitem, globalboost, help, inactividad, info, inventario, jumbo, lb, lbeconomia, leaderboard, level, marry, mensaje, minigame, mision, nacionalidad, nivel, pingrole, powerups, perfil, rank, rankcard, removecoins, removeglobalboost, removeitem, removelevel, resettempeconomy, resettemporada, retirar, rewards, rob, robar, seguro, setcoins, setlevel, shop, slots, staffeconomy, racha, subasta, sistema, impuestos, tienda, trabajar, trade, tradecard, unbanxp, work, xp
+⏰ Cron job para verificar rachas configurado (diario a medianoche)
+Error executing tienda: DiscordAPIError[50035]: Invalid Form Body
+data.components[0].components[0].options[1].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+data.components[0].components[0].options[3].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+    at handleErrors (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:762:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:866:23)
+    at async _REST.request (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:1307:22)
+    at async ChatInputCommandInteraction.reply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:193:22)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:1487:5) {
+  requestBody: { files: [], json: { type: 4, data: [Object] } },
+  rawError: {
+    message: 'Invalid Form Body',
+    code: 50035,
+    errors: { data: [Object] }
+  },
+  code: 50035,
+  status: 400,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1456444862042734828/aW50ZXJhY3Rpb246MTQ1NjQ0NDg2MjA0MjczNDgyODpoRTd1SXhqeU5QeXdNcmVOMUZ0QmM3V0dPa2M5M2t0R2lzdVU0eVBaRjRva1lHUHhKRDRwOHZxdUt6Um96WjRFUFVrazZHSlc5SkY4WkFHREFUYXJXZ2hOYXdVU0JvZGdjSk1OQUpWd2JoVEdEbklJRDhHRGFYSE9TR3JKY3N2eg/callback?with_response=false'
+}
+Error executing tienda: DiscordAPIError[50035]: Invalid Form Body
+data.components[0].components[0].options[1].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+data.components[0].components[0].options[4].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+data.components[0].components[0].options[5].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+data.components[0].components[0].options[7].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+data.components[0].components[0].options[8].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+data.components[0].components[0].options[10].emoji.name[BUTTON_COMPONENT_INVALID_EMOJI]: Invalid emoji
+    at handleErrors (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:762:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:866:23)
+    at async _REST.request (/opt/render/project/src/node_modules/@discordjs/rest/dist/index.js:1307:22)
+    at async ChatInputCommandInteraction.reply (/opt/render/project/src/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:193:22)
+    at async Client.<anonymous> (file:///opt/render/project/src/index.js:1487:5) {
+  requestBody: { files: [], json: { type: 4, data: [Object] } },
+  rawError: {
+    message: 'Invalid Form Body',
+    code: 50035,
+    errors: { data: [Object] }
+  },
+  code: 50035,
+  status: 400,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1456444915004346398/aW50ZXJhY3Rpb246MTQ1NjQ0NDkxNTAwNDM0NjM5ODpRNkdqTXJDNVhGY1NFbTFjVWpaNnBhRzJtN3RUczJuSDZBNW9LdENxcDB0cnNsUDJXTHI2dHJ5U0ZjNVo3YTZDY3EzN0F1OTNlMEpMT21rV2lyWmNnaEtrUmlpeDFlTm1lYzZQT1hudDAzT2g0d1BVYW5WakdBaGU1Y1JzQ1E0YQ/callback?with_response=false'
+}
+✅ Rol agregado al nivel 25 para mazingermax
+==> Detected service running on port 10000
+==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+(node:68) Warning: Supplying "fetchReply" for interaction response options is deprecated. Utilize "withResponse" instead or fetch the response after using the method.
+✅ Rol agregado al nivel 20 para jugo.de.mango33
+✅ Rol agregado al nivel 1 para gerardito05528
+(node:68) Warning: Supplying "ephemeral" for interaction response options is deprecated. Utilize flags instead.
+🔄 Verificando rachas expiradas...
+✅ No hay rachas expiradas
