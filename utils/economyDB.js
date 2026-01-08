@@ -1222,19 +1222,19 @@ export async function robUser(guildId, robberUserId, victimUserId) {
       robBonus += adminBoost.percentage;
     }
     
-    const baseSuccess = 0.35;
+    const baseSuccess = 0.25;
     const success = Math.random() < (baseSuccess + robBonus);
     robber.lastRobAttempt = new Date().toISOString();
     
     if (!success) {
-      const fine = Math.floor(Math.random() * 200) + 100;
+      const fine = Math.floor(Math.random() * 300) + 200;
       robber.lagcoins = Math.max(0, (robber.lagcoins || 0) - fine);
       await saveUserEconomy(guildId, robberUserId, robber);
       return { success: false, fine };
     }
     
-    const maxSteal = Math.floor(victim.lagcoins * 0.15);
-    let stolen = Math.floor(Math.random() * maxSteal) + 30;
+    const maxSteal = Math.floor(victim.lagcoins * 0.10);
+    let stolen = Math.floor(Math.random() * maxSteal) + 15;
     
     // Bonus de robo con power-ups
     if (robBonus > 0) {

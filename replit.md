@@ -13,6 +13,7 @@
   - Se incrementaron significativamente los precios de todos los power-ups.
   - Se reequilibraron los juegos del casino con mayor ventaja para la casa y menores multiplicadores.
   - Se corrigió el error del Jackpot en las Slots y se limitó a una recompensa x6.
+  - Se nerfeó el sistema de robos: probabilidad base reducida al 25%, robo máximo del 10% y multas incrementadas.
 - **Restauración de Nacionalidades (Enero 2026):**
   - Se revirtieron los multiplicadores de nacionalidad y salarios a sus valores originales según la preferencia del usuario.
 
