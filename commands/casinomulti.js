@@ -431,8 +431,8 @@ async function handleRuleta(interaction) {
       break;
     case 'verde':
       won = result === 0;
-      // Probabilidad de x4 es muy baja (10%), de lo contrario x3
-      multiplier = Math.random() < 0.1 ? 4 : 3;
+      // Probabilidad de x3 es muy baja (10%), de lo contrario x2.5
+      multiplier = Math.random() < 0.1 ? 3 : 2.5;
       break;
     case 'par':
       won = result !== 0 && result % 2 === 0;
