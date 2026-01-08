@@ -510,35 +510,35 @@ export const ITEM_CATEGORIES = {
 
 // Sistema de Nacionalidades
 export const COUNTRIES = {
-  venezuela: { name: 'Venezuela', emoji: '🇻🇪', probability: 0.65, jobMultiplier: 0.6, minWage: 30, maxWageBonus: 80 },
-  mexico: { name: 'México', emoji: '🇲🇽', probability: 0.40, jobMultiplier: 0.8, minWage: 50, maxWageBonus: 120 },
-  argentina: { name: 'Argentina', emoji: '🇦🇷', probability: 0.40, jobMultiplier: 0.7, minWage: 45, maxWageBonus: 100 },
-  colombia: { name: 'Colombia', emoji: '🇨🇴', probability: 0.43, jobMultiplier: 0.75, minWage: 40, maxWageBonus: 95 },
+  venezuela: { name: 'Venezuela', emoji: '🇻🇪', probability: 0.65, jobMultiplier: 0.7, minWage: 40, maxWageBonus: 85 },
+  mexico: { name: 'México', emoji: '🇲🇽', probability: 0.40, jobMultiplier: 0.85, minWage: 55, maxWageBonus: 125 },
+  argentina: { name: 'Argentina', emoji: '🇦🇷', probability: 0.40, jobMultiplier: 0.75, minWage: 48, maxWageBonus: 105 },
+  colombia: { name: 'Colombia', emoji: '🇨🇴', probability: 0.43, jobMultiplier: 0.8, minWage: 45, maxWageBonus: 100 },
   brasil: { name: 'Brasil', emoji: '🇧🇷', probability: 0.24, jobMultiplier: 0.9, minWage: 60, maxWageBonus: 150 },
-  ecuador: { name: 'Ecuador', emoji: '🇪🇨', probability: 0.30, jobMultiplier: 0.7, minWage: 40, maxWageBonus: 90 },
-  peru: { name: 'Perú', emoji: '🇵🇪', probability: 0.32, jobMultiplier: 0.72, minWage: 42, maxWageBonus: 95 },
+  ecuador: { name: 'Ecuador', emoji: '🇪🇨', probability: 0.30, jobMultiplier: 0.75, minWage: 45, maxWageBonus: 95 },
+  peru: { name: 'Perú', emoji: '🇵🇪', probability: 0.32, jobMultiplier: 0.78, minWage: 46, maxWageBonus: 100 },
   chile: { name: 'Chile', emoji: '🇨🇱', probability: 0.28, jobMultiplier: 0.95, minWage: 70, maxWageBonus: 180 },
-  uruguay: { name: 'Uruguay', emoji: '🇺🇾', probability: 0.31, jobMultiplier: 0.85, minWage: 55, maxWageBonus: 130 },
-  el_salvador: { name: 'El Salvador', emoji: '🇸🇻', probability: 0.30, jobMultiplier: 0.65, minWage: 35, maxWageBonus: 85 },
-  panama: { name: 'Panamá', emoji: '🇵🇦', probability: 0.25, jobMultiplier: 0.9, minWage: 60, maxWageBonus: 140 },
-  costa_rica: { name: 'Costa Rica', emoji: '🇨🇷', probability: 0.27, jobMultiplier: 0.82, minWage: 52, maxWageBonus: 125 },
-  republica_dominicana: { name: 'República Dominicana', emoji: '🇩🇴', probability: 0.28, jobMultiplier: 0.7, minWage: 40, maxWageBonus: 95 },
-  guatemala: { name: 'Guatemala', emoji: '🇬🇹', probability: 0.29, jobMultiplier: 0.65, minWage: 35, maxWageBonus: 80 },
-  honduras: { name: 'Honduras', emoji: '🇭🇳', probability: 0.26, jobMultiplier: 0.6, minWage: 30, maxWageBonus: 70 },
-  bolivia: { name: 'Bolivia', emoji: '🇧🇴', probability: 0.27, jobMultiplier: 0.62, minWage: 32, maxWageBonus: 75 },
-  paraguay: { name: 'Paraguay', emoji: '🇵🇾', probability: 0.26, jobMultiplier: 0.68, minWage: 38, maxWageBonus: 88 },
-  nicaragua: { name: 'Nicaragua', emoji: '🇳🇮', probability: 0.24, jobMultiplier: 0.58, minWage: 28, maxWageBonus: 65 },
-  cuba: { name: 'Cuba', emoji: '🇨🇺', probability: 0.20, jobMultiplier: 0.5, minWage: 25, maxWageBonus: 55 },
-  espana: { name: 'España', emoji: '🇪🇸', probability: 0.14, jobMultiplier: 1.3, minWage: 100, maxWageBonus: 300 },
-  estados_unidos: { name: 'Estados Unidos', emoji: '🇺🇸', probability: 0.05, jobMultiplier: 2.0, minWage: 150, maxWageBonus: 500 },
-  canada: { name: 'Canadá', emoji: '🇨🇦', probability: 0.07, jobMultiplier: 1.8, minWage: 130, maxWageBonus: 400 },
-  reino_unido: { name: 'Reino Unido', emoji: '🇬🇧', probability: 0.06, jobMultiplier: 1.7, minWage: 120, maxWageBonus: 380 },
-  japon: { name: 'Japón', emoji: '🇯🇵', probability: 0.09, jobMultiplier: 1.6, minWage: 110, maxWageBonus: 350 },
-  alemania: { name: 'Alemania', emoji: '🇩🇪', probability: 0.08, jobMultiplier: 1.7, minWage: 125, maxWageBonus: 370 },
-  francia: { name: 'Francia', emoji: '🇫🇷', probability: 0.10, jobMultiplier: 1.5, minWage: 105, maxWageBonus: 320 },
-  italia: { name: 'Italia', emoji: '🇮🇹', probability: 0.11, jobMultiplier: 1.4, minWage: 95, maxWageBonus: 280 },
-  portugal: { name: 'Portugal', emoji: '🇵🇹', probability: 0.12, jobMultiplier: 1.2, minWage: 85, maxWageBonus: 220 },
-  australia: { name: 'Australia', emoji: '🇦🇺', probability: 0.06, jobMultiplier: 1.9, minWage: 140, maxWageBonus: 450 }
+  uruguay: { name: 'Uruguay', emoji: '🇺🇾', probability: 0.31, jobMultiplier: 0.9, minWage: 60, maxWageBonus: 140 },
+  el_salvador: { name: 'El Salvador', emoji: '🇸🇻', probability: 0.30, jobMultiplier: 0.7, minWage: 38, maxWageBonus: 90 },
+  panama: { name: 'Panamá', emoji: '🇵🇦', probability: 0.25, jobMultiplier: 0.9, minWage: 60, maxWageBonus: 145 },
+  costa_rica: { name: 'Costa Rica', emoji: '🇨🇷', probability: 0.27, jobMultiplier: 0.85, minWage: 55, maxWageBonus: 130 },
+  republica_dominicana: { name: 'República Dominicana', emoji: '🇩🇴', probability: 0.28, jobMultiplier: 0.75, minWage: 45, maxWageBonus: 100 },
+  guatemala: { name: 'Guatemala', emoji: '🇬🇹', probability: 0.29, jobMultiplier: 0.7, minWage: 38, maxWageBonus: 85 },
+  honduras: { name: 'Honduras', emoji: '🇭🇳', probability: 0.26, jobMultiplier: 0.65, minWage: 35, maxWageBonus: 75 },
+  bolivia: { name: 'Bolivia', emoji: '🇧🇴', probability: 0.27, jobMultiplier: 0.68, minWage: 36, maxWageBonus: 80 },
+  paraguay: { name: 'Paraguay', emoji: '🇵🇾', probability: 0.26, jobMultiplier: 0.72, minWage: 40, maxWageBonus: 92 },
+  nicaragua: { name: 'Nicaragua', emoji: '🇳🇮', probability: 0.24, jobMultiplier: 0.62, minWage: 32, maxWageBonus: 70 },
+  cuba: { name: 'Cuba', emoji: '🇨🇺', probability: 0.20, jobMultiplier: 0.55, minWage: 28, maxWageBonus: 60 },
+  espana: { name: 'España', emoji: '🇪🇸', probability: 0.14, jobMultiplier: 1.25, minWage: 95, maxWageBonus: 280 },
+  estados_unidos: { name: 'Estados Unidos', emoji: '🇺🇸', probability: 0.05, jobMultiplier: 1.6, minWage: 130, maxWageBonus: 400 },
+  canada: { name: 'Canadá', emoji: '🇨🇦', probability: 0.07, jobMultiplier: 1.5, minWage: 120, maxWageBonus: 350 },
+  reino_unido: { name: 'Reino Unido', emoji: '🇬🇧', probability: 0.06, jobMultiplier: 1.45, minWage: 115, maxWageBonus: 330 },
+  japon: { name: 'Japón', emoji: '🇯🇵', probability: 0.09, jobMultiplier: 1.4, minWage: 110, maxWageBonus: 310 },
+  alemania: { name: 'Alemania', emoji: '🇩🇪', probability: 0.08, jobMultiplier: 1.5, minWage: 120, maxWageBonus: 340 },
+  francia: { name: 'Francia', emoji: '🇫🇷', probability: 0.10, jobMultiplier: 1.35, minWage: 100, maxWageBonus: 300 },
+  italia: { name: 'Italia', emoji: '🇮🇹', probability: 0.11, jobMultiplier: 1.3, minWage: 90, maxWageBonus: 260 },
+  portugal: { name: 'Portugal', emoji: '🇵🇹', probability: 0.12, jobMultiplier: 1.15, minWage: 80, maxWageBonus: 210 },
+  australia: { name: 'Australia', emoji: '🇦🇺', probability: 0.06, jobMultiplier: 1.55, minWage: 125, maxWageBonus: 360 }
 };
 
 // Obtener power-ups activos del usuario
@@ -797,11 +797,11 @@ export async function getDailyReward(guildId, userId) {
     const wasYesterday = economy.lastDailyReward === yesterday.toDateString();
     
     const baseReward = 150;
-    const bonusReward = Math.floor(Math.random() * 200);
+    const bonusReward = Math.floor(Math.random() * 100);
     
     // Mantener racha si reclamó ayer
     let streak = wasYesterday ? (economy.dailyStreak || 0) + 1 : 1;
-    const streakBonus = Math.min(streak * 25, 250);
+    const streakBonus = Math.min(streak * 15, 200);
     
     // Aplicar boost de admin si está activo
     const adminBoost = getAdminBoost();
@@ -1222,19 +1222,19 @@ export async function robUser(guildId, robberUserId, victimUserId) {
       robBonus += adminBoost.percentage;
     }
     
-    const baseSuccess = 0.4;
+    const baseSuccess = 0.35;
     const success = Math.random() < (baseSuccess + robBonus);
     robber.lastRobAttempt = new Date().toISOString();
     
     if (!success) {
-      const fine = Math.floor(Math.random() * 150) + 50;
+      const fine = Math.floor(Math.random() * 200) + 100;
       robber.lagcoins = Math.max(0, (robber.lagcoins || 0) - fine);
       await saveUserEconomy(guildId, robberUserId, robber);
       return { success: false, fine };
     }
     
-    const maxSteal = Math.floor(victim.lagcoins * 0.3);
-    let stolen = Math.floor(Math.random() * maxSteal) + 50;
+    const maxSteal = Math.floor(victim.lagcoins * 0.15);
+    let stolen = Math.floor(Math.random() * maxSteal) + 30;
     
     // Bonus de robo con power-ups
     if (robBonus > 0) {
