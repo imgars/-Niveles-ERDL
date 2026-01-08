@@ -69,7 +69,7 @@ export default {
             .addChoices(
               { name: '🔴 Rojo (x2)', value: 'rojo' },
               { name: '⚫ Negro (x2)', value: 'negro' },
-              { name: '🟢 Verde/0 (x12)', value: 'verde' },
+              { name: '🟢 Verde/0 (x3-x4)', value: 'verde' },
               { name: '1️⃣ Par (x2)', value: 'par' },
               { name: '2️⃣ Impar (x2)', value: 'impar' },
               { name: '⬆️ Alto 19-36 (x2)', value: 'alto' },
@@ -431,7 +431,8 @@ async function handleRuleta(interaction) {
       break;
     case 'verde':
       won = result === 0;
-      multiplier = 12;
+      // Probabilidad de x4 es muy baja (10%), de lo contrario x3
+      multiplier = Math.random() < 0.1 ? 4 : 3;
       break;
     case 'par':
       won = result !== 0 && result % 2 === 0;
