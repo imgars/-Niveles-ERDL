@@ -69,7 +69,7 @@ export default {
             .addChoices(
               { name: '🔴 Rojo (x2)', value: 'rojo' },
               { name: '⚫ Negro (x2)', value: 'negro' },
-              { name: '🟢 Verde/0 (x14)', value: 'verde' },
+              { name: '🟢 Verde/0 (x12)', value: 'verde' },
               { name: '1️⃣ Par (x2)', value: 'par' },
               { name: '2️⃣ Impar (x2)', value: 'impar' },
               { name: '⬆️ Alto 19-36 (x2)', value: 'alto' },
