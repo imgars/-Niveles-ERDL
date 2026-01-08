@@ -13,6 +13,8 @@
   - Se incrementaron significativamente los precios de todos los power-ups.
   - Se reequilibraron los juegos del casino con mayor ventaja para la casa y menores multiplicadores.
   - Se corrigió el error del Jackpot en las Slots y se limitó a una recompensa x6.
+- **Restauración de Nacionalidades (Enero 2026):**
+  - Se revirtieron los multiplicadores de nacionalidad y salarios a sus valores originales según la preferencia del usuario.
 
 ## Overview
 This project is a comprehensive Discord bot featuring a leveling and XP system, a virtual economy (Lagcoins), a casino with various games, minigames, power-ups, anti-theft insurance, nationality assignments, auctions, user streaks, and customizable PIXEL ART rank cards. The bot is designed for deployment on Render from GitHub, ensuring persistence and scalability. It aims to provide an engaging and interactive experience for Discord communities through gamification and social features.
