@@ -1,5 +1,13 @@
 # -Niveles
 
+## Recent Changes
+- **Economy Rebalancing (Jan 2026):** 
+  - Nerfed all job earnings by 40-50% to control inflation.
+  - Increased shop prices (e.g., 100 XP now costs 3000 Lagcoins).
+  - Increased all power-up prices significantly.
+  - Rebalanced casino games with higher house edges and lower multipliers.
+  - Fixed Slots Jackpot bug and capped it at x6 reward.
+
 ## Overview
 This project is a comprehensive Discord bot featuring a leveling and XP system, a virtual economy (Lagcoins), a casino with various games, minigames, power-ups, anti-theft insurance, nationality assignments, auctions, user streaks, and customizable PIXEL ART rank cards. The bot is designed for deployment on Render from GitHub, ensuring persistence and scalability. It aims to provide an engaging and interactive experience for Discord communities through gamification and social features.
 
