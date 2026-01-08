@@ -162,9 +162,12 @@ export async function connectMongoDB() {
 export async function saveUserToMongo(guildId, userId, userData) {
   if (!isConnected) return;
   try {
+    // Eliminar campos inmutables o problemáticos si existen en userData
+    const { _id, ...updateData } = userData;
+    
     await User.updateOne(
       { userId, guildId },
-      userData,
+      { $set: updateData },
       { upsert: true }
     );
   } catch (error) {
@@ -561,22 +564,24 @@ export function isMongoConnected() {
 export async function saveEconomyToMongo(guildId, userId, economyData) {
   if (!isConnected) return null;
   try {
+    const { _id, ...cleanEconomyData } = economyData;
+    
     const updateData = {
       guildId,
       userId,
-      lagcoins: economyData.lagcoins || 100,
-      bankBalance: economyData.bankBalance || 0,
-      lastWorkTime: economyData.lastWorkTime,
-      lastRobTime: economyData.lastRobTime,
-      lastDailyReward: economyData.lastDailyReward,
-      lastRobAttempt: economyData.lastRobAttempt,
-      lastBankRob: economyData.lastBankRob,
-      dailyStreak: economyData.dailyStreak || 0,
-      totalEarned: economyData.totalEarned || 0,
-      totalSpent: economyData.totalSpent || 0,
-      items: economyData.items || [],
-      inventory: economyData.inventory || [],
-      marriedTo: economyData.marriedTo || null
+      lagcoins: cleanEconomyData.lagcoins || 100,
+      bankBalance: cleanEconomyData.bankBalance || 0,
+      lastWorkTime: cleanEconomyData.lastWorkTime,
+      lastRobTime: cleanEconomyData.lastRobTime,
+      lastDailyReward: cleanEconomyData.lastDailyReward,
+      lastRobAttempt: cleanEconomyData.lastRobAttempt,
+      lastBankRob: cleanEconomyData.lastBankRob,
+      dailyStreak: cleanEconomyData.dailyStreak || 0,
+      totalEarned: cleanEconomyData.totalEarned || 0,
+      totalSpent: cleanEconomyData.totalSpent || 0,
+      items: cleanEconomyData.items || [],
+      inventory: cleanEconomyData.inventory || [],
+      marriedTo: cleanEconomyData.marriedTo || null
     };
 
     if (economyData.casinoStats) {
