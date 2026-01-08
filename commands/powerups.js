@@ -25,18 +25,18 @@ export default {
             .setDescription('Power-up a comprar')
             .setRequired(true)
             .addChoices(
-              { name: '💪 Boost Trabajo Básico (+25% 1h) - 1,000', value: 'powerup_trabajo_1' },
-              { name: '💪💪 Boost Trabajo Pro (+50% 1h) - 2,500', value: 'powerup_trabajo_2' },
-              { name: '🔥 Boost Trabajo Ultra (+100% 30m) - 5,000', value: 'powerup_trabajo_3' },
-              { name: '🎰 Suerte Básica (+15% casino 1h) - 1,500', value: 'powerup_casino_1' },
-              { name: '🎰🎰 Suerte Avanzada (+30% casino 1h) - 3,500', value: 'powerup_casino_2' },
-              { name: '🎰🔥 Suerte Máxima (+50% casino 30m) - 7,500', value: 'powerup_casino_3' },
-              { name: '🥷 Sigilo Básico (+20% robo 1h) - 2,000', value: 'powerup_robo_1' },
-              { name: '🥷🥷 Sigilo Avanzado (+40% robo 1h) - 4,500', value: 'powerup_robo_2' },
-              { name: '🥷🔥 Maestro del Robo (+60% robo 30m) - 10,000', value: 'powerup_robo_3' },
-              { name: '⭐ Boost XP Básico (+25% XP 2h) - 1,200', value: 'powerup_xp_1' },
-              { name: '⭐⭐ Boost XP Pro (+50% XP 2h) - 3,000', value: 'powerup_xp_2' },
-              { name: '🌟 Boost XP Ultra (+100% XP 1h) - 6,000', value: 'powerup_xp_3' }
+              { name: '💪 Boost Trabajo Básico (+25% 1h) - 10,000', value: 'powerup_trabajo_1' },
+              { name: '💪💪 Boost Trabajo Pro (+50% 1h) - 25,000', value: 'powerup_trabajo_2' },
+              { name: '🔥 Boost Trabajo Ultra (+100% 30m) - 56,000', value: 'powerup_trabajo_3' },
+              { name: '🎰 Suerte Básica (+15% casino 1h) - 15,000', value: 'powerup_casino_1' },
+              { name: '🎰🎰 Suerte Avanzada (+30% casino 1h) - 35,000', value: 'powerup_casino_2' },
+              { name: '🎰🔥 Suerte Máxima (+50% casino 30m) - 75,000', value: 'powerup_casino_3' },
+              { name: '🥷 Sigilo Básico (+20% robo 1h) - 20,000', value: 'powerup_robo_1' },
+              { name: '🥷🥷 Sigilo Avanzado (+40% robo 1h) - 60,000', value: 'powerup_robo_2' },
+              { name: '🥷🔥 Maestro del Robo (+60% robo 30m) - 100,000', value: 'powerup_robo_3' },
+              { name: '⭐ Boost XP Básico (+25% XP 2h) - 30,000', value: 'powerup_xp_1' },
+              { name: '⭐⭐ Boost XP Pro (+50% XP 2h) - 100,000', value: 'powerup_xp_2' },
+              { name: '🌟 Boost XP Ultra (+100% XP 1h) - 65,000', value: 'powerup_xp_3' }
             )
         )
     ),

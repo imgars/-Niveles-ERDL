@@ -388,30 +388,30 @@ export async function saveUserEconomy(guildId, userId, data) {
 
 // Sistema de trabajos mejorado con más trabajos
 export const JOBS = {
-  basico: { name: 'Trabajo Básico', emoji: '💼', minEarnings: 50, maxEarnings: 120, itemsNeeded: [], cooldown: 60000, countryMultiplier: 1.0 },
-  pescar: { name: 'Pescador', emoji: '🎣', minEarnings: 100, maxEarnings: 250, itemsNeeded: ['cana_pesca'], cooldown: 45000, countryMultiplier: 1.0 },
-  talar: { name: 'Leñador', emoji: '🪓', minEarnings: 120, maxEarnings: 300, itemsNeeded: ['hacha'], cooldown: 45000, countryMultiplier: 1.0 },
-  minar: { name: 'Minero', emoji: '⛏️', minEarnings: 150, maxEarnings: 400, itemsNeeded: ['pico'], cooldown: 45000, countryMultiplier: 1.2 },
-  construir: { name: 'Albañil', emoji: '🏗️', minEarnings: 180, maxEarnings: 450, itemsNeeded: ['pala'], cooldown: 45000, countryMultiplier: 1.0 },
-  programar: { name: 'Programador', emoji: '💻', minEarnings: 200, maxEarnings: 500, itemsNeeded: ['laptop'], cooldown: 40000, countryMultiplier: 1.5 },
-  cocinar: { name: 'Chef', emoji: '👨‍🍳', minEarnings: 150, maxEarnings: 350, itemsNeeded: ['utensilios'], cooldown: 50000, countryMultiplier: 1.0 },
-  entregar: { name: 'Repartidor', emoji: '🛵', minEarnings: 80, maxEarnings: 200, itemsNeeded: ['moto'], cooldown: 30000, countryMultiplier: 0.8 },
-  streaming: { name: 'Streamer', emoji: '🎥', minEarnings: 100, maxEarnings: 600, itemsNeeded: ['camara', 'laptop'], cooldown: 120000, countryMultiplier: 1.3 },
-  musica: { name: 'Músico', emoji: '🎸', minEarnings: 120, maxEarnings: 400, itemsNeeded: ['guitarra'], cooldown: 60000, countryMultiplier: 1.0 },
-  arte: { name: 'Artista', emoji: '🎨', minEarnings: 100, maxEarnings: 450, itemsNeeded: ['lienzo'], cooldown: 90000, countryMultiplier: 1.1 },
-  cazar: { name: 'Cazador', emoji: '🏹', minEarnings: 180, maxEarnings: 500, itemsNeeded: ['arco'], cooldown: 60000, countryMultiplier: 1.0 },
-  granja: { name: 'Granjero', emoji: '🌾', minEarnings: 130, maxEarnings: 350, itemsNeeded: ['semillas'], cooldown: 45000, countryMultiplier: 1.0 },
+  basico: { name: 'Trabajo Básico', emoji: '💼', minEarnings: 30, maxEarnings: 80, itemsNeeded: [], cooldown: 60000, countryMultiplier: 1.0 },
+  pescar: { name: 'Pescador', emoji: '🎣', minEarnings: 70, maxEarnings: 180, itemsNeeded: ['cana_pesca'], cooldown: 45000, countryMultiplier: 1.0 },
+  talar: { name: 'Leñador', emoji: '🪓', minEarnings: 80, maxEarnings: 220, itemsNeeded: ['hacha'], cooldown: 45000, countryMultiplier: 1.0 },
+  minar: { name: 'Minero', emoji: '⛏️', minEarnings: 100, maxEarnings: 300, itemsNeeded: ['pico'], cooldown: 45000, countryMultiplier: 1.2 },
+  construir: { name: 'Albañil', emoji: '🏗️', minEarnings: 120, maxEarnings: 350, itemsNeeded: ['pala'], cooldown: 45000, countryMultiplier: 1.0 },
+  programar: { name: 'Programador', emoji: '💻', minEarnings: 150, maxEarnings: 400, itemsNeeded: ['laptop'], cooldown: 40000, countryMultiplier: 1.5 },
+  cocinar: { name: 'Chef', emoji: '👨‍🍳', minEarnings: 100, maxEarnings: 280, itemsNeeded: ['utensilios'], cooldown: 50000, countryMultiplier: 1.0 },
+  entregar: { name: 'Repartidor', emoji: '🛵', minEarnings: 50, maxEarnings: 140, itemsNeeded: ['moto'], cooldown: 30000, countryMultiplier: 0.8 },
+  streaming: { name: 'Streamer', emoji: '🎥', minEarnings: 70, maxEarnings: 450, itemsNeeded: ['camara', 'laptop'], cooldown: 120000, countryMultiplier: 1.3 },
+  musica: { name: 'Músico', emoji: '🎸', minEarnings: 80, maxEarnings: 300, itemsNeeded: ['guitarra'], cooldown: 60000, countryMultiplier: 1.0 },
+  arte: { name: 'Artista', emoji: '🎨', minEarnings: 70, maxEarnings: 350, itemsNeeded: ['lienzo'], cooldown: 90000, countryMultiplier: 1.1 },
+  cazar: { name: 'Cazador', emoji: '🏹', minEarnings: 120, maxEarnings: 400, itemsNeeded: ['arco'], cooldown: 60000, countryMultiplier: 1.0 },
+  granja: { name: 'Granjero', emoji: '🌾', minEarnings: 90, maxEarnings: 280, itemsNeeded: ['semillas'], cooldown: 45000, countryMultiplier: 1.0 },
   // Nuevos trabajos
-  medico: { name: 'Médico', emoji: '👨‍⚕️', minEarnings: 300, maxEarnings: 700, itemsNeeded: ['estetoscopio', 'laptop'], cooldown: 90000, countryMultiplier: 1.8 },
-  abogado: { name: 'Abogado', emoji: '⚖️', minEarnings: 250, maxEarnings: 600, itemsNeeded: ['maletin', 'laptop'], cooldown: 80000, countryMultiplier: 1.6 },
-  piloto: { name: 'Piloto', emoji: '✈️', minEarnings: 400, maxEarnings: 900, itemsNeeded: ['licencia_piloto'], cooldown: 180000, countryMultiplier: 2.0 },
-  taxista: { name: 'Taxista', emoji: '🚕', minEarnings: 80, maxEarnings: 180, itemsNeeded: ['taxi'], cooldown: 30000, countryMultiplier: 0.7 },
-  mecanico: { name: 'Mecánico', emoji: '🔧', minEarnings: 150, maxEarnings: 350, itemsNeeded: ['herramientas'], cooldown: 50000, countryMultiplier: 1.0 },
-  barista: { name: 'Barista', emoji: '☕', minEarnings: 70, maxEarnings: 150, itemsNeeded: [], cooldown: 25000, countryMultiplier: 0.9 },
-  dj: { name: 'DJ', emoji: '🎧', minEarnings: 200, maxEarnings: 500, itemsNeeded: ['tornamesa', 'laptop'], cooldown: 100000, countryMultiplier: 1.2 },
-  futbolista: { name: 'Futbolista', emoji: '⚽', minEarnings: 500, maxEarnings: 1500, itemsNeeded: ['contrato_deportivo'], cooldown: 300000, countryMultiplier: 2.5 },
-  youtuber: { name: 'YouTuber', emoji: '📺', minEarnings: 150, maxEarnings: 800, itemsNeeded: ['camara', 'laptop', 'microfono'], cooldown: 150000, countryMultiplier: 1.4 },
-  influencer: { name: 'Influencer', emoji: '📱', minEarnings: 100, maxEarnings: 600, itemsNeeded: ['smartphone_pro'], cooldown: 120000, countryMultiplier: 1.3 }
+  medico: { name: 'Médico', emoji: '👨‍⚕️', minEarnings: 200, maxEarnings: 550, itemsNeeded: ['estetoscopio', 'laptop'], cooldown: 90000, countryMultiplier: 1.8 },
+  abogado: { name: 'Abogado', emoji: '⚖️', minEarnings: 180, maxEarnings: 480, itemsNeeded: ['maletin', 'laptop'], cooldown: 80000, countryMultiplier: 1.6 },
+  piloto: { name: 'Piloto', emoji: '✈️', minEarnings: 280, maxEarnings: 700, itemsNeeded: ['licencia_piloto'], cooldown: 180000, countryMultiplier: 2.0 },
+  taxista: { name: 'Taxista', emoji: '🚕', minEarnings: 50, maxEarnings: 130, itemsNeeded: ['taxi'], cooldown: 30000, countryMultiplier: 0.7 },
+  mecanico: { name: 'Mecánico', emoji: '🔧', minEarnings: 100, maxEarnings: 280, itemsNeeded: ['herramientas'], cooldown: 50000, countryMultiplier: 1.0 },
+  barista: { name: 'Barista', emoji: '☕', minEarnings: 40, maxEarnings: 100, itemsNeeded: [], cooldown: 25000, countryMultiplier: 0.9 },
+  dj: { name: 'DJ', emoji: '🎧', minEarnings: 150, maxEarnings: 400, itemsNeeded: ['tornamesa', 'laptop'], cooldown: 100000, countryMultiplier: 1.2 },
+  futbolista: { name: 'Futbolista', emoji: '⚽', minEarnings: 350, maxEarnings: 1000, itemsNeeded: ['contrato_deportivo'], cooldown: 300000, countryMultiplier: 2.5 },
+  youtuber: { name: 'YouTuber', emoji: '📺', minEarnings: 100, maxEarnings: 600, itemsNeeded: ['camara', 'laptop', 'microfono'], cooldown: 150000, countryMultiplier: 1.4 },
+  influencer: { name: 'Influencer', emoji: '📱', minEarnings: 70, maxEarnings: 450, itemsNeeded: ['smartphone_pro'], cooldown: 120000, countryMultiplier: 1.3 }
 };
 
 // Sistema de items extendido con power-ups
@@ -467,21 +467,21 @@ export const ITEMS = {
   visa_trabajo: { name: 'Visa de Trabajo', emoji: '📝', price: 5000, unlocks: null, description: 'Permite trabajar en el extranjero', category: 'viaje' },
   
   // POWER-UPS (Nuevos)
-  powerup_trabajo_1: { name: 'Boost Trabajo Básico', emoji: '💪', price: 1000, unlocks: null, description: '+25% ganancias en trabajos por 1h', category: 'powerup', effect: { type: 'work_boost', value: 0.25, duration: 3600000 } },
-  powerup_trabajo_2: { name: 'Boost Trabajo Pro', emoji: '💪💪', price: 2500, unlocks: null, description: '+50% ganancias en trabajos por 1h', category: 'powerup', effect: { type: 'work_boost', value: 0.5, duration: 3600000 } },
-  powerup_trabajo_3: { name: 'Boost Trabajo Ultra', emoji: '🔥', price: 5000, unlocks: null, description: '+100% ganancias en trabajos por 30min', category: 'powerup', effect: { type: 'work_boost', value: 1.0, duration: 1800000 } },
+  powerup_trabajo_1: { name: 'Boost Trabajo Básico', emoji: '💪', price: 10000, unlocks: null, description: '+25% ganancias en trabajos por 1h', category: 'powerup', effect: { type: 'work_boost', value: 0.25, duration: 3600000 } },
+  powerup_trabajo_2: { name: 'Boost Trabajo Pro', emoji: '💪💪', price: 25000, unlocks: null, description: '+50% ganancias en trabajos por 1h', category: 'powerup', effect: { type: 'work_boost', value: 0.5, duration: 3600000 } },
+  powerup_trabajo_3: { name: 'Boost Trabajo Ultra', emoji: '🔥', price: 56000, unlocks: null, description: '+100% ganancias en trabajos por 30min', category: 'powerup', effect: { type: 'work_boost', value: 1.0, duration: 1800000 } },
   
-  powerup_casino_1: { name: 'Suerte Básica', emoji: '🎰', price: 1500, unlocks: null, description: '+15% suerte en casino por 1h', category: 'powerup', effect: { type: 'casino_luck', value: 0.15, duration: 3600000 } },
-  powerup_casino_2: { name: 'Suerte Avanzada', emoji: '🎰🎰', price: 3500, unlocks: null, description: '+30% suerte en casino por 1h', category: 'powerup', effect: { type: 'casino_luck', value: 0.3, duration: 3600000 } },
-  powerup_casino_3: { name: 'Suerte Máxima', emoji: '🎰🔥', price: 7500, unlocks: null, description: '+50% suerte en casino por 30min', category: 'powerup', effect: { type: 'casino_luck', value: 0.5, duration: 1800000 } },
+  powerup_casino_1: { name: 'Suerte Básica', emoji: '🎰', price: 15000, unlocks: null, description: '+15% suerte en casino por 1h', category: 'powerup', effect: { type: 'casino_luck', value: 0.15, duration: 3600000 } },
+  powerup_casino_2: { name: 'Suerte Avanzada', emoji: '🎰🎰', price: 35000, unlocks: null, description: '+30% suerte en casino por 1h', category: 'powerup', effect: { type: 'casino_luck', value: 0.3, duration: 3600000 } },
+  powerup_casino_3: { name: 'Suerte Máxima', emoji: '🎰🔥', price: 75000, unlocks: null, description: '+50% suerte en casino por 30min', category: 'powerup', effect: { type: 'casino_luck', value: 0.5, duration: 1800000 } },
   
-  powerup_robo_1: { name: 'Sigilo Básico', emoji: '🥷', price: 2000, unlocks: null, description: '+20% éxito en robos por 1h', category: 'powerup', effect: { type: 'rob_success', value: 0.2, duration: 3600000 } },
-  powerup_robo_2: { name: 'Sigilo Avanzado', emoji: '🥷🥷', price: 4500, unlocks: null, description: '+40% éxito en robos por 1h', category: 'powerup', effect: { type: 'rob_success', value: 0.4, duration: 3600000 } },
-  powerup_robo_3: { name: 'Maestro del Robo', emoji: '🥷🔥', price: 10000, unlocks: null, description: '+60% éxito en robos por 30min', category: 'powerup', effect: { type: 'rob_success', value: 0.6, duration: 1800000 } },
+  powerup_robo_1: { name: 'Sigilo Básico', emoji: '🥷', price: 20000, unlocks: null, description: '+20% éxito en robos por 1h', category: 'powerup', effect: { type: 'rob_success', value: 0.2, duration: 3600000 } },
+  powerup_robo_2: { name: 'Sigilo Avanzado', emoji: '🥷🥷', price: 60000, unlocks: null, description: '+40% éxito en robos por 1h', category: 'powerup', effect: { type: 'rob_success', value: 0.4, duration: 3600000 } },
+  powerup_robo_3: { name: 'Maestro del Robo', emoji: '🥷🔥', price: 100000, unlocks: null, description: '+60% éxito en robos por 30min', category: 'powerup', effect: { type: 'rob_success', value: 0.6, duration: 1800000 } },
   
-  powerup_xp_1: { name: 'Boost XP Básico', emoji: '⭐', price: 1200, unlocks: null, description: '+25% XP de niveles por 2h', category: 'powerup', effect: { type: 'xp_boost', value: 0.25, duration: 7200000 } },
-  powerup_xp_2: { name: 'Boost XP Pro', emoji: '⭐⭐', price: 3000, unlocks: null, description: '+50% XP de niveles por 2h', category: 'powerup', effect: { type: 'xp_boost', value: 0.5, duration: 7200000 } },
-  powerup_xp_3: { name: 'Boost XP Ultra', emoji: '🌟', price: 6000, unlocks: null, description: '+100% XP de niveles por 1h', category: 'powerup', effect: { type: 'xp_boost', value: 1.0, duration: 3600000 } },
+  powerup_xp_1: { name: 'Boost XP Básico', emoji: '⭐', price: 30000, unlocks: null, description: '+25% XP de niveles por 2h', category: 'powerup', effect: { type: 'xp_boost', value: 0.25, duration: 7200000 } },
+  powerup_xp_2: { name: 'Boost XP Pro', emoji: '⭐⭐', price: 100000, unlocks: null, description: '+50% XP de niveles por 2h', category: 'powerup', effect: { type: 'xp_boost', value: 0.5, duration: 7200000 } },
+  powerup_xp_3: { name: 'Boost XP Ultra', emoji: '🌟', price: 65000, unlocks: null, description: '+100% XP de niveles por 1h', category: 'powerup', effect: { type: 'xp_boost', value: 1.0, duration: 3600000 } },
   
   // Seguros Anti-Robo (Nuevos)
   seguro_basico: { name: 'Seguro Anti-Robo Básico', emoji: '🔒', price: 800, unlocks: null, description: '50% protección por 2h', category: 'seguro', effect: { type: 'anti_rob', value: 0.5, duration: 7200000 } },
@@ -854,9 +854,9 @@ export async function playCasino(guildId, userId, bet) {
     }
     
     const roll = Math.floor(Math.random() * 100);
-    const threshold = 45 - (luckBonus * 30); // Más suerte = menor threshold necesario
+    const threshold = 55 - (luckBonus * 20); // Nerf: threshold base sube de 45 a 55 (más difícil ganar)
     const won = roll > threshold;
-    const multiplier = won ? (roll > 90 ? 3 : roll > 75 ? 2 : 1.5) : 0;
+    const multiplier = won ? (roll > 95 ? 2.5 : roll > 80 ? 2 : 1.4) : 0; // Nerf: Multiplicadores reducidos
     const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
@@ -910,7 +910,7 @@ export async function playSlots(guildId, userId, bet) {
     
     // Con más suerte, hay mayor probabilidad de obtener símbolos iguales
     const getSymbol = () => {
-      if (luckBonus > 0 && Math.random() < luckBonus * 0.3) {
+      if (luckBonus > 0 && Math.random() < luckBonus * 0.2) { // Nerf: Suerte influye menos
         // Mayor probabilidad de símbolos de alto valor
         return symbols[Math.floor(Math.random() * 3) + 5];
       }
@@ -920,9 +920,9 @@ export async function playSlots(guildId, userId, bet) {
     const reels = [getSymbol(), getSymbol(), getSymbol()];
     
     // Bonus de suerte para emparejar
-    if (luckBonus > 0.3 && Math.random() < luckBonus * 0.4) {
+    if (luckBonus > 0.4 && Math.random() < luckBonus * 0.3) { // Nerf: Requisito de suerte mayor y probabilidad menor
       reels[1] = reels[0];
-      if (Math.random() < luckBonus * 0.3) {
+      if (Math.random() < luckBonus * 0.2) {
         reels[2] = reels[0];
       }
     }
@@ -932,21 +932,21 @@ export async function playSlots(guildId, userId, bet) {
     
     if (reels[0] === reels[1] && reels[1] === reels[2]) {
       if (reels[0] === '7️⃣') {
-        multiplier = 10;
+        multiplier = 6; // Nerf: x10 -> x6
         jackpot = true;
       } else if (reels[0] === '💎') {
-        multiplier = 7;
+        multiplier = 4.5; // Nerf: x7 -> x4.5
       } else if (reels[0] === '🍀') {
-        multiplier = 5;
+        multiplier = 3.5; // Nerf: x5 -> x3.5
       } else {
-        multiplier = 3;
+        multiplier = 2.5; // Nerf: x3 -> x2.5
       }
     } else if (reels[0] === reels[1] || reels[1] === reels[2]) {
-      multiplier = 1.5;
+      multiplier = 1.2; // Nerf: x1.5 -> x1.2
     }
     
     const won = multiplier > 0;
-    const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
+    const winnings = won ? Math.floor(bet * (jackpot ? multiplier : multiplier)) - bet : -bet; // FIX: Jackpot bug, se quitó el multiplicador extra implícito en el comando slots.js y se balanceó aquí.
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
     if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
@@ -996,10 +996,10 @@ export async function playCoinflip(guildId, userId, bet, choice) {
     }
     
     // Con suerte, más probabilidad de ganar
-    const winChance = 0.5 + (luckBonus * 0.2);
+    const winChance = 0.47 + (luckBonus * 0.15); // Nerf: 0.5 -> 0.47 base y suerte influye menos
     const result = Math.random() > winChance ? (choice.toLowerCase() === 'cara' ? 'cruz' : 'cara') : choice.toLowerCase();
     const won = choice.toLowerCase() === result;
-    const winnings = won ? bet : -bet;
+    const winnings = won ? Math.floor(bet * 0.95) : -bet; // Nerf: Casa se queda con un 5% en victorias (comisión)
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
     if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
@@ -1048,42 +1048,32 @@ export async function playDice(guildId, userId, bet, guess) {
       luckBonus += adminBoost.percentage;
     }
     
-    let dice1 = Math.floor(Math.random() * 6) + 1;
-    let dice2 = Math.floor(Math.random() * 6) + 1;
+    const dice1 = Math.floor(Math.random() * 6) + 1;
+    const dice2 = Math.floor(Math.random() * 6) + 1;
     
-    // Con suerte alta, ajustar dados hacia la apuesta
-    if (luckBonus > 0.3 && Math.random() < luckBonus * 0.4) {
-      if (guess === 'exacto') {
-        dice1 = Math.floor(Math.random() * 3) + 2;
-        dice2 = 7 - dice1;
-      } else if (guess === 'alto') {
-        dice1 = Math.floor(Math.random() * 3) + 4;
-        dice2 = Math.floor(Math.random() * 3) + 4;
-      } else if (guess === 'bajo') {
-        dice1 = Math.floor(Math.random() * 3) + 1;
-        dice2 = Math.floor(Math.random() * 3) + 1;
-      } else if (guess === 'dobles') {
-        dice2 = dice1;
-      }
+    // Nerf: Suerte influye mucho menos en dados
+    if (luckBonus > 0.5 && Math.random() < luckBonus * 0.15) {
+      // Pequeño empuje según predicción
+      if (guess === 'alto' && dice1 + dice2 < 8) dice1 = 4;
+      if (guess === 'bajo' && dice1 + dice2 > 6) dice1 = 2;
     }
     
     const total = dice1 + dice2;
-    
-    let won = false;
     let multiplier = 0;
     
-    if (guess === 'exacto' && total === 7) {
-      won = true;
-      multiplier = 4;
-    } else if (guess === 'alto' && total > 7) {
-      won = true;
-      multiplier = 2;
-    } else if (guess === 'bajo' && total < 7) {
-      won = true;
-      multiplier = 2;
-    } else if (guess === 'dobles' && dice1 === dice2) {
-      won = true;
-      multiplier = 5;
+    switch (guess) {
+      case 'alto':
+        if (total >= 8) multiplier = 1.8;
+        break;
+      case 'bajo':
+        if (total <= 6) multiplier = 1.8;
+        break;
+      case 'exacto':
+        if (total === 7) multiplier = 3.5;
+        break;
+      case 'dobles':
+        if (dice1 === dice2) multiplier = 4.5;
+        break;
     }
     
     const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
@@ -1154,10 +1144,10 @@ export async function playBlackjack(guildId, userId, bet) {
     
     if (playerTotal === 21) {
       result = 'blackjack';
-      multiplier = 2.5;
+      multiplier = 2.2; // Nerf: x2.5 -> x2.2
     } else if (dealerTotal > 21 || (playerTotal <= 21 && playerTotal > dealerTotal)) {
       result = 'win';
-      multiplier = 2;
+      multiplier = 1.8; // Nerf: x2 -> x1.8
     } else if (playerTotal === dealerTotal) {
       result = 'tie';
       multiplier = 1;

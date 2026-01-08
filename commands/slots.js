@@ -60,7 +60,7 @@ export default {
         );
 
       if (result.jackpot) {
-        embed.setFooter({ text: '🌟 ¡Jackpot x10!' });
+        embed.setFooter({ text: '🌟 ¡Jackpot x6!' });
       }
 
       return interaction.reply({ embeds: [embed] });

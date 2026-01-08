@@ -127,7 +127,7 @@ async function handleHorseRace(interaction) {
   
   const horses = ['🏇', '🐎', '🦄', '🐴', '🎠', '🏇'];
   const horseNames = ['Rayo', 'Tormenta', 'Unicornio', 'Veloz', 'Carrusel', 'Campeón'];
-  const odds = [2, 3, 5, 2.5, 4, 2];
+  const odds = [1.8, 2.5, 4, 2.2, 3.5, 1.8];
   
   // Simulación de carrera
   let raceMessages = [];
@@ -423,31 +423,31 @@ async function handleRuleta(interaction) {
   switch (tipo) {
     case 'rojo':
       won = isRed;
-      multiplier = 2;
+      multiplier = 1.9;
       break;
     case 'negro':
       won = isBlack;
-      multiplier = 2;
+      multiplier = 1.9;
       break;
     case 'verde':
       won = result === 0;
-      multiplier = 14;
+      multiplier = 12;
       break;
     case 'par':
       won = result !== 0 && result % 2 === 0;
-      multiplier = 2;
+      multiplier = 1.9;
       break;
     case 'impar':
       won = result % 2 === 1;
-      multiplier = 2;
+      multiplier = 1.9;
       break;
     case 'alto':
       won = result >= 19 && result <= 36;
-      multiplier = 2;
+      multiplier = 1.9;
       break;
     case 'bajo':
       won = result >= 1 && result <= 18;
-      multiplier = 2;
+      multiplier = 1.9;
       break;
   }
   

@@ -10,15 +10,15 @@ export default {
       option.setName('item')
         .setDescription('Qué quieres comprar')
         .setChoices(
-          { name: '100 XP - 150 Lagcoins', value: 'xp100' },
-          { name: '500 XP - 600 Lagcoins', value: 'xp500' },
-          { name: '1 Nivel - 800 Lagcoins', value: 'level1' },
-          { name: '5 Niveles - 3500 Lagcoins', value: 'level5' },
-          { name: 'Boost 50% 24h - 1200 Lagcoins', value: 'boost24' },
-          { name: 'Boost 100% 48h - 2500 Lagcoins', value: 'boost48' },
-          { name: 'Tarjeta Minecraft - 5000 Lagcoins', value: 'card_minecraft' },
-          { name: 'Tarjeta FNAF - 4500 Lagcoins', value: 'card_fnaf' },
-          { name: 'Tarjeta Roblox - 7000 Lagcoins', value: 'card_roblox' }
+          { name: '100 XP - 3000 Lagcoins', value: 'xp100' },
+          { name: '500 XP - 4500 Lagcoins', value: 'xp500' },
+          { name: '1 Nivel - 7000 Lagcoins', value: 'level1' },
+          { name: '5 Niveles - 25000 Lagcoins', value: 'level5' },
+          { name: 'Boost 50% 24h - 16000 Lagcoins', value: 'boost24' },
+          { name: 'Boost 100% 48h - 32000 Lagcoins', value: 'boost48' },
+          { name: 'Tarjeta Minecraft - 16000 Lagcoins', value: 'card_minecraft' },
+          { name: 'Tarjeta FNAF - 18000 Lagcoins', value: 'card_fnaf' },
+          { name: 'Tarjeta Roblox - 25000 Lagcoins', value: 'card_roblox' }
         )
         .setRequired(true)
     ),
@@ -34,15 +34,15 @@ export default {
     }
 
     const items = {
-      xp100: { price: 150, xp: 100, name: '100 XP' },
-      xp500: { price: 600, xp: 500, name: '500 XP' },
-      level1: { price: 800, levels: 1, name: '1 Nivel' },
-      level5: { price: 3500, levels: 5, name: '5 Niveles' },
-      boost24: { price: 1200, boost: 150, hours: 24, name: 'Boost 50% 24h' },
-      boost48: { price: 2500, boost: 200, hours: 48, name: 'Boost 100% 48h' },
-      card_minecraft: { price: 5000, card: 'minecraft', name: 'Tarjeta Minecraft' },
-      card_fnaf: { price: 4500, card: 'fnaf', name: 'Tarjeta FNAF' },
-      card_roblox: { price: 7000, card: 'roblox', name: 'Tarjeta Roblox' }
+      xp100: { price: 3000, xp: 100, name: '100 XP' },
+      xp500: { price: 4500, xp: 500, name: '500 XP' },
+      level1: { price: 7000, levels: 1, name: '1 Nivel' },
+      level5: { price: 25000, levels: 5, name: '5 Niveles' },
+      boost24: { price: 16000, boost: 150, hours: 24, name: 'Boost 50% 24h' },
+      boost48: { price: 32000, boost: 200, hours: 48, name: 'Boost 100% 48h' },
+      card_minecraft: { price: 16000, card: 'minecraft', name: 'Tarjeta Minecraft' },
+      card_fnaf: { price: 18000, card: 'fnaf', name: 'Tarjeta FNAF' },
+      card_roblox: { price: 25000, card: 'roblox', name: 'Tarjeta Roblox' }
     };
 
     const itemData = items[item];
