@@ -159,11 +159,32 @@ export async function connectMongoDB() {
   }
 }
 
+// Función auxiliar para eliminar campos inmutables recursivamente
+function cleanDataForMongo(data) {
+  if (!data || typeof data !== 'object') return data;
+  
+  if (Array.isArray(data)) {
+    return data.map(item => cleanDataForMongo(item));
+  }
+  
+  const clean = { ...data };
+  delete clean._id;
+  delete clean.__v;
+  delete clean.$setOnInsert;
+  
+  for (const key in clean) {
+    if (clean[key] && typeof clean[key] === 'object') {
+      clean[key] = cleanDataForMongo(clean[key]);
+    }
+  }
+  
+  return clean;
+}
+
 export async function saveUserToMongo(guildId, userId, userData) {
   if (!isConnected) return;
   try {
-    // Eliminar campos inmutables o problemáticos si existen en userData
-    const { _id, ...updateData } = userData;
+    const updateData = cleanDataForMongo(userData);
     
     await User.updateOne(
       { userId, guildId },
@@ -564,7 +585,7 @@ export function isMongoConnected() {
 export async function saveEconomyToMongo(guildId, userId, economyData) {
   if (!isConnected) return null;
   try {
-    const { _id, ...cleanEconomyData } = economyData;
+    const cleanEconomyData = cleanDataForMongo(economyData);
     
     const updateData = {
       guildId,
