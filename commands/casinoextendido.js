@@ -76,7 +76,22 @@ export default {
           { name: '🃏 Póker', value: 'Juega póker simple contra la máquina\nPremio: x3 tu apuesta si ganas' }
         );
 
-      return interaction.reply({ embeds: [embed], components: [row], flags: 64 });
+      const response = await interaction.reply({ embeds: [embed], components: [row], flags: 64 });
+
+      // Collector para manejar la selección del menú
+      const collector = response.createMessageComponentCollector({
+        filter: i => i.user.id === interaction.user.id,
+        time: 60000
+      });
+
+      collector.on('collect', async i => {
+        if (i.customId === 'casino_select') {
+          const game = i.values[0];
+          await i.reply({ content: `✅ Has seleccionado **${game}**. Usa \`/casino_juegos ${game} apuesta: [cantidad]\` para jugar.`, flags: 64 });
+        }
+      });
+
+      return;
     }
 
     if (subcommand === 'tragaperras') {
