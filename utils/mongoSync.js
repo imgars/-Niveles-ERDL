@@ -174,7 +174,12 @@ function cleanDataForMongo(data) {
   
   for (const key in clean) {
     if (clean[key] && typeof clean[key] === 'object') {
-      clean[key] = cleanDataForMongo(clean[key]);
+      // Si es un objeto vacío {}, convertirlo a null para evitar errores de cast en Date
+      if (Object.keys(clean[key]).length === 0) {
+        clean[key] = null;
+      } else {
+        clean[key] = cleanDataForMongo(clean[key]);
+      }
     }
   }
   

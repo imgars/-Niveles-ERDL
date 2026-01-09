@@ -23,12 +23,12 @@ export default {
     ),
   
   async execute(interaction) {
+    if (!isStaff(interaction.member)) {
+      return interaction.reply({ content: '❌ Solo el staff puede usar este comando', flags: 64 });
+    }
+
     // Defer de inmediato para evitar el error "Unknown interaction" de 3 segundos
     await interaction.deferReply();
-
-    if (!isStaff(interaction.member)) {
-      return interaction.editReply({ content: '❌ Solo el staff puede usar este comando' });
-    }
 
     const targetUser = interaction.options.getUser('usuario');
     const amount = interaction.options.getInteger('cantidad');
