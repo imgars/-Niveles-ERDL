@@ -212,6 +212,21 @@ async function handleHorseRace(interaction) {
   const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
   
   economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
+
+  // Sistema anti-rachas para Carreras
+  if (won) {
+    if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+    if ((economy.casinoStats.winStreak || 0) >= 3) {
+      // Forzar pérdida si lleva racha de 3
+      return interaction.editReply({ 
+        embeds: [EmbedBuilder.from(embed).setColor('#FF0000').setDescription(`😢 Perdiste...\n\n💰 **Fianza:** 500 Lagcoins (Perdida)\n**Ganador:** ${horses[(winnerIndex + 1) % 6]} (Carrera amañada)\n\n**Resultado:** -${bet} Lagcoins\n**Nuevo saldo:** ${economy.lagcoins - bet} Lagcoins`)] 
+      });
+    }
+    economy.casinoStats.winStreak = (economy.casinoStats.winStreak || 0) + 1;
+  } else {
+    if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+    economy.casinoStats.winStreak = 0;
+  }
   
   // Devolver fianza solo si ganó
   if (won) {

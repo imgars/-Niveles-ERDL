@@ -950,6 +950,20 @@ export async function playSlots(guildId, userId, bet) {
     
     const won = multiplier > 0;
     
+    // Sistema anti-rachas: Si gana más de 3 seguidas, pierde obligatoriamente
+    if (won) {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      if ((economy.casinoStats.winStreak || 0) >= 3) {
+        multiplier = 0;
+        economy.casinoStats.winStreak = 0;
+        return { won: false, reels, winnings: -bet, newBalance: economy.lagcoins, multiplier: 0, luckBonus, antiStreak: true };
+      }
+      economy.casinoStats.winStreak = (economy.casinoStats.winStreak || 0) + 1;
+    } else {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      economy.casinoStats.winStreak = 0;
+    }
+    
     // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
     let winnings;
     if (won) {
@@ -1017,7 +1031,22 @@ export async function playCoinflip(guildId, userId, bet, choice) {
     // Con suerte, más probabilidad de ganar
     const winChance = 0.45 + (luckBonus * 0.15); // Buff: 0.25 -> 0.45 base
     const result = Math.random() > winChance ? (choice.toLowerCase() === 'cara' ? 'cruz' : 'cara') : choice.toLowerCase();
-    const won = choice.toLowerCase() === result;
+    let won = choice.toLowerCase() === result;
+    
+    // Sistema anti-rachas: Si gana más de 3 seguidas, pierde obligatoriamente
+    if (won) {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      if ((economy.casinoStats.winStreak || 0) >= 3) {
+        won = false;
+        economy.casinoStats.winStreak = 0;
+        const fakeResult = choice.toLowerCase() === 'cara' ? 'cruz' : 'cara';
+        return { won: false, result: fakeResult, choice, winnings: -bet, newBalance: economy.lagcoins, luckBonus, antiStreak: true };
+      }
+      economy.casinoStats.winStreak = (economy.casinoStats.winStreak || 0) + 1;
+    } else {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      economy.casinoStats.winStreak = 0;
+    }
     
     // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
     let winnings;
@@ -1109,6 +1138,21 @@ export async function playDice(guildId, userId, bet, guess) {
     
     // Buff: Probabilidad de perder eliminada (era 75% antes)
     let won = multiplier > 0;
+
+    // Sistema anti-rachas: Si gana más de 3 seguidas, pierde obligatoriamente
+    if (won) {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      if ((economy.casinoStats.winStreak || 0) >= 3) {
+        won = false;
+        multiplier = 0;
+        economy.casinoStats.winStreak = 0;
+        return { won: false, dice1, dice2, total, guess, winnings: -bet, newBalance: economy.lagcoins, multiplier: 0, luckBonus, antiStreak: true };
+      }
+      economy.casinoStats.winStreak = (economy.casinoStats.winStreak || 0) + 1;
+    } else {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      economy.casinoStats.winStreak = 0;
+    }
     
     // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
     let winnings;
@@ -1196,6 +1240,21 @@ export async function playBlackjack(guildId, userId, bet) {
     } else if (playerTotal === dealerTotal) {
       result = 'tie';
       multiplier = 1;
+    }
+
+    // Sistema anti-rachas para Blackjack
+    if (result === 'win' || result === 'blackjack') {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      if ((economy.casinoStats.winStreak || 0) >= 3) {
+        result = 'lose';
+        multiplier = 0;
+        economy.casinoStats.winStreak = 0;
+      } else {
+        economy.casinoStats.winStreak = (economy.casinoStats.winStreak || 0) + 1;
+      }
+    } else if (result === 'lose') {
+      if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0, winStreak: 0 };
+      economy.casinoStats.winStreak = 0;
     }
     
     const won = result === 'win' || result === 'blackjack';
