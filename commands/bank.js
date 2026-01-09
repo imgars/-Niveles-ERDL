@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getUserEconomy, saveUserEconomy } from '../utils/economyDB.js';
+import { getUserEconomy, bankDeposit, bankWithdraw } from '../utils/economyDB.js';
 
 export default {
   data: new SlashCommandBuilder()
