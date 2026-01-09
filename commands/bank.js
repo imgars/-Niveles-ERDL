@@ -34,21 +34,22 @@ export default {
     ),
   
   async execute(interaction) {
+    await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
     const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
 
     if (!economy) {
-      return interaction.reply({ content: '❌ Error al obtener tu cuenta', flags: 64 });
+      return interaction.editReply({ content: '❌ Error al obtener tu cuenta' });
     }
 
     if (subcommand === 'depositar') {
       const amount = interaction.options.getInteger('cantidad');
-      if (amount <= 0) return interaction.reply({ content: '❌ La cantidad debe ser mayor a 0', flags: 64 });
+      if (amount <= 0) return interaction.editReply({ content: '❌ La cantidad debe ser mayor a 0' });
 
       const result = await bankDeposit(interaction.guildId, interaction.user.id, amount);
       if (!result) {
         const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
-        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins. Tienes: ${economy?.lagcoins || 0}`, flags: 64 });
+        return interaction.editReply({ content: `❌ No tienes suficientes Lagcoins. Tienes: ${economy?.lagcoins || 0}` });
       }
 
       const embed = new EmbedBuilder()
@@ -60,17 +61,17 @@ export default {
           { name: 'Banco', value: `🏦 ${result.bankBalance}` }
         );
 
-      return interaction.reply({ embeds: [embed] });
+      return interaction.editReply({ embeds: [embed] });
     }
 
     if (subcommand === 'retirar') {
       const amount = interaction.options.getInteger('cantidad');
-      if (amount <= 0) return interaction.reply({ content: '❌ La cantidad debe ser mayor a 0', flags: 64 });
+      if (amount <= 0) return interaction.editReply({ content: '❌ La cantidad debe ser mayor a 0' });
 
       const result = await bankWithdraw(interaction.guildId, interaction.user.id, amount);
       if (!result) {
         const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
-        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins en el banco. Tienes: ${economy?.bankBalance || 0}`, flags: 64 });
+        return interaction.editReply({ content: `❌ No tienes suficientes Lagcoins en el banco. Tienes: ${economy?.bankBalance || 0}` });
       }
 
       const embed = new EmbedBuilder()
@@ -82,7 +83,7 @@ export default {
           { name: 'Banco', value: `🏦 ${result.bankBalance}` }
         );
 
-      return interaction.reply({ embeds: [embed] });
+      return interaction.editReply({ embeds: [embed] });
     }
 
     if (subcommand === 'ver') {
@@ -95,7 +96,7 @@ export default {
           { name: 'Total', value: `💎 ${economy.lagcoins + (economy.bankBalance || 0)} Lagcoins` }
         );
 
-      return interaction.reply({ embeds: [embed] });
+      return interaction.editReply({ embeds: [embed] });
     }
   }
 };
