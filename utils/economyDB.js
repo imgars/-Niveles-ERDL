@@ -855,15 +855,14 @@ export async function playCasino(guildId, userId, bet) {
     
     const roll = Math.floor(Math.random() * 100);
     const multiplier = 1.1; // Nerf: x1.4 -> x1.1
-    const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
-    economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
-    
-    // Nerf masivo de probabilidad base
-    const finalThreshold = won && Math.random() < 0.7 ? 101 : threshold;
+    const finalThreshold = (won && Math.random() < 0.7) ? 101 : threshold;
     const finalWon = roll > finalThreshold;
+    const winnings = finalWon ? Math.floor(bet * multiplier) - bet : -bet;
+    
+    economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
     if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
     economy.casinoStats.plays++;
-    if (won) {
+    if (finalWon) {
       economy.casinoStats.wins++;
       economy.casinoStats.totalWon = (economy.casinoStats.totalWon || 0) + winnings;
       economy.totalEarned = (economy.totalEarned || 0) + winnings;
@@ -873,14 +872,14 @@ export async function playCasino(guildId, userId, bet) {
     
     if (!economy.transactions) economy.transactions = [];
     economy.transactions.push({ 
-      type: won ? 'casino_win' : 'casino_loss', 
+      type: finalWon ? 'casino_win' : 'casino_loss', 
       amount: winnings, 
-      description: `Casino: ${won ? 'Ganaste' : 'Perdiste'} ${Math.abs(winnings)} Lagcoins`,
+      description: `Casino: ${finalWon ? 'Ganaste' : 'Perdiste'} ${Math.abs(winnings)} Lagcoins`,
       date: new Date().toISOString() 
     });
     
     await saveUserEconomy(guildId, userId, economy);
-    return { won, winnings, newBalance: economy.lagcoins, multiplier, roll, luckBonus };
+    return { won: finalWon, winnings, newBalance: economy.lagcoins, multiplier, roll, luckBonus };
   } catch (error) {
     console.error('Error in playCasino:', error);
     throw error;
