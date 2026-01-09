@@ -129,6 +129,14 @@ async function handleHorseRace(interaction) {
   const horseNames = ['Rayo', 'Tormenta', 'Unicornio', 'Veloz', 'Carrusel', 'Campeón'];
   const odds = [1.1, 1.15, 1.2, 1.1, 1.25, 1.1];
   
+  const positions = [0, 0, 0, 0, 0, 0];
+  const embed = new EmbedBuilder()
+    .setColor('#FFD700')
+    .setTitle('🏇 Carrera de Caballos')
+    .setDescription(`Apostaste **${bet} Lagcoins** al caballo #${horseNumber}\n\nLa carrera está por comenzar...`);
+
+  await interaction.editReply({ embeds: [embed] });
+
   // Simulación de carrera con nerf masivo de probabilidad para el usuario
   const userHorseBonus = luckBonus * 0.05; 
   
