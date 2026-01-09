@@ -932,17 +932,20 @@ export async function playSlots(guildId, userId, bet) {
     
     if (reels[0] === reels[1] && reels[1] === reels[2]) {
       if (reels[0] === '7️⃣') {
-        multiplier = 6; // Nerf: x10 -> x6
+        multiplier = 1.5; // Nerf: x6 -> x1.5
         jackpot = true;
       } else if (reels[0] === '💎') {
-        multiplier = 4.5; // Nerf: x7 -> x4.5
+        multiplier = 1.4; // Nerf: x4.5 -> x1.4
       } else if (reels[0] === '🍀') {
-        multiplier = 3.5; // Nerf: x5 -> x3.5
+        multiplier = 1.3; // Nerf: x3.5 -> x1.3
       } else {
-        multiplier = 2.5; // Nerf: x3 -> x2.5
+        multiplier = 1.2; // Nerf: x2.5 -> x1.2
       }
     } else if (reels[0] === reels[1] || reels[1] === reels[2]) {
-      multiplier = 1.2; // Nerf: x1.5 -> x1.2
+      // Nerf: Solo 15% de ganar con dos símbolos
+      if (Math.random() < 0.15) {
+        multiplier = 1.1; // Nerf: x1.2 -> x1.1
+      }
     }
     
     const won = multiplier > 0;
@@ -996,10 +999,10 @@ export async function playCoinflip(guildId, userId, bet, choice) {
     }
     
     // Con suerte, más probabilidad de ganar
-    const winChance = 0.35 + (luckBonus * 0.1); // Nerf: 0.47 -> 0.35 base
+    const winChance = 0.25 + (luckBonus * 0.05); // Nerf: 0.35 -> 0.25 base
     const result = Math.random() > winChance ? (choice.toLowerCase() === 'cara' ? 'cruz' : 'cara') : choice.toLowerCase();
     const won = choice.toLowerCase() === result;
-    const multiplier = 1.2; // Nerf: x1.8 -> x1.2 (Apuesta 5000 -> Gana 1000 netos)
+    const multiplier = 1.2; // Nerf: x1.2 (Apuesta 5000 -> Gana 1000 netos)
     const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
@@ -1064,22 +1067,22 @@ export async function playDice(guildId, userId, bet, guess) {
     
     switch (guess) {
       case 'alto':
-        if (total >= 8) multiplier = 1.2;
+        if (total >= 8) multiplier = 1.15;
         break;
       case 'bajo':
-        if (total <= 6) multiplier = 1.2;
+        if (total <= 6) multiplier = 1.15;
         break;
       case 'exacto':
-        if (total === 7) multiplier = 1.5;
+        if (total === 7) multiplier = 1.3;
         break;
       case 'dobles':
-        if (dice1 === dice2) multiplier = 1.8;
+        if (dice1 === dice2) multiplier = 1.5;
         break;
     }
     
-    // Nerf adicional de probabilidad: 50% de perder incluso si acertó
+    // Nerf adicional de probabilidad: 75% de perder incluso si acertó
     let won = multiplier > 0;
-    if (won && Math.random() < 0.5) {
+    if (won && Math.random() < 0.75) {
        won = false;
        multiplier = 0;
     }
@@ -1152,10 +1155,10 @@ export async function playBlackjack(guildId, userId, bet) {
     
     if (playerTotal === 21) {
       result = 'blackjack';
-      multiplier = 1.3; // Nerf: x2.0 -> x1.3
+      multiplier = 1.25; // Nerf: x1.3 -> x1.25
     } else if (dealerTotal > 21 || (playerTotal <= 21 && playerTotal > dealerTotal)) {
       result = 'win';
-      multiplier = 1.15; // Nerf: x1.7 -> x1.15
+      multiplier = 1.1; // Nerf: x1.15 -> x1.1
     } else if (playerTotal === dealerTotal) {
       result = 'tie';
       multiplier = 1;

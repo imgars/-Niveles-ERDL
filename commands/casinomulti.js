@@ -127,10 +127,10 @@ async function handleHorseRace(interaction) {
   
   const horses = ['🏇', '🐎', '🦄', '🐴', '🎠', '🏇'];
   const horseNames = ['Rayo', 'Tormenta', 'Unicornio', 'Veloz', 'Carrusel', 'Campeón'];
-  const odds = [1.2, 1.3, 1.5, 1.2, 1.4, 1.2];
+  const odds = [1.1, 1.15, 1.2, 1.1, 1.25, 1.1];
   
-  // Simulación de carrera con nerf de probabilidad para el usuario
-  const userHorseBonus = luckBonus * 0.1; 
+  // Simulación de carrera con nerf masivo de probabilidad para el usuario
+  const userHorseBonus = luckBonus * 0.05; 
   
   for (let round = 0; round < 5; round++) {
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -138,12 +138,12 @@ async function handleHorseRace(interaction) {
     for (let i = 0; i < 6; i++) {
       let advance = Math.floor(Math.random() * 4);
       if (i === horseNumber - 1) {
-        // Nerf: El caballo del usuario es más lento por defecto
-        advance = Math.max(0, advance - 1);
+        // Nerf: El caballo del usuario es significativamente más lento
+        advance = Math.max(0, advance - 2);
         advance += Math.floor(userHorseBonus);
       } else {
-        // Los otros caballos tienen un boost ligero
-        if (Math.random() < 0.3) advance += 1;
+        // Los otros caballos tienen un boost considerable
+        if (Math.random() < 0.5) advance += 1;
       }
       positions[i] += advance;
     }
