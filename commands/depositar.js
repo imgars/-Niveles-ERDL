@@ -16,10 +16,18 @@ export default {
     let amount = interaction.options.getInteger('cantidad');
     
     try {
+      if (amount < 0) {
+        return interaction.reply({ content: '❌ La cantidad a depositar debe ser mayor que 0.', flags: 64 });
+      }
+
       const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
       
       if (amount === 0) {
         amount = economy.lagcoins;
+      }
+
+      if (amount <= 0) {
+        return interaction.reply({ content: '❌ No tienes Lagcoins para depositar.', flags: 64 });
       }
 
       if (economy.lagcoins < amount) {
