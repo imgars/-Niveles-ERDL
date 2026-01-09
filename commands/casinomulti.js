@@ -204,7 +204,6 @@ async function handleHorseRace(interaction) {
   
   const multiplier = won ? odds[horseNumber - 1] : 0;
   const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
-  const fianza = 500;
   
   economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
   
