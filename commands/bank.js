@@ -43,25 +43,21 @@ export default {
 
     if (subcommand === 'depositar') {
       const amount = interaction.options.getInteger('cantidad');
-      
-      const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
-      if (!economy) return interaction.reply({ content: '❌ Error al obtener tu cuenta', flags: 64 });
+      if (amount <= 0) return interaction.reply({ content: '❌ La cantidad debe ser mayor a 0', flags: 64 });
 
-      if (economy.lagcoins < amount) {
-        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins. Tienes: ${economy.lagcoins}`, flags: 64 });
+      const result = await bankDeposit(interaction.guildId, interaction.user.id, amount);
+      if (!result) {
+        const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
+        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins. Tienes: ${economy?.lagcoins || 0}`, flags: 64 });
       }
-
-      economy.lagcoins -= amount;
-      economy.bankBalance = (economy.bankBalance || 0) + amount;
-      await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
 
       const embed = new EmbedBuilder()
         .setColor('#00FF00')
         .setTitle('💰 ¡Depósito Realizado!')
         .setDescription(`Depositaste **${amount} Lagcoins** en tu banco`)
         .addFields(
-          { name: 'Cartera', value: `💵 ${economy.lagcoins}` },
-          { name: 'Banco', value: `🏦 ${economy.bankBalance}` }
+          { name: 'Cartera', value: `💵 ${result.lagcoins}` },
+          { name: 'Banco', value: `🏦 ${result.bankBalance}` }
         );
 
       return interaction.reply({ embeds: [embed] });
@@ -69,25 +65,21 @@ export default {
 
     if (subcommand === 'retirar') {
       const amount = interaction.options.getInteger('cantidad');
-      
-      const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
-      if (!economy) return interaction.reply({ content: '❌ Error al obtener tu cuenta', flags: 64 });
+      if (amount <= 0) return interaction.reply({ content: '❌ La cantidad debe ser mayor a 0', flags: 64 });
 
-      if ((economy.bankBalance || 0) < amount) {
-        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins en el banco. Tienes: ${economy.bankBalance || 0}`, flags: 64 });
+      const result = await bankWithdraw(interaction.guildId, interaction.user.id, amount);
+      if (!result) {
+        const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
+        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins en el banco. Tienes: ${economy?.bankBalance || 0}`, flags: 64 });
       }
-
-      economy.bankBalance = (economy.bankBalance || 0) - amount;
-      economy.lagcoins += amount;
-      await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
 
       const embed = new EmbedBuilder()
         .setColor('#00FF00')
         .setTitle('💰 ¡Retiro Realizado!')
         .setDescription(`Retiraste **${amount} Lagcoins** de tu banco`)
         .addFields(
-          { name: 'Cartera', value: `💵 ${economy.lagcoins}` },
-          { name: 'Banco', value: `🏦 ${economy.bankBalance}` }
+          { name: 'Cartera', value: `💵 ${result.lagcoins}` },
+          { name: 'Banco', value: `🏦 ${result.bankBalance}` }
         );
 
       return interaction.reply({ embeds: [embed] });

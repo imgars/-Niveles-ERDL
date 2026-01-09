@@ -1499,8 +1499,9 @@ export async function staffRemoveItem(guildId, userId, itemId) {
 // Banco - Depositar
 export async function bankDeposit(guildId, userId, amount) {
   try {
+    if (amount <= 0) return null;
     const economy = await getUserEconomy(guildId, userId);
-    if ((economy.lagcoins || 0) < amount) return null;
+    if (!economy || (economy.lagcoins || 0) < amount) return null;
     
     economy.lagcoins -= amount;
     economy.bankBalance = (economy.bankBalance || 0) + amount;
@@ -1519,8 +1520,9 @@ export async function bankDeposit(guildId, userId, amount) {
 // Banco - Retirar
 export async function bankWithdraw(guildId, userId, amount) {
   try {
+    if (amount <= 0) return null;
     const economy = await getUserEconomy(guildId, userId);
-    if ((economy.bankBalance || 0) < amount) return null;
+    if (!economy || (economy.bankBalance || 0) < amount) return null;
     
     economy.bankBalance -= amount;
     economy.lagcoins = (economy.lagcoins || 0) + amount;
