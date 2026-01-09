@@ -182,8 +182,13 @@ async function handleHorseRace(interaction) {
           advance = Math.floor(Math.random() * 5) + 1;
           advance += Math.floor(userHorseBonus);
         } else {
-          // Los otros caballos ya no tienen boost extra
-          if (Math.random() < 0.3) advance += 1;
+          // El caballo 4 tiene una pequeña penalización para ser más justo
+          if (i === 3) {
+            if (Math.random() < 0.4) advance = Math.max(0, advance - 1);
+          } else {
+            // Los otros caballos ya no tienen boost extra
+            if (Math.random() < 0.3) advance += 1;
+          }
         }
         positions[i] += advance;
       }
