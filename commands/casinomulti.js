@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { getUserEconomy, saveUserEconomy, getUserActivePowerups, getAdminBoost, COUNTRIES } from '../utils/economyDB.js';
+import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
 
 const activeGames = new Map();
 
@@ -81,8 +82,27 @@ export default {
   async execute(interaction) {
     const subcommand = interaction.options.getSubcommand();
     
+    // Mapeo de subcomandos a tipos de cooldown
+    const cooldownTypes = {
+      'carreras': 'races',
+      'poker': 'poker',
+      'ruleta': 'roulette'
+    };
+
+    if (cooldownTypes[subcommand]) {
+      const cooldown = checkCasinoCooldown(interaction.user.id, cooldownTypes[subcommand]);
+      if (!cooldown.canPlay) {
+        return interaction.reply({ 
+          content: `⏳ Debes esperar **${formatCooldownTime(cooldown.remaining)}** para volver a jugar ${subcommand}.`, 
+          flags: 64 
+        });
+      }
+    }
+
     if (subcommand === 'carreras') {
-      return handleHorseRace(interaction);
+      const result = await handleHorseRace(interaction);
+      if (result !== false) setCasinoCooldown(interaction.user.id, 'races');
+      return result;
     }
     
     if (subcommand === 'duelo') {
@@ -90,11 +110,15 @@ export default {
     }
     
     if (subcommand === 'poker') {
-      return handlePoker(interaction);
+      const result = await handlePoker(interaction);
+      if (result !== false) setCasinoCooldown(interaction.user.id, 'poker');
+      return result;
     }
     
     if (subcommand === 'ruleta') {
-      return handleRuleta(interaction);
+      const result = await handleRuleta(interaction);
+      if (result !== false) setCasinoCooldown(interaction.user.id, 'roulette');
+      return result;
     }
   }
 };

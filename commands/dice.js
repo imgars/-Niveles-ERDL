@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { playDice } from '../utils/economyDB.js';
+import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -24,6 +25,14 @@ export default {
     ),
   
   async execute(interaction) {
+    const cooldown = checkCasinoCooldown(interaction.user.id, 'dice');
+    if (!cooldown.canPlay) {
+      return interaction.reply({ 
+        content: `⏳ Debes esperar **${formatCooldownTime(cooldown.remaining)}** para volver a jugar dados.`, 
+        flags: 64 
+      });
+    }
+
     const bet = interaction.options.getInteger('apuesta');
     const guess = interaction.options.getString('prediccion');
     
@@ -33,6 +42,8 @@ export default {
       if (!result) {
         return interaction.reply({ content: '❌ No tienes suficientes Lagcoins para esa apuesta', flags: 64 });
       }
+
+      setCasinoCooldown(interaction.user.id, 'dice');
 
       const diceEmojis = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
       const dice1Emoji = diceEmojis[result.dice1];

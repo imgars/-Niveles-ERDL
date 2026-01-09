@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { playCoinflip } from '../utils/economyDB.js';
+import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -22,6 +23,14 @@ export default {
     ),
   
   async execute(interaction) {
+    const cooldown = checkCasinoCooldown(interaction.user.id, 'coinflip');
+    if (!cooldown.canPlay) {
+      return interaction.reply({ 
+        content: `⏳ Debes esperar **${formatCooldownTime(cooldown.remaining)}** para volver a jugar coinflip.`, 
+        flags: 64 
+      });
+    }
+
     const bet = interaction.options.getInteger('apuesta');
     const choice = interaction.options.getString('eleccion');
     
@@ -31,6 +40,8 @@ export default {
       if (!result) {
         return interaction.reply({ content: '❌ No tienes suficientes Lagcoins para esa apuesta', flags: 64 });
       }
+
+      setCasinoCooldown(interaction.user.id, 'coinflip');
 
       const coinEmoji = result.result === 'cara' ? '🪙' : '⭐';
       const choiceEmoji = choice === 'cara' ? '🪙' : '⭐';

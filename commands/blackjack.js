@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { playBlackjack } from '../utils/economyDB.js';
+import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -13,6 +14,14 @@ export default {
     ),
   
   async execute(interaction) {
+    const cooldown = checkCasinoCooldown(interaction.user.id, 'blackjack');
+    if (!cooldown.canPlay) {
+      return interaction.reply({ 
+        content: `⏳ Debes esperar **${formatCooldownTime(cooldown.remaining)}** para volver a jugar blackjack.`, 
+        flags: 64 
+      });
+    }
+
     const bet = interaction.options.getInteger('apuesta');
     
     try {
@@ -21,6 +30,8 @@ export default {
       if (!result) {
         return interaction.reply({ content: '❌ No tienes suficientes Lagcoins para esa apuesta', flags: 64 });
       }
+
+      setCasinoCooldown(interaction.user.id, 'blackjack');
 
       const cardEmojis = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
       const playerCardsStr = result.playerCards.map(c => cardEmojis[c] || c).join(' + ');
