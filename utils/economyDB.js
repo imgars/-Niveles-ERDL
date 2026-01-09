@@ -910,7 +910,7 @@ export async function playSlots(guildId, userId, bet) {
     
     // Con más suerte, hay mayor probabilidad de obtener símbolos iguales
     const getSymbol = () => {
-      if (luckBonus > 0 && Math.random() < luckBonus * 0.2) { // Nerf: Suerte influye menos
+      if (luckBonus > 0 && Math.random() < luckBonus * 0.4) { // Buff: Suerte influye más
         // Mayor probabilidad de símbolos de alto valor
         return symbols[Math.floor(Math.random() * 3) + 5];
       }
@@ -920,9 +920,9 @@ export async function playSlots(guildId, userId, bet) {
     const reels = [getSymbol(), getSymbol(), getSymbol()];
     
     // Bonus de suerte para emparejar
-    if (luckBonus > 0.4 && Math.random() < luckBonus * 0.3) { // Nerf: Requisito de suerte mayor y probabilidad menor
+    if (luckBonus > 0.2 && Math.random() < luckBonus * 0.5) { // Buff: Requisito de suerte menor y probabilidad mayor
       reels[1] = reels[0];
-      if (Math.random() < luckBonus * 0.2) {
+      if (Math.random() < luckBonus * 0.4) {
         reels[2] = reels[0];
       }
     }
@@ -932,19 +932,19 @@ export async function playSlots(guildId, userId, bet) {
     
     if (reels[0] === reels[1] && reels[1] === reels[2]) {
       if (reels[0] === '7️⃣') {
-        multiplier = 1.5; // Nerf: x6 -> x1.5
+        multiplier = 2.5; // Buff: x1.5 -> x2.5
         jackpot = true;
       } else if (reels[0] === '💎') {
-        multiplier = 1.4; // Nerf: x4.5 -> x1.4
+        multiplier = 2.0; // Buff: x1.4 -> x2.0
       } else if (reels[0] === '🍀') {
-        multiplier = 1.3; // Nerf: x3.5 -> x1.3
+        multiplier = 1.8; // Buff: x1.3 -> x1.8
       } else {
-        multiplier = 1.2; // Nerf: x2.5 -> x1.2
+        multiplier = 1.5; // Buff: x1.2 -> x1.5
       }
     } else if (reels[0] === reels[1] || reels[1] === reels[2]) {
-      // Nerf: Solo 15% de ganar con dos símbolos
-      if (Math.random() < 0.15) {
-        multiplier = 1.1; // Nerf: x1.2 -> x1.1
+      // Buff: 40% de ganar con dos símbolos
+      if (Math.random() < 0.40) {
+        multiplier = 1.2; // Buff: x1.1 -> x1.2
       }
     }
     
@@ -1015,7 +1015,7 @@ export async function playCoinflip(guildId, userId, bet, choice) {
     }
     
     // Con suerte, más probabilidad de ganar
-    const winChance = 0.25 + (luckBonus * 0.05); // Nerf: 0.35 -> 0.25 base
+    const winChance = 0.45 + (luckBonus * 0.15); // Buff: 0.25 -> 0.45 base
     const result = Math.random() > winChance ? (choice.toLowerCase() === 'cara' ? 'cruz' : 'cara') : choice.toLowerCase();
     const won = choice.toLowerCase() === result;
     
@@ -1082,11 +1082,11 @@ export async function playDice(guildId, userId, bet, guess) {
     const dice1 = Math.floor(Math.random() * 6) + 1;
     const dice2 = Math.floor(Math.random() * 6) + 1;
     
-    // Nerf: Suerte influye mucho menos en dados
-    if (luckBonus > 0.5 && Math.random() < luckBonus * 0.15) {
-      // Pequeño empuje según predicción
-      if (guess === 'alto' && dice1 + dice2 < 8) dice1 = 4;
-      if (guess === 'bajo' && dice1 + dice2 > 6) dice1 = 2;
+    // Buff: Suerte influye más en dados
+    if (luckBonus > 0.2 && Math.random() < luckBonus * 0.3) {
+      // Empuje según predicción
+      if (guess === 'alto' && dice1 + dice2 < 8) dice1 = 5;
+      if (guess === 'bajo' && dice1 + dice2 > 6) dice1 = 1;
     }
     
     const total = dice1 + dice2;
@@ -1094,25 +1094,21 @@ export async function playDice(guildId, userId, bet, guess) {
     
     switch (guess) {
       case 'alto':
-        if (total >= 8) multiplier = 1.15;
+        if (total >= 8) multiplier = 1.8; // Buff: x1.15 -> x1.8
         break;
       case 'bajo':
-        if (total <= 6) multiplier = 1.15;
+        if (total <= 6) multiplier = 1.8; // Buff: x1.15 -> x1.8
         break;
       case 'exacto':
-        if (total === 7) multiplier = 1.3;
+        if (total === 7) multiplier = 3.0; // Buff: x1.3 -> x3.0
         break;
       case 'dobles':
-        if (dice1 === dice2) multiplier = 1.5;
+        if (dice1 === dice2) multiplier = 4.0; // Buff: x1.5 -> x4.0
         break;
     }
     
-    // Nerf adicional de probabilidad: 75% de perder incluso si acertó
+    // Buff: Probabilidad de perder eliminada (era 75% antes)
     let won = multiplier > 0;
-    if (won && Math.random() < 0.75) {
-       won = false;
-       multiplier = 0;
-    }
     
     // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
     let winnings;
@@ -1178,9 +1174,9 @@ export async function playBlackjack(guildId, userId, bet) {
     const playerCards = [getCard(), getCard()];
     let dealerCards = [getCard(), getCard()];
     
-    // Con suerte, el dealer tiene peores cartas
-    if (luckBonus > 0.3 && Math.random() < luckBonus * 0.5) {
-      while (dealerCards[0] + dealerCards[1] > 15 && dealerCards[0] + dealerCards[1] < 21) {
+    // Buff: El dealer tiene peores cartas con menos suerte requerida
+    if (luckBonus > 0.1 && Math.random() < luckBonus * 0.6) {
+      while (dealerCards[0] + dealerCards[1] > 14 && dealerCards[0] + dealerCards[1] < 21) {
         dealerCards = [getCard(), getCard()];
       }
     }

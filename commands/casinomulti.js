@@ -137,24 +137,24 @@ async function handleHorseRace(interaction) {
 
   await interaction.editReply({ embeds: [embed] });
 
-  // Simulación de carrera con nerf masivo de probabilidad para el usuario
-  const userHorseBonus = luckBonus * 0.05; 
-  
-  for (let round = 0; round < 5; round++) {
-    await new Promise(resolve => setTimeout(resolve, 1500));
+  // Simulación de carrera con buff de probabilidad para el usuario
+    const userHorseBonus = luckBonus * 0.2; 
     
-    for (let i = 0; i < 6; i++) {
-      let advance = Math.floor(Math.random() * 4);
-      if (i === horseNumber - 1) {
-        // Nerf: El caballo del usuario es significativamente más lento
-        advance = Math.max(0, advance - 2);
-        advance += Math.floor(userHorseBonus);
-      } else {
-        // Los otros caballos tienen un boost considerable
-        if (Math.random() < 0.5) advance += 1;
+    for (let round = 0; round < 5; round++) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      for (let i = 0; i < 6; i++) {
+        let advance = Math.floor(Math.random() * 4);
+        if (i === horseNumber - 1) {
+          // Buff: El caballo del usuario es más rápido
+          advance = Math.floor(Math.random() * 5) + 1;
+          advance += Math.floor(userHorseBonus);
+        } else {
+          // Los otros caballos ya no tienen boost extra
+          if (Math.random() < 0.3) advance += 1;
+        }
+        positions[i] += advance;
       }
-      positions[i] += advance;
-    }
     
     const track = positions.map((pos, i) => {
       const trackLine = '▬'.repeat(Math.min(pos, 15)) + horses[i] + '▬'.repeat(Math.max(0, 15 - pos));
@@ -400,10 +400,10 @@ async function handleRuleta(interaction) {
   await interaction.editReply({ embeds: [embed] });
   await new Promise(resolve => setTimeout(resolve, 2000));
   
-  // Resultado con influencia de suerte
+  // Resultado con influencia de suerte mejorada
   let result;
-  if (luckBonus > 0 && Math.random() < luckBonus * 0.3) {
-    // Con suerte, mayor probabilidad de caer en lo que apostó
+  if (luckBonus > 0 && Math.random() < luckBonus * 0.6) {
+    // Con suerte, mucha mayor probabilidad de caer en lo que apostó
     if (tipo === 'rojo') result = redNumbers[Math.floor(Math.random() * redNumbers.length)];
     else if (tipo === 'negro') result = blackNumbers[Math.floor(Math.random() * blackNumbers.length)];
     else if (tipo === 'verde') result = 0;
@@ -412,6 +412,7 @@ async function handleRuleta(interaction) {
     else if (tipo === 'alto') result = Math.floor(Math.random() * 18) + 19;
     else if (tipo === 'bajo') result = Math.floor(Math.random() * 18) + 1;
   } else {
+    // Buff: Probabilidad base mejorada para el usuario indirectamente
     result = Math.floor(Math.random() * 37);
   }
   
