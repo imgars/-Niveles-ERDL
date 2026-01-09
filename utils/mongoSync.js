@@ -617,6 +617,11 @@ export async function saveEconomyToMongo(guildId, userId, economyData) {
     if (economyData.jobStats) {
       updateData.jobStats = economyData.jobStats;
     }
+    
+    // Si lastWorkTime es un objeto vacío {}, forzar null
+    if (updateData.lastWorkTime && typeof updateData.lastWorkTime === 'object' && Object.keys(updateData.lastWorkTime).length === 0) {
+      updateData.lastWorkTime = null;
+    }
 
     const economy = await Economy.findOneAndUpdate(
       { guildId, userId },

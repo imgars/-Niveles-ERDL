@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { getUserEconomy, getUserActivePowerups } from '../utils/economyDB.js';
+import { getUserEconomy, getUserActivePowerups, JOBS } from '../utils/economyDB.js';
 import { getCasinoCooldown } from '../utils/casinoCooldowns.js';
 
 export default {
@@ -17,8 +17,22 @@ export default {
       const cooldowns = [];
       
       if (economy.lastWorkTime) {
-        const workCooldown = 60000;
-        const remaining = (economy.lastWorkTime + workCooldown) - now;
+        // Encontrar el cooldown del último trabajo realizado
+        let workCooldown = 60000;
+        if (economy.jobStats && economy.jobStats.favoriteJob && JOBS[economy.jobStats.favoriteJob]) {
+          workCooldown = JOBS[economy.jobStats.favoriteJob].cooldown || 60000;
+        }
+
+        // Aplicar reducciones de cooldown si existen powerups
+        const powerups = await getUserActivePowerups(interaction.guildId, interaction.user.id);
+        if (powerups) {
+          const reduction = powerups.find(p => p.type === 'cooldown_reduction');
+          if (reduction) {
+            workCooldown = workCooldown * (1 - reduction.value);
+          }
+        }
+
+        const remaining = (new Date(economy.lastWorkTime).getTime() + workCooldown) - now;
         if (remaining > 0) {
           cooldowns.push({
             name: '💼 Trabajo',
