@@ -126,12 +126,20 @@ export default {
 async function handleHorseRace(interaction) {
   const bet = interaction.options.getInteger('apuesta');
   const horseNumber = interaction.options.getInteger('caballo');
+  const fianza = 500;
   
   const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
   
-  if ((economy.lagcoins || 0) < bet) {
-    return interaction.reply({ content: `❌ No tienes suficientes Lagcoins. Tienes ${economy.lagcoins || 0}`, flags: 64 });
+  if ((economy.lagcoins || 0) < (bet + fianza)) {
+    return interaction.reply({ 
+      content: `❌ Necesitas tener al menos **${bet + fianza} Lagcoins** para jugar (Apuesta: ${bet} + Fianza: ${fianza}). Tienes ${economy.lagcoins || 0}`, 
+      flags: 64 
+    });
   }
+
+  // Cobrar fianza inmediatamente
+  economy.lagcoins -= fianza;
+  await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
   
   await interaction.deferReply();
   
@@ -196,8 +204,15 @@ async function handleHorseRace(interaction) {
   
   const multiplier = won ? odds[horseNumber - 1] : 0;
   const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
+  const fianza = 500;
   
   economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
+  
+  // Devolver fianza solo si ganó
+  if (won) {
+    economy.lagcoins += fianza;
+  }
+  
   if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
   economy.casinoStats.plays++;
   if (won) {

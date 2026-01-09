@@ -200,7 +200,7 @@ function createNewEconomy(guildId, userId) {
   return {
     guildId,
     userId,
-    lagcoins: 100,
+    lagcoins: 0,
     bankBalance: 0,
     lastWorkTime: null,
     lastRobTime: null,
