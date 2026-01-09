@@ -94,14 +94,29 @@ export default {
 
         let multiplier = 0;
         if (roll[0] === roll[1] && roll[1] === roll[2]) {
-          multiplier = 5;
+          multiplier = 3.5; // Nerf: x5 -> x3.5
         } else if (roll[0] === roll[1] || roll[1] === roll[2]) {
-          multiplier = 1.5;
+          // Nerf: Solo 40% de probabilidad de ganar con dos símbolos
+          if (Math.random() < 0.4) {
+            multiplier = 1.2; // Nerf: x1.5 -> x1.2
+          }
         }
 
         const won = multiplier > 0;
         const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
         economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
+
+        // Aumentar probabilidad de perder en slots
+        if (won && Math.random() < 0.3) {
+           // Forzar pérdida en el 30% de los casos que originalmente ganaba
+           // Re-roll para intentar perder
+           roll[2] = symbols[(symbols.indexOf(roll[2]) + 1) % symbols.length];
+           // Recalcular
+           if (!(roll[0] === roll[1] && roll[1] === roll[2]) && !(roll[0] === roll[1] || roll[1] === roll[2])) {
+              // Ahora pierde
+              return interaction.editReply({ content: '❌ La suerte no estuvo de tu lado esta vez.' });
+           }
+        }
 
         if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
         economy.casinoStats.plays++;
@@ -148,8 +163,8 @@ export default {
         const dado2 = Math.floor(Math.random() * 6) + 1;
         const suma = dado1 + dado2;
 
-        const gana = suma === 7 || suma === 11;
-        const winnings = gana ? bet * 2 : -bet;
+        const gana = (suma === 7 || suma === 11) && Math.random() < 0.8; // Nerf: 20% de probabilidad de perder incluso si suma 7 u 11
+        const winnings = gana ? Math.floor(bet * 1.8) - bet : -bet; // Nerf: x2 -> x1.8
         economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
 
         if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
@@ -198,10 +213,10 @@ export default {
         const colorEmoji = { 'Rojo': '🔴', 'Negro': '⚫', 'Verde': '🟢' };
 
         let multiplier = 0;
-        if (colorRandom === 'Rojo' || colorRandom === 'Negro') multiplier = 1.9;
+        if (colorRandom === 'Rojo' || colorRandom === 'Negro') multiplier = 1.7; // Nerf: x1.9 -> x1.7
         if (colorRandom === 'Verde') {
-          // x3 base, con 10% de probabilidad de x4
-          multiplier = Math.random() < 0.1 ? 4 : 3;
+          // x2.5 base, con 5% de probabilidad de x3
+          multiplier = Math.random() < 0.05 ? 3 : 2.5; // Nerf: x3-x4 -> x2.5-x3
         }
 
         const won = multiplier > 0;

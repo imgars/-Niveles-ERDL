@@ -16,10 +16,10 @@ export default {
         .setDescription('¿Qué predices?')
         .setRequired(true)
         .addChoices(
-          { name: '📈 Alto (8-12) - x2', value: 'alto' },
-          { name: '📉 Bajo (2-6) - x2', value: 'bajo' },
-          { name: '🎯 Exacto (7) - x4', value: 'exacto' },
-          { name: '🎲 Dobles - x5', value: 'dobles' }
+          { name: '📈 Alto (8-12) - x1.8', value: 'alto' },
+          { name: '📉 Bajo (2-6) - x1.8', value: 'bajo' },
+          { name: '🎯 Exacto (7) - x3', value: 'exacto' },
+          { name: '🎲 Dobles - x4', value: 'dobles' }
         )
     ),
   

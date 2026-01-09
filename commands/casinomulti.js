@@ -127,7 +127,7 @@ async function handleHorseRace(interaction) {
   
   const horses = ['🏇', '🐎', '🦄', '🐴', '🎠', '🏇'];
   const horseNames = ['Rayo', 'Tormenta', 'Unicornio', 'Veloz', 'Carrusel', 'Campeón'];
-  const odds = [1.8, 2.5, 4, 2.2, 3.5, 1.8];
+  const odds = [1.5, 2.0, 3.5, 1.8, 3.0, 1.5];
   
   // Simulación de carrera
   let raceMessages = [];
@@ -319,11 +319,11 @@ async function handlePoker(interaction) {
   
   let multiplier = 0;
   if (won) {
-    if (playerEval.rank >= 9) multiplier = 10;
-    else if (playerEval.rank >= 7) multiplier = 5;
-    else if (playerEval.rank >= 5) multiplier = 3;
-    else if (playerEval.rank >= 3) multiplier = 2;
-    else multiplier = 1.5;
+    if (playerEval.rank >= 9) multiplier = 5;
+    else if (playerEval.rank >= 7) multiplier = 3;
+    else if (playerEval.rank >= 5) multiplier = 2;
+    else if (playerEval.rank >= 3) multiplier = 1.5;
+    else multiplier = 1.2;
   } else if (tie) {
     multiplier = 1;
   }
@@ -423,32 +423,32 @@ async function handleRuleta(interaction) {
   switch (tipo) {
     case 'rojo':
       won = isRed;
-      multiplier = 1.9;
+      multiplier = 1.8;
       break;
     case 'negro':
       won = isBlack;
-      multiplier = 1.9;
+      multiplier = 1.8;
       break;
     case 'verde':
       won = result === 0;
-      // Probabilidad de x3 es muy baja (10%), de lo contrario x2.5
-      multiplier = Math.random() < 0.1 ? 3 : 2.5;
+      // Probabilidad de x3 es muy baja (5%), de lo contrario x2.5
+      multiplier = Math.random() < 0.05 ? 3 : 2.2;
       break;
     case 'par':
       won = result !== 0 && result % 2 === 0;
-      multiplier = 1.9;
+      multiplier = 1.8;
       break;
     case 'impar':
       won = result % 2 === 1;
-      multiplier = 1.9;
+      multiplier = 1.8;
       break;
     case 'alto':
       won = result >= 19 && result <= 36;
-      multiplier = 1.9;
+      multiplier = 1.8;
       break;
     case 'bajo':
       won = result >= 1 && result <= 18;
-      multiplier = 1.9;
+      multiplier = 1.8;
       break;
   }
   

@@ -58,7 +58,7 @@ export default {
           { name: '🎴 Dealer', value: `${dealerCardsStr} = **${result.dealerTotal}**`, inline: true },
           { name: '\u200B', value: '\u200B', inline: true },
           { name: 'Apuesta', value: `${bet} Lagcoins`, inline: true },
-          { name: result.result !== 'lose' ? 'Ganancia' : 'Pérdida', value: `${result.winnings >= 0 ? '+' : ''}${result.winnings} Lagcoins`, inline: true },
+          { name: result.result !== 'lose' ? 'Ganancia' : 'Pérdida', value: `${result.winnings > 0 ? '+' : ''}${result.winnings} Lagcoins`, inline: true },
           { name: 'Nuevo Saldo', value: `💰 ${result.newBalance} Lagcoins`, inline: true }
         );
 
