@@ -949,7 +949,23 @@ export async function playSlots(guildId, userId, bet) {
     }
     
     const won = multiplier > 0;
-    const winnings = won ? Math.floor(bet * (jackpot ? multiplier : multiplier)) - bet : -bet; // FIX: Jackpot bug, se quitó el multiplicador extra implícito en el comando slots.js y se balanceó aquí.
+    
+    // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
+    let winnings;
+    if (won) {
+      let effectiveMultiplier = jackpot ? multiplier : multiplier;
+      // Aumentamos un poco la ganancia base (ej: +10%)
+      effectiveMultiplier *= 1.1;
+      
+      if (bet >= 5000) {
+        // A partir de 5000, la ganancia es solo del 25% (multiplicador 1.25 total)
+        winnings = Math.floor(bet * 1.25) - bet;
+      } else {
+        winnings = Math.floor(bet * effectiveMultiplier) - bet;
+      }
+    } else {
+      winnings = -bet;
+    }
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
     if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
@@ -1002,8 +1018,19 @@ export async function playCoinflip(guildId, userId, bet, choice) {
     const winChance = 0.25 + (luckBonus * 0.05); // Nerf: 0.35 -> 0.25 base
     const result = Math.random() > winChance ? (choice.toLowerCase() === 'cara' ? 'cruz' : 'cara') : choice.toLowerCase();
     const won = choice.toLowerCase() === result;
-    const multiplier = 1.2; // Nerf: x1.2 (Apuesta 5000 -> Gana 1000 netos)
-    const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
+    
+    // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
+    let winnings;
+    if (won) {
+      if (bet >= 5000) {
+        winnings = Math.floor(bet * 1.25) - bet;
+      } else {
+        // Aumentamos ganancia base de x1.2 a x1.5
+        winnings = Math.floor(bet * 1.5) - bet;
+      }
+    } else {
+      winnings = -bet;
+    }
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
     if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
@@ -1087,7 +1114,18 @@ export async function playDice(guildId, userId, bet, guess) {
        multiplier = 0;
     }
     
-    const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
+    // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
+    let winnings;
+    if (won) {
+      if (bet >= 5000) {
+        winnings = Math.floor(bet * 1.25) - bet;
+      } else {
+        // Aumentamos un poco la ganancia base (+20%)
+        winnings = Math.floor(bet * (multiplier * 1.2)) - bet;
+      }
+    } else {
+      winnings = -bet;
+    }
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
     if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
@@ -1165,7 +1203,21 @@ export async function playBlackjack(guildId, userId, bet) {
     }
     
     const won = result === 'win' || result === 'blackjack';
-    const winnings = multiplier > 0 ? Math.floor(bet * multiplier) - bet : -bet;
+    
+    // Nueva lógica de ganancias: Más ganancia por defecto, pero cap al 25% si apuesta >= 5000
+    let winnings;
+    if (won) {
+      if (bet >= 5000) {
+        winnings = Math.floor(bet * 1.25) - bet;
+      } else {
+        // Aumentamos un poco la ganancia base (+15%)
+        winnings = Math.floor(bet * (multiplier * 1.15)) - bet;
+      }
+    } else if (result === 'tie') {
+      winnings = 0;
+    } else {
+      winnings = -bet;
+    }
     
     economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
     if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
