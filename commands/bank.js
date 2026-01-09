@@ -44,8 +44,11 @@ export default {
     if (subcommand === 'depositar') {
       const amount = interaction.options.getInteger('cantidad');
       
+      const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
+      if (!economy) return interaction.reply({ content: '❌ Error al obtener tu cuenta', flags: 64 });
+
       if (economy.lagcoins < amount) {
-        return interaction.reply({ content: '❌ No tienes suficientes Lagcoins', flags: 64 });
+        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins. Tienes: ${economy.lagcoins}`, flags: 64 });
       }
 
       economy.lagcoins -= amount;
@@ -67,8 +70,11 @@ export default {
     if (subcommand === 'retirar') {
       const amount = interaction.options.getInteger('cantidad');
       
+      const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
+      if (!economy) return interaction.reply({ content: '❌ Error al obtener tu cuenta', flags: 64 });
+
       if ((economy.bankBalance || 0) < amount) {
-        return interaction.reply({ content: '❌ No tienes suficientes Lagcoins en el banco', flags: 64 });
+        return interaction.reply({ content: `❌ No tienes suficientes Lagcoins en el banco. Tienes: ${economy.bankBalance || 0}`, flags: 64 });
       }
 
       economy.bankBalance = (economy.bankBalance || 0) - amount;
