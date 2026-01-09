@@ -94,11 +94,11 @@ export default {
 
         let multiplier = 0;
         if (roll[0] === roll[1] && roll[1] === roll[2]) {
-          multiplier = 3.5; // Nerf: x5 -> x3.5
+          multiplier = 1.3; // Nerf: x3.5 -> x1.3
         } else if (roll[0] === roll[1] || roll[1] === roll[2]) {
-          // Nerf: Solo 40% de probabilidad de ganar con dos símbolos
-          if (Math.random() < 0.4) {
-            multiplier = 1.2; // Nerf: x1.5 -> x1.2
+          // Nerf: Solo 20% de probabilidad de ganar con dos símbolos
+          if (Math.random() < 0.2) {
+            multiplier = 1.1; // Nerf: x1.2 -> x1.1
           }
         }
 
@@ -163,8 +163,8 @@ export default {
         const dado2 = Math.floor(Math.random() * 6) + 1;
         const suma = dado1 + dado2;
 
-        const gana = (suma === 7 || suma === 11) && Math.random() < 0.8; // Nerf: 20% de probabilidad de perder incluso si suma 7 u 11
-        const winnings = gana ? Math.floor(bet * 1.8) - bet : -bet; // Nerf: x2 -> x1.8
+        const gana = (suma === 7 || suma === 11) && Math.random() < 0.3; // Nerf: 70% de probabilidad de perder incluso si suma 7 u 11
+        const winnings = gana ? Math.floor(bet * 1.2) - bet : -bet; // Nerf: x1.8 -> x1.2
         economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
 
         if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
@@ -213,10 +213,10 @@ export default {
         const colorEmoji = { 'Rojo': '🔴', 'Negro': '⚫', 'Verde': '🟢' };
 
         let multiplier = 0;
-        if (colorRandom === 'Rojo' || colorRandom === 'Negro') multiplier = 1.7; // Nerf: x1.9 -> x1.7
+        if (colorRandom === 'Rojo' || colorRandom === 'Negro') multiplier = 1.15; // Nerf: x1.7 -> x1.15
         if (colorRandom === 'Verde') {
-          // x2.5 base, con 5% de probabilidad de x3
-          multiplier = Math.random() < 0.05 ? 3 : 2.5; // Nerf: x3-x4 -> x2.5-x3
+          // x1.3 base, con 2% de probabilidad de x1.5
+          multiplier = Math.random() < 0.02 ? 1.5 : 1.3; // Nerf: x2.5-x3 -> x1.3-x1.5
         }
 
         const won = multiplier > 0;

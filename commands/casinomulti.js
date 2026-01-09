@@ -127,21 +127,10 @@ async function handleHorseRace(interaction) {
   
   const horses = ['🏇', '🐎', '🦄', '🐴', '🎠', '🏇'];
   const horseNames = ['Rayo', 'Tormenta', 'Unicornio', 'Veloz', 'Carrusel', 'Campeón'];
-  const odds = [1.5, 2.0, 3.5, 1.8, 3.0, 1.5];
+  const odds = [1.2, 1.3, 1.5, 1.2, 1.4, 1.2];
   
-  // Simulación de carrera
-  let raceMessages = [];
-  let positions = [0, 0, 0, 0, 0, 0];
-  
-  const embed = new EmbedBuilder()
-    .setColor('#FFD700')
-    .setTitle('🏁 ¡Carrera de Caballos!')
-    .setDescription(`Apostaste **${bet} Lagcoins** al caballo #${horseNumber} (${horses[horseNumber-1]} ${horseNames[horseNumber-1]})\n\n🏁 ¡La carrera comienza!`);
-  
-  await interaction.editReply({ embeds: [embed] });
-  
-  // Con suerte, el caballo elegido tiene bonus
-  const userHorseBonus = luckBonus * 0.5;
+  // Simulación de carrera con nerf de probabilidad para el usuario
+  const userHorseBonus = luckBonus * 0.1; 
   
   for (let round = 0; round < 5; round++) {
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -149,7 +138,12 @@ async function handleHorseRace(interaction) {
     for (let i = 0; i < 6; i++) {
       let advance = Math.floor(Math.random() * 4);
       if (i === horseNumber - 1) {
-        advance += Math.floor(userHorseBonus * 2);
+        // Nerf: El caballo del usuario es más lento por defecto
+        advance = Math.max(0, advance - 1);
+        advance += Math.floor(userHorseBonus);
+      } else {
+        // Los otros caballos tienen un boost ligero
+        if (Math.random() < 0.3) advance += 1;
       }
       positions[i] += advance;
     }
