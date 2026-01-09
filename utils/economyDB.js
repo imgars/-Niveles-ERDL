@@ -1282,7 +1282,14 @@ export async function robUser(guildId, robberUserId, victimUserId) {
     }
     
     const baseSuccess = 0.25;
-    const success = Math.random() < (baseSuccess + robBonus);
+    let finalSuccessProb = baseSuccess + robBonus;
+
+    // Nerf para víctimas ricas (>= 5000 Lagcoins)
+    if ((victim.lagcoins || 0) >= 5000) {
+      finalSuccessProb *= 0.6; // Reduce la probabilidad de éxito en un 40%
+    }
+
+    const success = Math.random() < finalSuccessProb;
     robber.lastRobAttempt = new Date().toISOString();
     
     if (!success) {
@@ -1292,7 +1299,9 @@ export async function robUser(guildId, robberUserId, victimUserId) {
       return { success: false, fine };
     }
     
-    const maxSteal = Math.floor(victim.lagcoins * 0.10);
+    // Si la víctima tiene >= 5000, roba un porcentaje menor
+    const stealPercentage = (victim.lagcoins || 0) >= 5000 ? 0.05 : 0.10;
+    const maxSteal = Math.floor(victim.lagcoins * stealPercentage);
     let stolen = Math.floor(Math.random() * maxSteal) + 15;
     
     // Bonus de robo con power-ups
