@@ -21,6 +21,10 @@ export default {
     const targetUser = interaction.options.getUser('usuario');
     const amount = interaction.options.getInteger('cantidad');
 
+    if (amount <= 0) {
+      return interaction.reply({ content: '❌ La cantidad a enviar debe ser mayor que 0.', flags: 64 });
+    }
+
     if (targetUser.bot) {
       return interaction.reply({ content: '❌ No puedes hacer trading con bots', flags: 64 });
     }
