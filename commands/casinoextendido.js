@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { playCasino, getUserEconomy, saveUserEconomy } from '../utils/economyDB.js';
+import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -96,6 +97,11 @@ export default {
 
     if (subcommand === 'tragaperras') {
       try {
+        const cooldownCheck = checkCasinoCooldown(interaction.user.id, 'slots');
+        if (!cooldownCheck.canPlay) {
+          return interaction.editReply({ content: `⏳ Debes esperar **${formatCooldownTime(cooldownCheck.remaining)}** para volver a jugar a las tragaperras.`, flags: 64 });
+        }
+
         const bet = interaction.options.getInteger('apuesta');
         const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
         if (!economy || economy.lagcoins < bet) {
@@ -148,6 +154,8 @@ export default {
           lagcoins: economy.lagcoins
         });
 
+        setCasinoCooldown(interaction.user.id, 'slots');
+
         const embed = new EmbedBuilder()
           .setColor(won ? '#00FF00' : '#FF0000')
           .setTitle('🎰 TRAGAPERRAS 🎰')
@@ -168,6 +176,11 @@ export default {
 
     if (subcommand === 'dados') {
       try {
+        const cooldownCheck = checkCasinoCooldown(interaction.user.id, 'dice');
+        if (!cooldownCheck.canPlay) {
+          return interaction.editReply({ content: `⏳ Debes esperar **${formatCooldownTime(cooldownCheck.remaining)}** para volver a jugar a los dados.`, flags: 64 });
+        }
+
         const bet = interaction.options.getInteger('apuesta');
         const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
         if (!economy || economy.lagcoins < bet) {
@@ -197,6 +210,8 @@ export default {
           lagcoins: economy.lagcoins
         });
 
+        setCasinoCooldown(interaction.user.id, 'dice');
+
         const embed = new EmbedBuilder()
           .setColor(gana ? '#00FF00' : '#FF0000')
           .setTitle('🎲 DADOS 🎲')
@@ -217,6 +232,11 @@ export default {
 
     if (subcommand === 'ruleta') {
       try {
+        const cooldownCheck = checkCasinoCooldown(interaction.user.id, 'roulette');
+        if (!cooldownCheck.canPlay) {
+          return interaction.editReply({ content: `⏳ Debes esperar **${formatCooldownTime(cooldownCheck.remaining)}** para volver a jugar a la ruleta.`, flags: 64 });
+        }
+
         const bet = interaction.options.getInteger('apuesta');
         const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
         if (!economy || economy.lagcoins < bet) {
@@ -250,6 +270,8 @@ export default {
           ...economy,
           lagcoins: economy.lagcoins
         });
+
+        setCasinoCooldown(interaction.user.id, 'dice');
 
         const embed = new EmbedBuilder()
           .setColor(colorRandom === 'Rojo' ? '#FF0000' : colorRandom === 'Negro' ? '#000000' : '#00FF00')
