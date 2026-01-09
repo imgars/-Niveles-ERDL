@@ -166,6 +166,11 @@ export async function getUserEconomy(guildId, userId) {
       const result = await getEconomy(guildId, userId);
       if (result) {
         const plainResult = result.toObject ? result.toObject() : result;
+        // Sincronizar JSON local con datos de MongoDB para consistencia
+        const economyData = loadEconomyFile();
+        const key = `${guildId}-${userId}`;
+        economyData[key] = plainResult;
+        saveEconomyFile(economyData);
         return plainResult;
       }
       return createNewEconomy(guildId, userId);
