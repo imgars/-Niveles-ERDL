@@ -1663,7 +1663,7 @@ export async function robBank(guildId, userId) {
     
     const now = Date.now();
     const lastRob = economy.lastBankRob ? new Date(economy.lastBankRob).getTime() : 0;
-    const cooldown = 3600000; // 1 hora
+    const cooldown = 180000; // 3 minutos
     
     if (now - lastRob < cooldown) {
       const remaining = Math.ceil((cooldown - (now - lastRob)) / 1000);

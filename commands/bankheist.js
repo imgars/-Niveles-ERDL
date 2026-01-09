@@ -17,6 +17,14 @@ export default {
       return interaction.editReply('❌ Error en la operación');
     }
 
+    if (result && result.error === 'cooldown') {
+      const embed = new EmbedBuilder()
+        .setColor('#FFA500')
+        .setTitle('⏳ COOLDOWN')
+        .setDescription(`Debes esperar **${result.remaining}** segundos antes de intentar otro robo al banco.`);
+      return interaction.editReply({ embeds: [embed] });
+    }
+
     if (result && result.success) {
       const embed = new EmbedBuilder()
         .setColor('#00FF00')
