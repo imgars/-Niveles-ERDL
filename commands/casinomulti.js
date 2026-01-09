@@ -165,7 +165,7 @@ async function handleHorseRace(interaction) {
   const embed = new EmbedBuilder()
     .setColor('#FFD700')
     .setTitle('🏇 Carrera de Caballos')
-    .setDescription(`Apostaste **${bet} Lagcoins** al caballo #${horseNumber}\n\nLa carrera está por comenzar...`);
+    .setDescription(`💰 **Fianza Pagada:** 500 Lagcoins\n🎰 **Apuesta:** ${bet} Lagcoins al caballo **#${horseNumber}**\n\nLa carrera está por comenzar...`);
 
   await interaction.editReply({ embeds: [embed] });
 
@@ -182,9 +182,10 @@ async function handleHorseRace(interaction) {
           advance = Math.floor(Math.random() * 5) + 1;
           advance += Math.floor(userHorseBonus);
         } else {
-          // El caballo 4 tiene una pequeña penalización para ser más justo
+          // El caballo 4 tiene una penalización mayor para balancear
           if (i === 3) {
-            if (Math.random() < 0.4) advance = Math.max(0, advance - 1);
+            if (Math.random() < 0.6) advance = Math.max(0, advance - 2);
+            else advance = Math.floor(Math.random() * 2); // Cap de velocidad para el 4
           } else {
             // Los otros caballos ya no tienen boost extra
             if (Math.random() < 0.3) advance += 1;
@@ -198,7 +199,7 @@ async function handleHorseRace(interaction) {
       return `${i + 1}. ${trackLine}`;
     }).join('\n');
     
-    embed.setDescription(`Apostaste **${bet} Lagcoins** al caballo #${horseNumber}\n\n\`\`\`\n${track}\n\`\`\`\nRonda ${round + 1}/5`);
+    embed.setDescription(`💰 **Fianza Pagada:** 500 Lagcoins\n🎰 **Apuesta:** ${bet} Lagcoins al caballo **#${horseNumber}**\n\n\`\`\`\n${track}\n\`\`\`\nRonda ${round + 1}/5`);
     await interaction.editReply({ embeds: [embed] });
   }
   
@@ -230,7 +231,8 @@ async function handleHorseRace(interaction) {
   await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
   
   embed.setColor(won ? '#00FF00' : '#FF0000');
-  embed.setDescription(`${won ? '🎉 ¡GANASTE!' : '😢 Perdiste...'}\n\n**Ganador:** ${horses[winnerIndex]} ${horseNames[winnerIndex]} (#${winnerIndex + 1})\n**Tu caballo:** ${horses[horseNumber-1]} ${horseNames[horseNumber-1]} (#${horseNumber})\n\n**Resultado:** ${won ? '+' : ''}${winnings} Lagcoins\n**Nuevo saldo:** ${economy.lagcoins} Lagcoins`);
+  const fianzaStatus = won ? ' (Devuelta)' : ' (Perdida)';
+  embed.setDescription(`${won ? '🎉 ¡GANASTE!' : '😢 Perdiste...'}\n\n💰 **Fianza:** 500 Lagcoins${fianzaStatus}\n**Ganador:** ${horses[winnerIndex]} ${horseNames[winnerIndex]} (#${winnerIndex + 1})\n**Tu caballo:** ${horses[horseNumber-1]} ${horseNames[horseNumber-1]} (#${horseNumber})\n\n**Resultado:** ${won ? '+' : ''}${winnings} Lagcoins\n**Nuevo saldo:** ${economy.lagcoins} Lagcoins`);
   
   return interaction.editReply({ embeds: [embed] });
 }
