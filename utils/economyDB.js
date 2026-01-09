@@ -1500,7 +1500,19 @@ export async function staffRemoveItem(guildId, userId, itemId) {
 export async function bankDeposit(guildId, userId, amount) {
   try {
     if (amount <= 0) return null;
-    const economy = await getUserEconomy(guildId, userId);
+    
+    // Sincronizar con MongoDB si está conectado
+    const mongoConnected = isMongoConnected();
+    if (mongoConnected) {
+      const result = await depositToBank(guildId, userId, amount);
+      if (result) return result.toObject ? result.toObject() : result;
+      return null; // Probablemente no tiene dinero suficiente
+    }
+
+    const economyData = loadEconomyFile();
+    const key = `${guildId}-${userId}`;
+    const economy = economyData[key];
+
     if (!economy || (economy.lagcoins || 0) < amount) return null;
     
     economy.lagcoins -= amount;
@@ -1509,7 +1521,7 @@ export async function bankDeposit(guildId, userId, amount) {
     if (!economy.transactions) economy.transactions = [];
     economy.transactions.push({ type: 'deposit', amount: -amount, description: `Depósito al banco`, date: new Date().toISOString() });
     
-    await saveUserEconomy(guildId, userId, economy);
+    saveEconomyFile(economyData);
     return economy;
   } catch (error) {
     console.error('Error en bankDeposit:', error);
@@ -1521,7 +1533,19 @@ export async function bankDeposit(guildId, userId, amount) {
 export async function bankWithdraw(guildId, userId, amount) {
   try {
     if (amount <= 0) return null;
-    const economy = await getUserEconomy(guildId, userId);
+
+    // Sincronizar con MongoDB si está conectado
+    const mongoConnected = isMongoConnected();
+    if (mongoConnected) {
+      const result = await withdrawFromBank(guildId, userId, amount);
+      if (result) return result.toObject ? result.toObject() : result;
+      return null; // Probablemente no tiene dinero en el banco
+    }
+
+    const economyData = loadEconomyFile();
+    const key = `${guildId}-${userId}`;
+    const economy = economyData[key];
+
     if (!economy || (economy.bankBalance || 0) < amount) return null;
     
     economy.bankBalance -= amount;
@@ -1530,7 +1554,7 @@ export async function bankWithdraw(guildId, userId, amount) {
     if (!economy.transactions) economy.transactions = [];
     economy.transactions.push({ type: 'withdraw', amount: amount, description: `Retiro del banco`, date: new Date().toISOString() });
     
-    await saveUserEconomy(guildId, userId, economy);
+    saveEconomyFile(economyData);
     return economy;
   } catch (error) {
     console.error('Error en bankWithdraw:', error);
