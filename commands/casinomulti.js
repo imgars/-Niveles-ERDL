@@ -424,106 +424,69 @@ async function handlePoker(interaction) {
 async function handleRuleta(interaction) {
   const bet = interaction.options.getInteger('apuesta');
   const tipo = interaction.options.getString('tipo');
+  const fianza = 500;
   
   const economy = await getUserEconomy(interaction.guildId, interaction.user.id);
   
-  if ((economy.lagcoins || 0) < bet) {
-    return interaction.reply({ content: `❌ No tienes suficientes Lagcoins. Tienes ${economy.lagcoins || 0}`, flags: 64 });
+  if ((economy.lagcoins || 0) < (bet + fianza)) {
+    return interaction.reply({ 
+      content: `❌ Necesitas tener al menos **${bet + fianza} Lagcoins** para jugar (Apuesta: ${bet} + Fianza: ${fianza}). Tienes ${economy.lagcoins || 0}`, 
+      flags: 64 
+    });
   }
+  
+  // Cobrar fianza inmediatamente
+  economy.lagcoins -= fianza;
+  await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
   
   await interaction.deferReply();
-  
-  // Calcular suerte
-  let luckBonus = 0;
-  const activePowerups = getUserActivePowerups(interaction.guildId, interaction.user.id);
-  for (const powerup of activePowerups) {
-    if (powerup.type === 'casino_luck' || powerup.type === 'luck_boost') {
-      luckBonus += powerup.value;
-    }
-  }
-  
-  const adminBoost = getAdminBoost();
-  if (adminBoost && adminBoost.systems.casino) {
-    luckBonus += adminBoost.percentage;
-  }
-  
-  // Números de ruleta (0-36)
-  const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-  const blackNumbers = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
   
   // Animación de ruleta
   const embed = new EmbedBuilder()
     .setColor('#FFD700')
     .setTitle('🎰 Ruleta - Girando...')
-    .setDescription('La bola está girando...');
+    .setDescription(`💰 **Fianza Pagada:** ${fianza} Lagcoins\nLa bola está girando...`);
   
   await interaction.editReply({ embeds: [embed] });
   await new Promise(resolve => setTimeout(resolve, 2000));
   
-  // Resultado con influencia de suerte mejorada
-  let result;
-  if (luckBonus > 0 && Math.random() < luckBonus * 0.6) {
-    // Con suerte, mucha mayor probabilidad de caer en lo que apostó
-    if (tipo === 'rojo') result = redNumbers[Math.floor(Math.random() * redNumbers.length)];
-    else if (tipo === 'negro') result = blackNumbers[Math.floor(Math.random() * blackNumbers.length)];
-    else if (tipo === 'verde') result = 0;
-    else if (tipo === 'par') result = [2, 4, 6, 8, 10][Math.floor(Math.random() * 5)] * 2;
-    else if (tipo === 'impar') result = [1, 3, 5, 7, 9][Math.floor(Math.random() * 5)] * 2 + 1;
-    else if (tipo === 'alto') result = Math.floor(Math.random() * 18) + 19;
-    else if (tipo === 'bajo') result = Math.floor(Math.random() * 18) + 1;
-  } else {
-    // Buff: Probabilidad base mejorada para el usuario indirectamente
-    result = Math.floor(Math.random() * 37);
-  }
+  // Resultado: Siempre pierde o gana lo mínimo (1 Lagcoin)
+  // Ignoramos Power-ups, Multiplicadores, Luck, etc.
+  const result = Math.floor(Math.random() * 37);
+  const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+  const blackNumbers = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
   
   const isRed = redNumbers.includes(result);
   const isBlack = blackNumbers.includes(result);
   const resultColor = result === 0 ? '🟢' : isRed ? '🔴' : '⚫';
   
   let won = false;
-  let multiplier = 0;
-  
   switch (tipo) {
-    case 'rojo':
-      won = isRed;
-      multiplier = 1.8;
-      break;
-    case 'negro':
-      won = isBlack;
-      multiplier = 1.8;
-      break;
-    case 'verde':
-      won = result === 0;
-      // Probabilidad de x3 es muy baja (5%), de lo contrario x2.5
-      multiplier = Math.random() < 0.05 ? 3 : 2.2;
-      break;
-    case 'par':
-      won = result !== 0 && result % 2 === 0;
-      multiplier = 1.8;
-      break;
-    case 'impar':
-      won = result % 2 === 1;
-      multiplier = 1.8;
-      break;
-    case 'alto':
-      won = result >= 19 && result <= 36;
-      multiplier = 1.8;
-      break;
-    case 'bajo':
-      won = result >= 1 && result <= 18;
-      multiplier = 1.8;
-      break;
+    case 'rojo': won = isRed; break;
+    case 'negro': won = isBlack; break;
+    case 'verde': won = result === 0; break;
+    case 'par': won = result !== 0 && result % 2 === 0; break;
+    case 'impar': won = result % 2 === 1; break;
+    case 'alto': won = result >= 19 && result <= 36; break;
+    case 'bajo': won = result >= 1 && result <= 18; break;
   }
   
-  const winnings = won ? Math.floor(bet * multiplier) - bet : -bet;
+  // SIEMPRE la ganancia es solo 1 Lagcoin si gana, de lo contrario pierde la apuesta
+  // La fianza NUNCA se devuelve (siempre se paga como costo de entrada)
+  const winnings = won ? 1 : -bet;
   
-  economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + winnings);
+  economy.lagcoins = Math.max(0, (economy.lagcoins || 0) + (won ? 1 : 0)); // Si gana sumamos 1, si pierde ya restamos apuesta abajo o no sumamos nada
+  // Ajuste: si ganó, sumamos 1. Si perdió, restamos la apuesta.
+  if (!won) {
+      economy.lagcoins = Math.max(0, economy.lagcoins - bet);
+  }
+  
   if (!economy.casinoStats) economy.casinoStats = { plays: 0, wins: 0, totalWon: 0, totalLost: 0 };
   economy.casinoStats.plays++;
   if (won) {
     economy.casinoStats.wins++;
-    economy.casinoStats.totalWon = (economy.casinoStats.totalWon || 0) + winnings;
-    economy.totalEarned = (economy.totalEarned || 0) + winnings;
+    economy.casinoStats.totalWon = (economy.casinoStats.totalWon || 0) + 1;
+    economy.totalEarned = (economy.totalEarned || 0) + 1;
   } else {
     economy.casinoStats.totalLost = (economy.casinoStats.totalLost || 0) + bet;
   }
@@ -531,18 +494,13 @@ async function handleRuleta(interaction) {
   await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
   
   const tipoNames = {
-    'rojo': '🔴 Rojo',
-    'negro': '⚫ Negro',
-    'verde': '🟢 Verde/0',
-    'par': 'Par',
-    'impar': 'Impar',
-    'alto': 'Alto (19-36)',
-    'bajo': 'Bajo (1-18)'
+    'rojo': '🔴 Rojo', 'negro': '⚫ Negro', 'verde': '🟢 Verde/0',
+    'par': 'Par', 'impar': 'Impar', 'alto': 'Alto (19-36)', 'bajo': 'Bajo (1-18)'
   };
   
   embed.setColor(won ? '#00FF00' : '#FF0000');
   embed.setTitle(`🎰 Ruleta - ${resultColor} ${result}`);
-  embed.setDescription(`**Tu apuesta:** ${tipoNames[tipo]} (${bet} Lagcoins)\n\n${won ? '🎉 ¡GANASTE!' : '😢 Perdiste...'}\n\n**Resultado:** ${won ? '+' : ''}${winnings} Lagcoins\n**Nuevo saldo:** ${economy.lagcoins} Lagcoins`);
+  embed.setDescription(`**Tu apuesta:** ${tipoNames[tipo]} (${bet} Lagcoins)\n💰 **Fianza:** ${fianza} Lagcoins (Pagada)\n\n${won ? '🎉 ¡GANASTE!' : '😢 Perdiste...'}\n\n**Resultado:** ${won ? '+1' : '-' + bet} Lagcoins\n**Nuevo saldo:** ${economy.lagcoins} Lagcoins`);
   
   return interaction.editReply({ embeds: [embed] });
 }
