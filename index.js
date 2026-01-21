@@ -90,6 +90,46 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Middleware de mantenimiento
+app.use((req, res, next) => {
+  if (db.settings && db.settings.maintenanceMode) {
+    // Permitir acceso a la API de salud para Uptime Robot
+    if (req.path === '/health' || req.path === '/ping') {
+      return next();
+    }
+    
+    // Si es una petición API, devolver JSON
+    if (req.path.startsWith('/api/')) {
+      return res.status(503).json({ error: 'Sitio en mantenimiento' });
+    }
+
+    // De lo contrario, mostrar página de mantenimiento
+    return res.status(503).send(`
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Mantenimiento - Discord Bot</title>
+          <style>
+              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #2c2f33; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+              .container { background: #23272a; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+              h1 { color: #7289da; }
+              p { font-size: 1.2rem; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1>🛠️ Página en Mantenimiento</h1>
+              <p>Estamos realizando mejoras. Por favor, vuelve más tarde.</p>
+          </div>
+      </body>
+      </html>
+    `);
+  }
+  next();
+});
+
 const userCache = new Map();
 const leaderboardCache = new Map();
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hora
