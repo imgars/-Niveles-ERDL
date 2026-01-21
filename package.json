@@ -21,7 +21,7 @@
     "discord.js": "^14.25.1",
     "express": "^4.22.1",
     "moment-timezone": "^0.5.48",
-    "mongoose": "^9.1.2",
+    "mongoose": "^9.1.5",
     "node-cron": "^3.0.3"
   }
 }
