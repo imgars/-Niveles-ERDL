@@ -90,12 +90,12 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware de mantenimiento (DEBE ir antes de express.static)
 app.use((req, res, next) => {
+  // Ignorar /health y /ping independientemente de maintenanceMode
+  if (req.path === '/health' || req.path === '/ping') {
+    return next();
+  }
+
   if (db.settings && db.settings.maintenanceMode) {
-    // Permitir acceso a la API de salud para Uptime Robot
-    if (req.path === '/health' || req.path === '/ping') {
-      return next();
-    }
-    
     // Si es una petición API, devolver JSON
     if (req.path.startsWith('/api/')) {
       return res.status(503).json({ error: 'Sitio en mantenimiento' });
