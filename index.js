@@ -8,6 +8,7 @@ import { isStaff } from './utils/helpers.js';
 import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getAllStreaksFromMongo, getUserMissions, updateMissionProgress, getEconomy, addLagcoins } from './utils/mongoSync.js';
 import { checkAndBreakExpiredStreaks, acceptStreakRequest, rejectStreakRequest, recordMessage, deleteStreak, getStreakBetween, getAllActiveStreaks, STREAK_BREAK_CHANNEL_ID } from './utils/streakService.js';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import cron from 'node-cron';
 
 import fs from 'fs';
@@ -88,10 +89,28 @@ setInterval(async () => {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+
 // Middleware de mantenimiento (DEBE ir antes de express.static)
 app.use((req, res, next) => {
   // Ignorar /health y /ping independientemente de maintenanceMode
   if (req.path === '/health' || req.path === '/ping') {
+    return next();
+  }
+
+  // Ruta para desbloquear (bypass)
+  if (req.path === '/unlock-maintenance' && req.method === 'POST') {
+    const { password } = req.body;
+    if (password === '14425140512.SirgioTeam') {
+      res.cookie('maintenance_bypass', 'true', { maxAge: 24 * 60 * 60 * 1000, httpOnly: true });
+      return res.redirect('/');
+    }
+    return res.status(403).send('Clave incorrecta');
+  }
+
+  // Verificar si tiene la cookie de bypass
+  if (req.cookies.maintenance_bypass === 'true') {
     return next();
   }
 
@@ -110,16 +129,27 @@ app.use((req, res, next) => {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Mantenimiento - Discord Bot</title>
           <style>
-              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #2c2f33; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
-              .container { background: #23272a; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-              h1 { color: #7289da; }
-              p { font-size: 1.2rem; }
+              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #2c2f33; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+              .container { background: #23272a; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
+              h1 { color: #7289da; margin-bottom: 1rem; }
+              p { font-size: 1.1rem; margin-bottom: 2rem; }
+              .admin-login { margin-top: 2rem; border-top: 1px solid #4f545c; padding-top: 1rem; }
+              input { background: #40444b; border: 1px solid #202225; color: white; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+              button { background: #5865f2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+              button:hover { background: #4752c4; }
           </style>
       </head>
       <body>
           <div class="container">
               <h1>🛠️ Página en Mantenimiento</h1>
               <p>Estamos realizando mejoras. Por favor, vuelve más tarde.</p>
+              
+              <div class="admin-login">
+                  <form action="/unlock-maintenance" method="POST">
+                      <input type="password" name="password" placeholder="Clave de Admin" required>
+                      <button type="submit">Desbloquear Acceso</button>
+                  </form>
+              </div>
           </div>
       </body>
       </html>

@@ -18,6 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "@napi-rs/canvas": "^0.1.88",
+    "cookie-parser": "^1.4.7",
     "discord.js": "^14.25.1",
     "express": "^4.22.1",
     "moment-timezone": "^0.5.48",
