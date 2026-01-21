@@ -88,9 +88,7 @@ setInterval(async () => {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Middleware de mantenimiento
+// Middleware de mantenimiento (DEBE ir antes de express.static)
 app.use((req, res, next) => {
   if (db.settings && db.settings.maintenanceMode) {
     // Permitir acceso a la API de salud para Uptime Robot
@@ -129,6 +127,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const userCache = new Map();
 const leaderboardCache = new Map();
