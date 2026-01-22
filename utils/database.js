@@ -19,7 +19,7 @@ class Database {
     this.cooldowns = this.loadFile(COOLDOWNS_FILE, { xp: {}, minigames: {} });
     this.bans = this.loadFile(BANS_FILE, { users: {}, channels: [] });
     this.systems = this.loadFile(SYSTEMS_FILE, {});
-    this.settings = this.loadFile(path.join(DATA_DIR, 'settings.json'), { maintenanceMode: false });
+    this.settings = { maintenanceMode: false };
     this.mongoSync = null;
   }
 
