@@ -89,16 +89,21 @@ setInterval(async () => {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// 1. Endpoints de salud (PRIMERO DE TODO, antes de cualquier middleware)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
+// 2. Middlewares de procesamiento
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware de mantenimiento (DEBE ir antes de express.static)
+// 3. Middleware de mantenimiento
 app.use((req, res, next) => {
-  // Ignorar /health y /ping independientemente de maintenanceMode
-  if (req.path === '/health' || req.path === '/ping') {
-    return next();
-  }
-
   // Ruta para desbloquear (bypass)
   if (req.path === '/unlock-maintenance' && req.method === 'POST') {
     const { password } = req.body;
@@ -115,7 +120,7 @@ app.use((req, res, next) => {
   }
 
   if (db.settings && db.settings.maintenanceMode) {
-    // Si es una petición API, devolver JSON
+    // Si es una petición API, devolver JSON (excepto health/ping que ya se manejaron)
     if (req.path.startsWith('/api/')) {
       return res.status(503).json({ error: 'Sitio en mantenimiento' });
     }
