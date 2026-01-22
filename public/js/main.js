@@ -33,6 +33,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sectionId === 'preguntas') {
             loadQuestions();
         }
+        
+        if (sectionId === 'estadisticas') {
+            // Resetear búsqueda al entrar a la sección
+            document.getElementById('stats-username-input').value = '';
+            document.getElementById('stats-container').style.display = 'none';
+            document.getElementById('stats-error').style.display = 'none';
+        }
 
         if (sectionId === 'inactividad') {
             // Lógica adicional para inactividad si fuera necesaria
@@ -595,5 +602,259 @@ document.addEventListener('DOMContentLoaded', function() {
         if (event.target == imgModal) {
             imgModal.style.display = "none";
         }
+    }
+
+    // Sistema de Estadísticas de Usuario
+    const statsSearchBtn = document.getElementById('stats-search-btn');
+    const statsUsernameInput = document.getElementById('stats-username-input');
+    const statsContainer = document.getElementById('stats-container');
+    const statsError = document.getElementById('stats-error');
+    const statsLoading = document.getElementById('stats-loading');
+
+    function showStatsLoading() {
+        statsLoading.style.display = 'block';
+        statsContainer.style.display = 'none';
+        statsError.style.display = 'none';
+    }
+
+    function hideStatsLoading() {
+        statsLoading.style.display = 'none';
+    }
+
+    function showStatsError(message) {
+        statsError.textContent = message;
+        statsError.style.display = 'block';
+        statsContainer.style.display = 'none';
+        hideStatsLoading();
+    }
+
+    function formatNumber(num) {
+        if (num === null || num === undefined) return '-';
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function formatTime(ms) {
+        if (!ms) return 'Permanente';
+        const seconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        
+        if (days > 0) return `${days}d ${hours % 24}h`;
+        if (hours > 0) return `${hours}h ${minutes % 60}m`;
+        if (minutes > 0) return `${minutes}m`;
+        return `${seconds}s`;
+    }
+
+    async function loadUserStats(username) {
+        showStatsLoading();
+        
+        try {
+            const response = await fetch(`/api/user-stats?username=${encodeURIComponent(username)}`);
+            const data = await response.json();
+            
+            if (!response.ok) {
+                showStatsError(`❌ ${data.error || 'Error al cargar estadísticas'}`);
+                return;
+            }
+            
+            hideStatsLoading();
+            displayUserStats(data);
+        } catch (error) {
+            console.error('Error loading user stats:', error);
+            showStatsError('❌ Error al conectar con el servidor');
+        }
+    }
+
+    function displayUserStats(data) {
+        // Información básica
+        document.getElementById('stats-avatar').src = data.avatar;
+        document.getElementById('stats-username').textContent = data.displayName || data.username;
+        document.getElementById('stats-userid').textContent = `ID: ${data.userId}`;
+        
+        if (data.rankcardImage) {
+            document.getElementById('stats-rankcard').src = data.rankcardImage;
+            document.getElementById('stats-rankcard').style.display = 'block';
+        } else {
+            document.getElementById('stats-rankcard').style.display = 'none';
+        }
+        
+        // Niveles y XP
+        document.getElementById('stat-level').textContent = data.level || 0;
+        document.getElementById('stat-totalxp').textContent = formatNumber(data.totalXp);
+        if (data.xpProgress) {
+            document.getElementById('stat-xpprogress').textContent = 
+                `${formatNumber(Math.floor(data.xpProgress.current))} / ${formatNumber(Math.floor(data.xpProgress.needed))} (${Math.floor(data.xpProgress.percentage)}%)`;
+        } else {
+            document.getElementById('stat-xpprogress').textContent = '-';
+        }
+        document.getElementById('stat-leaderboard-pos').textContent = data.leaderboardPosition ? `#${data.leaderboardPosition}` : 'N/A';
+        
+        // Economía
+        document.getElementById('stat-lagcoins').textContent = formatNumber(data.lagcoins);
+        document.getElementById('stat-bank').textContent = formatNumber(data.bankBalance);
+        document.getElementById('stat-married').textContent = data.isMarried ? 
+            (data.marriedTo ? `Casado/a con <@${data.marriedTo}>` : 'Casado/a') : 'Soltero/a';
+        document.getElementById('stat-items-count').textContent = data.inventoryCount || 0;
+        
+        // Robos
+        document.getElementById('stat-robberies').textContent = data.successfulRobberies || 0;
+        document.getElementById('stat-robbed').textContent = data.timesRobbed || 0;
+        
+        // Boosts y Power-ups
+        document.getElementById('stat-boosts').textContent = data.activeBoosts?.length || 0;
+        document.getElementById('stat-powerups').textContent = data.activePowerups?.length || 0;
+        
+        const boostsList = document.getElementById('stat-boosts-list');
+        boostsList.innerHTML = '';
+        if (data.activeBoosts && data.activeBoosts.length > 0) {
+            data.activeBoosts.forEach(boost => {
+                const item = document.createElement('div');
+                item.className = 'stat-list-item';
+                const percentage = boost.multiplier >= 1 ? Math.round((boost.multiplier - 1) * 100) : Math.round(boost.multiplier * 100);
+                let timeLeft = 'Permanente';
+                if (boost.expiresAt) {
+                    const expiresAt = new Date(boost.expiresAt).getTime();
+                    const remaining = expiresAt - Date.now();
+                    if (remaining > 0) {
+                        timeLeft = formatTime(remaining);
+                    } else {
+                        timeLeft = 'Expirado';
+                    }
+                }
+                item.innerHTML = `<span>+${percentage}% ${boost.description || ''}</span><span>${timeLeft}</span>`;
+                boostsList.appendChild(item);
+            });
+        }
+        
+        const powerupsList = document.getElementById('stat-powerups-list');
+        powerupsList.innerHTML = '';
+        if (data.activePowerups && data.activePowerups.length > 0) {
+            data.activePowerups.forEach(powerup => {
+                const item = document.createElement('div');
+                item.className = 'stat-list-item';
+                let timeLeft = 'Expirado';
+                if (powerup.expiresAt) {
+                    const remaining = powerup.expiresAt - Date.now();
+                    if (remaining > 0) {
+                        timeLeft = formatTime(remaining);
+                    }
+                }
+                const powerupNames = {
+                    'work_boost': 'Boost Trabajo',
+                    'casino_luck': 'Suerte Casino',
+                    'rob_success': 'Sigilo Robo',
+                    'xp_boost': 'Boost XP',
+                    'cooldown_reduction': 'Reducción Cooldown',
+                    'luck_boost': 'Boost Suerte'
+                };
+                item.innerHTML = `<span>${powerupNames[powerup.type] || powerup.type}</span><span>${timeLeft}</span>`;
+                powerupsList.appendChild(item);
+            });
+        }
+        
+        // Rankcard
+        const themeNames = {
+            'discord': 'Discord',
+            'pixel': 'Pixel',
+            'ocean': 'Océano',
+            'zelda': 'Zelda',
+            'pokemon': 'Pokémon',
+            'minecraft': 'Minecraft',
+            'fnaf': 'FNAF',
+            'roblox': 'Roblox',
+            'night': 'Noche Estrellada',
+            'geometrydash': 'Geometry Dash'
+        };
+        document.getElementById('stat-card-theme').textContent = themeNames[data.selectedCardTheme] || data.selectedCardTheme || 'Discord';
+        document.getElementById('stat-purchased-cards').textContent = data.purchasedCards?.length || 0;
+        
+        // Misiones
+        document.getElementById('stat-missions-completed').textContent = data.completedMissions || 0;
+        document.getElementById('stat-missions-total').textContent = data.totalMissions || 0;
+        
+        // Rachas
+        document.getElementById('stat-active-streaks').textContent = data.activeStreaks || 0;
+        document.getElementById('stat-broken-streaks').textContent = data.brokenStreaks || 0;
+        document.getElementById('stat-longest-streak').textContent = data.longestStreak ? `${data.longestStreak} días` : '0 días';
+        document.getElementById('stat-total-streak-days').textContent = data.totalStreakDays || 0;
+        
+        const streaksDetails = document.getElementById('stat-streaks-details');
+        streaksDetails.innerHTML = '';
+        if (data.streakDetails && data.streakDetails.length > 0) {
+            data.streakDetails.forEach(streak => {
+                const item = document.createElement('div');
+                item.className = 'stat-list-item';
+                item.innerHTML = `<span>Con <@${streak.partnerId}></span><span>${streak.days} días</span>`;
+                streaksDetails.appendChild(item);
+            });
+        }
+        
+        // Casino y Minijuegos
+        document.getElementById('stat-minigames-won').textContent = data.minigamesWon || 0;
+        document.getElementById('stat-minigame-wr').textContent = data.minigameWinRate || '0%';
+        document.getElementById('stat-casino-plays').textContent = data.casinoPlays || 0;
+        document.getElementById('stat-casino-wins').textContent = data.casinoWins || 0;
+        document.getElementById('stat-casino-wr').textContent = data.casinoWinRate || '0%';
+        document.getElementById('stat-casino-won').textContent = formatNumber(data.casinoTotalWon);
+        document.getElementById('stat-casino-lost').textContent = formatNumber(data.casinoTotalLost);
+        
+        // Trabajos
+        document.getElementById('stat-times-worked').textContent = formatNumber(data.timesWorked);
+        document.getElementById('stat-available-jobs').textContent = `${data.availableJobs} / ${data.totalJobsAvailable}`;
+        document.getElementById('stat-total-jobs').textContent = data.totalJobsAvailable || 0;
+        document.getElementById('stat-favorite-job').textContent = data.favoriteJob || 'Ninguno';
+        
+        // Nacionalidad
+        if (data.nationality) {
+            document.getElementById('stat-nationality').textContent = 
+                `${data.nationality.emoji || ''} ${data.nationality.name || data.nationality.country || 'N/A'}`;
+            document.getElementById('stat-current-country').textContent = 
+                data.nationality.currentCountry === data.nationality.country ? 
+                'Mismo país' : 
+                (data.nationality.currentCountry ? data.nationality.currentCountry : 'N/A');
+        } else {
+            document.getElementById('stat-nationality').textContent = 'No asignada';
+            document.getElementById('stat-current-country').textContent = '-';
+        }
+        
+        // Items
+        const itemsList = document.getElementById('stat-items-list');
+        itemsList.innerHTML = '';
+        if (data.items && data.items.length > 0) {
+            data.items.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'stat-item-card';
+                itemCard.innerHTML = `
+                    <span class="stat-item-emoji">${item.emoji || '❓'}</span>
+                    <span class="stat-item-name">${item.name || 'Item'}</span>
+                `;
+                itemsList.appendChild(itemCard);
+            });
+        } else {
+            itemsList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); font-size: 8px;">No hay items</div>';
+        }
+        
+        statsContainer.style.display = 'block';
+    }
+
+    if (statsSearchBtn) {
+        statsSearchBtn.addEventListener('click', () => {
+            const username = statsUsernameInput.value.trim();
+            if (username) {
+                loadUserStats(username);
+            }
+        });
+    }
+
+    if (statsUsernameInput) {
+        statsUsernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const username = statsUsernameInput.value.trim();
+                if (username) {
+                    loadUserStats(username);
+                }
+            }
+        });
     }
 });
