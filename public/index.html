@@ -28,6 +28,7 @@
                 <a href="#tarjetas" class="nav-link" data-section="tarjetas">Tarjetas</a>
                 <a href="#preguntas" class="nav-link" data-section="preguntas">Preguntas</a>
                 <a href="#leaderboard" class="nav-link" data-section="leaderboard">Leaderboard</a>
+                <a href="#estadisticas" class="nav-link" data-section="estadisticas">Estadisticas</a>
             </nav>
         </div>
     </header>
@@ -1085,6 +1086,257 @@
                 </div>
             </div>
         </div>
+
+        <!-- ESTADISTICAS DE USUARIO -->
+        <section id="estadisticas" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">📊</span>
+                Estadísticas de Usuario
+            </h2>
+
+            <div class="stats-search-container">
+                <div class="stats-search-box">
+                    <input type="text" id="stats-username-input" placeholder="Buscar por nombre de usuario..." class="pixel-input">
+                    <button id="stats-search-btn" class="pixel-btn">Buscar</button>
+                </div>
+            </div>
+
+            <div id="stats-container" class="stats-container" style="display: none;">
+                <div class="stats-header">
+                    <div class="stats-user-info">
+                        <img id="stats-avatar" src="" alt="Avatar" class="stats-avatar">
+                        <div class="stats-user-details">
+                            <h3 id="stats-username" class="stats-username"></h3>
+                            <p id="stats-userid" class="stats-userid"></p>
+                        </div>
+                    </div>
+                    <div class="stats-rankcard-container">
+                        <img id="stats-rankcard" src="" alt="Rankcard" class="stats-rankcard">
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <!-- Niveles y XP -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">📈 Niveles y XP</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Nivel Actual:</span>
+                                <span class="stat-value" id="stat-level">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">XP Total:</span>
+                                <span class="stat-value" id="stat-totalxp">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">XP Progreso:</span>
+                                <span class="stat-value" id="stat-xpprogress">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Posición en Leaderboard:</span>
+                                <span class="stat-value" id="stat-leaderboard-pos">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Economía -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">💰 Economía</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Lagcoins:</span>
+                                <span class="stat-value" id="stat-lagcoins">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Lagcoins en Banco:</span>
+                                <span class="stat-value" id="stat-bank">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Estado Civil:</span>
+                                <span class="stat-value" id="stat-married">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Items en Inventario:</span>
+                                <span class="stat-value" id="stat-items-count">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Robos -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🔫 Robos</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Robos Exitosos:</span>
+                                <span class="stat-value" id="stat-robberies">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Veces Robado:</span>
+                                <span class="stat-value" id="stat-robbed">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boosts y Power-ups -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">⚡ Boosts y Power-ups</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Boosts Activos:</span>
+                                <span class="stat-value" id="stat-boosts">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Power-ups Activos:</span>
+                                <span class="stat-value" id="stat-powerups">-</span>
+                            </div>
+                            <div id="stat-boosts-list" class="stat-list"></div>
+                            <div id="stat-powerups-list" class="stat-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Rankcard -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎨 Rankcard</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Tema Actual:</span>
+                                <span class="stat-value" id="stat-card-theme">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Tarjetas Compradas:</span>
+                                <span class="stat-value" id="stat-purchased-cards">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misiones -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎯 Misiones</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Misiones Completadas:</span>
+                                <span class="stat-value" id="stat-missions-completed">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total de Misiones:</span>
+                                <span class="stat-value" id="stat-missions-total">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rachas -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🔥 Rachas</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Rachas Activas:</span>
+                                <span class="stat-value" id="stat-active-streaks">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Rachas Perdidas:</span>
+                                <span class="stat-value" id="stat-broken-streaks">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Racha Más Larga:</span>
+                                <span class="stat-value" id="stat-longest-streak">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Días de Racha:</span>
+                                <span class="stat-value" id="stat-total-streak-days">-</span>
+                            </div>
+                            <div id="stat-streaks-details" class="stat-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Casino y Minijuegos -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎰 Casino y Minijuegos</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Minijuegos Ganados:</span>
+                                <span class="stat-value" id="stat-minigames-won">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Win Rate Minijuegos:</span>
+                                <span class="stat-value" id="stat-minigame-wr">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Partidas de Casino:</span>
+                                <span class="stat-value" id="stat-casino-plays">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Victorias en Casino:</span>
+                                <span class="stat-value" id="stat-casino-wins">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Win Rate Casino:</span>
+                                <span class="stat-value" id="stat-casino-wr">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Ganado Casino:</span>
+                                <span class="stat-value" id="stat-casino-won">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Perdido Casino:</span>
+                                <span class="stat-value" id="stat-casino-lost">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trabajos -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">💼 Trabajos</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Veces Trabajado:</span>
+                                <span class="stat-value" id="stat-times-worked">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Trabajos Disponibles:</span>
+                                <span class="stat-value" id="stat-available-jobs">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Trabajos:</span>
+                                <span class="stat-value" id="stat-total-jobs">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Trabajo Favorito:</span>
+                                <span class="stat-value" id="stat-favorite-job">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nacionalidad -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🌍 Nacionalidad</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">País:</span>
+                                <span class="stat-value" id="stat-nationality">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">País Actual:</span>
+                                <span class="stat-value" id="stat-current-country">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎒 Items</h4>
+                        <div class="stats-card-content">
+                            <div id="stat-items-list" class="stat-items-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stats-error" class="stats-error" style="display: none;"></div>
+            <div id="stats-loading" class="stats-loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <span>Cargando estadísticas...</span>
+            </div>
+        </section>
 
         <!-- LEADERBOARD -->
         <section id="leaderboard" class="section">
