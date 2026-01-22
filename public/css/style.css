@@ -1987,3 +1987,223 @@ body {
     font-size: 8px;
     color: var(--text-dim);
 }
+
+/* Estadísticas de Usuario */
+.stats-search-container {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.stats-search-box {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.stats-search-box .pixel-input {
+    flex: 1;
+    max-width: 400px;
+}
+
+.stats-container {
+    background: var(--bg-card);
+    border: 4px solid var(--primary);
+    padding: 30px;
+    margin-top: 20px;
+}
+
+.stats-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 3px solid var(--accent);
+}
+
+.stats-user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.stats-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid var(--primary);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    image-rendering: pixelated;
+}
+
+.stats-user-details {
+    flex: 1;
+}
+
+.stats-username {
+    font-size: 16px;
+    color: var(--primary);
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.stats-userid {
+    font-size: 9px;
+    color: var(--text-dim);
+}
+
+.stats-rankcard-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stats-rankcard {
+    max-width: 100%;
+    height: auto;
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+    image-rendering: pixelated;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.stats-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--accent);
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.stats-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.stats-card-title {
+    font-size: 12px;
+    color: var(--primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px dashed var(--accent);
+    text-align: center;
+}
+
+.stats-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 9px;
+}
+
+.stat-label {
+    color: var(--text-dim);
+    flex: 1;
+}
+
+.stat-value {
+    color: var(--accent);
+    font-weight: bold;
+    text-align: right;
+}
+
+.stat-list {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.stat-list-item {
+    font-size: 8px;
+    color: var(--text-dim);
+    padding: 5px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.stat-item-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--accent);
+    padding: 10px;
+    text-align: center;
+    font-size: 8px;
+    transition: all 0.2s;
+}
+
+.stat-item-card:hover {
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.stat-item-emoji {
+    font-size: 24px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.stat-item-name {
+    color: var(--text);
+    word-break: break-word;
+}
+
+.stats-error {
+    background: rgba(255, 0, 0, 0.2);
+    border: 2px solid #FF0000;
+    color: #FF0000;
+    padding: 20px;
+    text-align: center;
+    font-size: 10px;
+    margin-top: 20px;
+}
+
+.stats-loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-size: 10px;
+}
+
+.stats-loading .loading-spinner {
+    margin: 0 auto 15px;
+}
+
+@media (max-width: 768px) {
+    .stats-header {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-rankcard-container {
+        margin-top: 20px;
+    }
+    
+    .stats-search-box {
+        flex-direction: column;
+    }
+    
+    .stats-search-box .pixel-input {
+        max-width: 100%;
+    }
+}
