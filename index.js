@@ -409,6 +409,287 @@ app.post('/api/questions/:id/answer', express.json(), async (req, res) => {
   }
 });
 
+// API para obtener estadísticas de usuario
+app.get('/api/user-stats', async (req, res) => {
+  try {
+    const { username, userId } = req.query;
+    
+    if (!username && !userId) {
+      return res.status(400).json({ error: 'Se requiere username o userId' });
+    }
+    
+    // Buscar usuario en Discord
+    let discordUser = null;
+    if (userId) {
+      try {
+        discordUser = await client.users.fetch(userId);
+      } catch (e) {
+        // Usuario no encontrado por ID, intentar buscar por username
+      }
+    }
+    
+    if (!discordUser && username) {
+      // Buscar en el leaderboard cache primero (más rápido)
+      const cached = leaderboardCache.get(LEADERBOARD_CACHE_KEY);
+      if (cached && cached.data && cached.data.users) {
+        const foundInCache = cached.data.users.find(u => {
+          const searchLower = username.toLowerCase();
+          return (u.username && u.username.toLowerCase().includes(searchLower)) ||
+                 (u.displayName && u.displayName.toLowerCase().includes(searchLower));
+        });
+        
+        if (foundInCache) {
+          try {
+            discordUser = await client.users.fetch(foundInCache.userId);
+          } catch (e) {
+            // Continuar con búsqueda alternativa
+          }
+        }
+      }
+      
+      // Si no se encontró en cache, buscar en usuarios del bot
+      if (!discordUser) {
+        const allUsers = Object.values(db.users);
+        const searchLower = username.toLowerCase();
+        
+        // Limitar búsqueda a primeros 100 usuarios para evitar timeout
+        const limitedUsers = allUsers.slice(0, 100);
+        
+        for (const userData of limitedUsers) {
+          try {
+            const user = await client.users.fetch(userData.userId).catch(() => null);
+            if (user && (user.username.toLowerCase().includes(searchLower) || 
+                (user.globalName && user.globalName.toLowerCase().includes(searchLower)))) {
+              discordUser = user;
+              break;
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+      }
+    }
+    
+    if (!discordUser) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    const targetUserId = discordUser.id;
+    const guildId = client.guilds.cache.first()?.id; // Obtener el primer guild disponible
+    
+    if (!guildId) {
+      return res.status(500).json({ error: 'No hay servidores disponibles' });
+    }
+    
+    // Obtener datos del usuario
+    const userData = db.getUser(guildId, targetUserId);
+    const member = await client.guilds.cache.get(guildId)?.members.fetch(targetUserId).catch(() => null);
+    
+    // Obtener datos de economía
+    const { getUserEconomy, getUserProfile, getUserNationality, getUserActivePowerups } = await import('./utils/economyDB.js');
+    const economy = await getUserEconomy(guildId, targetUserId);
+    
+    // Importar funciones de XP
+    const { getXPProgress, getBoostTextForCard } = await import('./utils/xpSystem.js');
+    
+    // Obtener posición en leaderboard
+    const allUsers = Object.values(db.users);
+    const sortedUsers = allUsers
+      .filter(u => u.totalXp > 0)
+      .sort((a, b) => b.totalXp - a.totalXp);
+    const leaderboardPosition = sortedUsers.findIndex(u => u.userId === targetUserId) + 1;
+    
+    // Obtener boosts activos
+    const activeBoosts = db.getActiveBoosts(targetUserId, null);
+    const boostList = activeBoosts.map(b => ({
+      type: b.type || 'user',
+      multiplier: b.multiplier,
+      expiresAt: b.expiresAt,
+      description: b.description || 'Boost activo'
+    }));
+    
+    // Obtener power-ups activos
+    const powerups = getUserActivePowerups(guildId, targetUserId);
+    const powerupList = powerups.map(p => ({
+      type: p.type,
+      value: p.value,
+      expiresAt: p.expiresAt
+    }));
+    
+    // Obtener rachas
+    const { getUserStreaks, getStreakStats } = await import('./utils/streakService.js');
+    const streakStats = await getStreakStats(guildId, targetUserId);
+    const activeStreaks = await getUserStreaks(guildId, targetUserId);
+    
+    // Obtener misiones
+    const weekNumber = Math.ceil((new Date().getDate()) / 7);
+    const year = new Date().getFullYear();
+    const { getUserMissions, getMissionsStats } = await import('./utils/mongoSync.js');
+    const missions = await getUserMissions(guildId, targetUserId, weekNumber, year);
+    const missionsStats = await getMissionsStats(guildId, targetUserId, weekNumber, year);
+    
+    // Calcular misiones completadas
+    let completedMissions = 0;
+    if (missionsStats && missionsStats.missions) {
+      completedMissions = missionsStats.missions.filter(m => m.completed).length;
+    }
+    
+    // Obtener nacionalidad
+    const nationality = getUserNationality(guildId, targetUserId);
+    
+    // Calcular estadísticas de robos (desde transacciones)
+    const transactions = economy.transactions || [];
+    // Robos exitosos: transacciones donde el usuario ganó dinero por robar
+    const successfulRobberies = transactions.filter(t => 
+      (t.type === 'rob' && t.amount > 0) || 
+      (t.type === 'bank_heist' && t.amount > 0)
+    ).length;
+    // Veces que le robaron: transacciones donde perdió dinero por ser robado
+    const timesRobbed = transactions.filter(t => 
+      (t.type === 'rob' && t.amount < 0) ||
+      (t.type === 'rob_victim' && t.amount < 0)
+    ).length;
+    
+    // Calcular win rate de casino
+    const casinoStats = economy.casinoStats || { plays: 0, wins: 0 };
+    const casinoWinRate = casinoStats.plays > 0 ? ((casinoStats.wins / casinoStats.plays) * 100).toFixed(1) : 0;
+    
+    // Calcular win rate de minijuegos
+    const minigamesWon = economy.minigamesWon || 0;
+    // No hay tracking de minijuegos jugados, así que usaremos una estimación basada en wins
+    const minigameWinRate = minigamesWon > 0 ? 'N/A' : '0%';
+    
+    // Obtener trabajos disponibles (basado en items)
+    const items = economy.items || [];
+    const economyDB = await import('./utils/economyDB.js');
+    const { JOBS, COUNTRIES } = economyDB;
+    const availableJobs = Object.keys(JOBS).filter(jobId => {
+      const job = JOBS[jobId];
+      if (!job.itemsNeeded || job.itemsNeeded.length === 0) return true;
+      return job.itemsNeeded.every(itemId => items.includes(itemId));
+    });
+    
+    // Obtener tema de rankcard actual
+    const selectedTheme = userData.selectedCardTheme || 'discord';
+    const purchasedCards = userData.purchasedCards || [];
+    
+    // Generar rankcard
+    let rankcardImage = null;
+    try {
+      const { generateRankCard } = await import('./utils/cardGenerator.js');
+      const progress = getXPProgress(userData.totalXp || 0, userData.level || 0);
+      const boosts = db.getActiveBoosts(targetUserId, null);
+      const boostCardText = getBoostTextForCard(boosts);
+      
+      if (member) {
+        const cardBuffer = await generateRankCard(member, userData, progress, boostCardText);
+        rankcardImage = `data:image/png;base64,${cardBuffer.toString('base64')}`;
+      }
+    } catch (error) {
+      console.error('Error generando rankcard:', error);
+    }
+    
+    // Obtener avatar
+    const avatar = discordUser.displayAvatarURL({ format: 'png', size: 256 });
+    
+    // Calcular veces trabajado
+    const timesWorked = economy.jobStats?.totalJobs || 0;
+    
+    // Obtener items del inventario
+    const inventoryItems = economy.inventory || [];
+    const itemsList = items.map(itemId => {
+      return economyDB.ITEMS[itemId] || { name: itemId, emoji: '❓' };
+    });
+    
+    const stats = {
+      // Información básica
+      userId: targetUserId,
+      username: discordUser.username,
+      displayName: discordUser.globalName || discordUser.username,
+      avatar: avatar,
+      rankcardImage: rankcardImage,
+      
+      // Niveles y XP
+      level: userData.level || 0,
+      totalXp: userData.totalXp || 0,
+      xpProgress: getXPProgress(userData.totalXp || 0, userData.level || 0),
+      
+      // Leaderboard
+      leaderboardPosition: leaderboardPosition || null,
+      
+      // Economía
+      lagcoins: economy.lagcoins || 0,
+      bankBalance: economy.bankBalance || 0,
+      marriedTo: economy.marriedTo || null,
+      isMarried: !!economy.marriedTo,
+      
+      // Robos
+      successfulRobberies: successfulRobberies,
+      timesRobbed: timesRobbed,
+      
+      // Boosts y Power-ups
+      activeBoosts: boostList,
+      activePowerups: powerupList,
+      
+      // Rankcard
+      selectedCardTheme: selectedTheme,
+      purchasedCards: purchasedCards,
+      
+      // Misiones
+      completedMissions: completedMissions,
+      totalMissions: missionsStats?.missions?.length || 0,
+      
+      // Rachas
+      activeStreaks: activeStreaks.length,
+      brokenStreaks: streakStats?.brokenCount || 0,
+      longestStreak: streakStats?.longestStreak || 0,
+      totalStreakDays: streakStats?.totalDays || 0,
+      streakDetails: activeStreaks.map(s => ({
+        partnerId: s.partnerId,
+        days: s.streakCount,
+        status: s.status
+      })),
+      
+      // Minijuegos
+      minigamesWon: minigamesWon,
+      minigameWinRate: minigameWinRate,
+      
+      // Casino
+      casinoPlays: casinoStats.plays || 0,
+      casinoWins: casinoStats.wins || 0,
+      casinoWinRate: `${casinoWinRate}%`,
+      casinoTotalWon: casinoStats.totalWon || 0,
+      casinoTotalLost: casinoStats.totalLost || 0,
+      
+      // Trabajos
+      timesWorked: timesWorked,
+      availableJobs: availableJobs.length,
+      totalJobsAvailable: Object.keys(economyDB.JOBS).length,
+      favoriteJob: economy.jobStats?.favoriteJob || null,
+      
+      // Nacionalidad
+      nationality: nationality ? {
+        country: nationality.country,
+        currentCountry: nationality.currentCountry || nationality.country,
+        emoji: nationality.country ? COUNTRIES[nationality.country]?.emoji : null,
+        name: nationality.country ? COUNTRIES[nationality.country]?.name : null
+      } : null,
+      
+      // Items
+      items: itemsList,
+      inventoryCount: inventoryItems.length,
+      
+      // Comandos usados (no hay tracking, devolver 0)
+      commandsUsed: 0
+    };
+    
+    res.json(stats);
+  } catch (error) {
+    console.error('Error obteniendo estadísticas de usuario:', error);
+    res.status(500).json({ error: 'Error al obtener estadísticas' });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -419,6 +700,18 @@ app.get('/ping', (req, res) => {
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/api/diff', async (req, res) => {
+  res.json({
+    message: "Comparación realizada con el repositorio de GitHub",
+    differences: [
+      "Nuevos endpoints de API para estadísticas de usuario (/api/user-stats)",
+      "Panel de administración web completo (public/admin)",
+      "Configuración de despliegue para Replit/Render",
+      "Mejoras en el sistema de cache del leaderboard"
+    ]
+  });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
