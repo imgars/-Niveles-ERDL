@@ -6,6 +6,7 @@ import { generateRankCard } from './utils/cardGenerator.js';
 import { initializeNightBoost, getNightBoostMultiplier } from './utils/timeBoost.js';
 import { isStaff } from './utils/helpers.js';
 import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getAllStreaksFromMongo, getUserMissions, updateMissionProgress, getEconomy, addLagcoins } from './utils/mongoSync.js';
+import { logActivity, getLogs, getUserLogs, getLogStats, LOG_TYPES } from './utils/activityLogger.js';
 import { checkAndBreakExpiredStreaks, acceptStreakRequest, rejectStreakRequest, recordMessage, deleteStreak, getStreakBetween, getAllActiveStreaks, STREAK_BREAK_CHANNEL_ID } from './utils/streakService.js';
 import express from 'express';
 import cookieParser from 'cookie-parser';
@@ -2469,6 +2470,310 @@ app.post('/api/admin/maintenance', verifyAdminToken, express.json(), (req, res) 
     res.status(500).json({ message: 'Error del servidor' });
   }
 });
+
+// ===== ACTIVITY LOGS API =====
+app.get('/api/admin/logs', verifyAdminToken, (req, res) => {
+  try {
+    const { type, limit, userId } = req.query;
+    const logs = getLogs({
+      type,
+      userId,
+      limit: parseInt(limit) || 100
+    });
+    const stats = getLogStats();
+    res.json({ logs, stats });
+  } catch (error) {
+    console.error('Error en Logs API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== USER MANAGEMENT API =====
+app.get('/api/admin/user/search', verifyAdminToken, (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ message: 'Query requerida' });
+    }
+    
+    const allUsers = Object.values(db.users);
+    let foundUsers = [];
+    
+    for (const user of allUsers) {
+      if (user.userId === query || user.username?.toLowerCase().includes(query.toLowerCase())) {
+        const guild = client.guilds.cache.get(user.guildId);
+        const member = guild?.members.cache.get(user.userId);
+        
+        foundUsers.push({
+          ...user,
+          username: member?.user?.username || user.username || 'Desconocido',
+          displayName: member?.displayName || user.username || 'Desconocido',
+          avatar: member?.user?.avatarURL() || null,
+          guildName: guild?.name || 'Servidor'
+        });
+      }
+    }
+    
+    if (foundUsers.length === 0) {
+      for (const guild of client.guilds.cache.values()) {
+        const member = guild.members.cache.find(m => 
+          m.user.username.toLowerCase().includes(query.toLowerCase()) ||
+          m.id === query
+        );
+        if (member) {
+          const key = `${guild.id}-${member.id}`;
+          const userData = db.users[key] || { userId: member.id, guildId: guild.id };
+          foundUsers.push({
+            ...userData,
+            username: member.user.username,
+            displayName: member.displayName,
+            avatar: member.user.avatarURL(),
+            guildName: guild.name
+          });
+        }
+      }
+    }
+    
+    res.json({ users: foundUsers.slice(0, 20) });
+  } catch (error) {
+    console.error('Error en User Search API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.get('/api/admin/user/:guildId/:userId', verifyAdminToken, async (req, res) => {
+  try {
+    const { guildId, userId } = req.params;
+    const key = `${guildId}-${userId}`;
+    
+    const userData = db.users[key] || null;
+    let economyData = null;
+    
+    try {
+      const { getUserEconomy } = await import('./utils/economyDB.js');
+      economyData = await getUserEconomy(guildId, userId);
+    } catch (e) {}
+    
+    const guild = client.guilds.cache.get(guildId);
+    const member = guild?.members.cache.get(userId);
+    
+    const userLogs = getUserLogs(userId, 100);
+    
+    res.json({
+      user: userData,
+      economy: economyData,
+      username: member?.user?.username || 'Desconocido',
+      displayName: member?.displayName || 'Desconocido',
+      avatar: member?.user?.avatarURL() || null,
+      guildName: guild?.name || 'Servidor',
+      roles: member?.roles.cache.map(r => ({ id: r.id, name: r.name, color: r.hexColor })) || [],
+      logs: userLogs
+    });
+  } catch (error) {
+    console.error('Error en User Details API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.post('/api/admin/user/:guildId/:userId/modify', verifyAdminToken, express.json(), async (req, res) => {
+  try {
+    const { guildId, userId } = req.params;
+    const { action, field, value, reason } = req.body;
+    const key = `${guildId}-${userId}`;
+    
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    const session = sessionTokens.get(token);
+    const adminName = session?.username || 'Admin';
+    
+    const guild = client.guilds.cache.get(guildId);
+    const member = guild?.members.cache.get(userId);
+    const username = member?.user?.username || 'Usuario';
+    
+    if (!db.users[key]) {
+      db.users[key] = { userId, guildId, xp: 0, level: 0, totalXp: 0 };
+    }
+    
+    let result = { success: false };
+    
+    if (field === 'lagcoins' || field === 'bank') {
+      const { getUserEconomy, saveUserEconomy } = await import('./utils/economyDB.js');
+      let economy = await getUserEconomy(guildId, userId);
+      if (!economy) {
+        economy = { guildId, userId, lagcoins: 0, bank: 0 };
+      }
+      
+      const oldValue = field === 'lagcoins' ? economy.lagcoins : economy.bank;
+      let newValue = oldValue;
+      
+      switch (action) {
+        case 'add':
+          newValue = oldValue + parseInt(value);
+          break;
+        case 'remove':
+          newValue = Math.max(0, oldValue - parseInt(value));
+          break;
+        case 'set':
+          newValue = Math.max(0, parseInt(value));
+          break;
+        case 'reset':
+          newValue = 0;
+          break;
+      }
+      
+      if (field === 'lagcoins') {
+        economy.lagcoins = newValue;
+      } else {
+        economy.bank = newValue;
+      }
+      
+      await saveUserEconomy(guildId, userId, economy);
+      
+      logActivity({
+        type: LOG_TYPES.ADMIN_ACTION,
+        userId,
+        username,
+        guildId,
+        guildName: guild?.name,
+        amount: newValue - oldValue,
+        reason: `Admin ${adminName}: ${action} ${field} - ${reason || 'Sin motivo'}`,
+        details: { field, action, oldValue, newValue, admin: adminName }
+      });
+      
+      result = { success: true, field, oldValue, newValue };
+    }
+    else if (field === 'xp' || field === 'totalXp') {
+      const user = db.users[key];
+      const oldValue = user.totalXp || 0;
+      let newValue = oldValue;
+      
+      switch (action) {
+        case 'add':
+          newValue = oldValue + parseInt(value);
+          break;
+        case 'remove':
+          newValue = Math.max(0, oldValue - parseInt(value));
+          break;
+        case 'set':
+          newValue = Math.max(0, parseInt(value));
+          break;
+        case 'reset':
+          newValue = 0;
+          break;
+      }
+      
+      user.totalXp = newValue;
+      user.level = calculateLevel(newValue);
+      user.xp = getXPProgress(newValue, user.level).current;
+      db.save();
+      
+      if (isMongoConnected()) {
+        await saveUserToMongo(user);
+      }
+      
+      logActivity({
+        type: newValue > oldValue ? LOG_TYPES.XP_GAIN : LOG_TYPES.XP_LOSS,
+        userId,
+        username,
+        guildId,
+        guildName: guild?.name,
+        amount: newValue - oldValue,
+        reason: `Admin ${adminName}: ${action} XP - ${reason || 'Sin motivo'}`,
+        details: { action, oldValue, newValue, admin: adminName }
+      });
+      
+      result = { success: true, field: 'totalXp', oldValue, newValue, newLevel: user.level };
+    }
+    else if (field === 'level') {
+      const user = db.users[key];
+      const oldLevel = user.level || 0;
+      let newLevel = oldLevel;
+      
+      switch (action) {
+        case 'add':
+          newLevel = oldLevel + parseInt(value);
+          break;
+        case 'remove':
+          newLevel = Math.max(0, oldLevel - parseInt(value));
+          break;
+        case 'set':
+          newLevel = Math.max(0, parseInt(value));
+          break;
+        case 'reset':
+          newLevel = 0;
+          break;
+      }
+      
+      const { getTotalXPForLevel } = await import('./utils/xpSystem.js');
+      user.totalXp = getTotalXPForLevel(newLevel);
+      user.level = newLevel;
+      user.xp = 0;
+      db.save();
+      
+      if (isMongoConnected()) {
+        await saveUserToMongo(user);
+      }
+      
+      logActivity({
+        type: newLevel > oldLevel ? LOG_TYPES.LEVEL_UP : LOG_TYPES.LEVEL_DOWN,
+        userId,
+        username,
+        guildId,
+        guildName: guild?.name,
+        amount: newLevel - oldLevel,
+        reason: `Admin ${adminName}: ${action} nivel - ${reason || 'Sin motivo'}`,
+        details: { action, oldLevel, newLevel, admin: adminName }
+      });
+      
+      result = { success: true, field: 'level', oldValue: oldLevel, newValue: newLevel };
+    }
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Error en User Modify API:', error);
+    res.status(500).json({ message: 'Error del servidor', error: error.message });
+  }
+});
+
+app.get('/api/admin/users/list', verifyAdminToken, (req, res) => {
+  try {
+    const { page = 1, limit = 50, sortBy = 'totalXp', order = 'desc' } = req.query;
+    
+    let allUsers = Object.values(db.users).map(user => {
+      const guild = client.guilds.cache.get(user.guildId);
+      const member = guild?.members.cache.get(user.userId);
+      return {
+        ...user,
+        username: member?.user?.username || user.username || 'Desconocido',
+        displayName: member?.displayName || 'Desconocido',
+        guildName: guild?.name || 'Servidor'
+      };
+    });
+    
+    allUsers.sort((a, b) => {
+      const aVal = a[sortBy] || 0;
+      const bVal = b[sortBy] || 0;
+      return order === 'desc' ? bVal - aVal : aVal - bVal;
+    });
+    
+    const start = (parseInt(page) - 1) * parseInt(limit);
+    const paginatedUsers = allUsers.slice(start, start + parseInt(limit));
+    
+    res.json({
+      users: paginatedUsers,
+      total: allUsers.length,
+      page: parseInt(page),
+      totalPages: Math.ceil(allUsers.length / parseInt(limit))
+    });
+  } catch (error) {
+    console.error('Error en Users List API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== EXPORT LOG FUNCTION FOR OTHER MODULES =====
+globalThis.logBotActivity = logActivity;
+globalThis.LOG_TYPES = LOG_TYPES;
 
 // Conectar a Discord SI hay token disponible
 const token = process.env.DISCORD_BOT_TOKEN;

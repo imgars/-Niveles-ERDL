@@ -35,6 +35,12 @@
                 <a href="#estadisticas" class="nav-link" data-page="estadisticas">
                     <span>📈</span> Estadisticas
                 </a>
+                <a href="#logs" class="nav-link" data-page="logs">
+                    <span>📋</span> Logs en Vivo
+                </a>
+                <a href="#usuarios" class="nav-link" data-page="usuarios">
+                    <span>👥</span> Gestion Usuarios
+                </a>
                 <a href="#configuracion" class="nav-link" data-page="configuracion">
                     <span>⚙️</span> Configuracion
                 </a>
@@ -565,6 +571,131 @@
                                 <span class="toggle-slider"></span>
                             </label>
                             <span id="maintenanceStatus">Desactivado</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="logs-page" class="page">
+                    <div class="section-content">
+                        <div class="logs-header">
+                            <div class="logs-stats">
+                                <div class="log-stat">
+                                    <span class="log-stat-value" id="logsTotal">0</span>
+                                    <span class="log-stat-label">Total</span>
+                                </div>
+                                <div class="log-stat">
+                                    <span class="log-stat-value" id="logsLastHour">0</span>
+                                    <span class="log-stat-label">Ultima hora</span>
+                                </div>
+                                <div class="log-stat">
+                                    <span class="log-stat-value" id="logsLastDay">0</span>
+                                    <span class="log-stat-label">Ultimo dia</span>
+                                </div>
+                            </div>
+                            <div class="logs-filters">
+                                <select id="logTypeFilter">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="xp_gain">XP Ganado</option>
+                                    <option value="xp_loss">XP Perdido</option>
+                                    <option value="level_up">Subida de Nivel</option>
+                                    <option value="level_down">Bajada de Nivel</option>
+                                    <option value="coins_gain">Lagcoins Ganados</option>
+                                    <option value="coins_loss">Lagcoins Perdidos</option>
+                                    <option value="work">Trabajo</option>
+                                    <option value="casino_win">Casino Ganado</option>
+                                    <option value="casino_loss">Casino Perdido</option>
+                                    <option value="theft_success">Robo Exitoso</option>
+                                    <option value="theft_fail">Robo Fallido</option>
+                                    <option value="mission_complete">Mision Completada</option>
+                                    <option value="item_gain">Item Obtenido</option>
+                                    <option value="admin_action">Accion Admin</option>
+                                </select>
+                                <button id="refreshLogs" class="btn-primary">Actualizar</button>
+                                <label style="color: #fff; margin-left: 15px;">
+                                    <input type="checkbox" id="autoRefreshLogs" checked> Auto-refresh
+                                </label>
+                            </div>
+                        </div>
+                        <div class="logs-container" id="logsContainer">
+                            <p class="loading-text">Cargando logs...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="usuarios-page" class="page">
+                    <div class="section-content">
+                        <div class="user-search-section">
+                            <h3>Buscar Usuario</h3>
+                            <div class="search-box">
+                                <input type="text" id="userSearchInput" placeholder="Nombre de usuario o ID de Discord">
+                                <button id="userSearchBtn" class="btn-primary">Buscar</button>
+                            </div>
+                            <div id="searchResults" class="search-results"></div>
+                        </div>
+                        
+                        <div id="userDetailsSection" class="user-details-section" style="display: none;">
+                            <div class="user-header">
+                                <img id="userAvatar" src="" alt="Avatar" class="user-avatar">
+                                <div class="user-info-header">
+                                    <h2 id="userDisplayName">Usuario</h2>
+                                    <p id="userUsername">@username</p>
+                                    <p id="userGuild">Servidor</p>
+                                </div>
+                            </div>
+                            
+                            <div class="user-stats-grid">
+                                <div class="user-stat-card">
+                                    <h4>XP Total</h4>
+                                    <span id="userTotalXp" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('totalXp', 'add')">+</button>
+                                        <button onclick="modifyUser('totalXp', 'remove')">-</button>
+                                        <button onclick="modifyUser('totalXp', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('totalXp', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="user-stat-card">
+                                    <h4>Nivel</h4>
+                                    <span id="userLevel" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('level', 'add')">+</button>
+                                        <button onclick="modifyUser('level', 'remove')">-</button>
+                                        <button onclick="modifyUser('level', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('level', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="user-stat-card">
+                                    <h4>Lagcoins (Cartera)</h4>
+                                    <span id="userLagcoins" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('lagcoins', 'add')">+</button>
+                                        <button onclick="modifyUser('lagcoins', 'remove')">-</button>
+                                        <button onclick="modifyUser('lagcoins', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('lagcoins', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="user-stat-card">
+                                    <h4>Lagcoins (Banco)</h4>
+                                    <span id="userBank" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('bank', 'add')">+</button>
+                                        <button onclick="modifyUser('bank', 'remove')">-</button>
+                                        <button onclick="modifyUser('bank', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('bank', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="user-extra-info">
+                                <div class="user-info-card">
+                                    <h4>Roles del Usuario</h4>
+                                    <div id="userRoles" class="user-roles-list"></div>
+                                </div>
+                                <div class="user-info-card">
+                                    <h4>Historial de Actividad</h4>
+                                    <div id="userActivityLogs" class="user-activity-logs"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

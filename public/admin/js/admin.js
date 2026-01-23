@@ -41,6 +41,8 @@ document.querySelectorAll('.nav-link').forEach(link => {
             misiones: 'Misiones',
             powerups: 'Power-ups',
             estadisticas: 'Estadisticas',
+            logs: 'Logs en Tiempo Real',
+            usuarios: 'Gestion de Usuarios',
             configuracion: 'Configuracion'
         };
         document.getElementById('pageTitle').textContent = titles[page] || 'Panel Admin';
@@ -394,6 +396,12 @@ function loadPageData(page) {
         case 'estadisticas':
             loadStatisticsData();
             break;
+        case 'logs':
+            loadLogsData();
+            break;
+        case 'usuarios':
+            initUserManagement();
+            break;
         case 'configuracion':
             loadConfigData();
             break;
@@ -481,6 +489,215 @@ function updateSessionTime() {
     document.getElementById('sessionTime').textContent = `Sesion: ${hours}h ${minutes}m`;
 }
 
+let logsRefreshInterval = null;
+let selectedUser = null;
+
+async function loadLogsData() {
+    try {
+        const typeFilter = document.getElementById('logTypeFilter')?.value || '';
+        const url = typeFilter ? `/api/admin/logs?type=${typeFilter}` : '/api/admin/logs';
+        const data = await fetchAPI(url);
+        
+        document.getElementById('logsTotal').textContent = data.stats?.total || 0;
+        document.getElementById('logsLastHour').textContent = data.stats?.lastHour || 0;
+        document.getElementById('logsLastDay').textContent = data.stats?.lastDay || 0;
+        
+        const container = document.getElementById('logsContainer');
+        if (!data.logs || data.logs.length === 0) {
+            container.innerHTML = '<p class="no-logs">No hay logs disponibles. Los logs aparecen cuando hay actividad en el bot.</p>';
+            return;
+        }
+        
+        container.innerHTML = data.logs.map(log => `
+            <div class="log-entry log-type-${log.type}">
+                <div class="log-time">${formatLogTime(log.timestamp)}</div>
+                <div class="log-icon">${getLogIcon(log.type)}</div>
+                <div class="log-content">
+                    <span class="log-user">${log.username}</span>
+                    <span class="log-action">${getLogDescription(log)}</span>
+                    ${log.amount ? `<span class="log-amount ${log.amount >= 0 ? 'positive' : 'negative'}">${log.amount >= 0 ? '+' : ''}${log.amount.toLocaleString()}</span>` : ''}
+                </div>
+                <div class="log-server">${log.guildName || 'Servidor'}</div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error cargando logs:', error);
+        document.getElementById('logsContainer').innerHTML = '<p class="error-text">Error al cargar los logs</p>';
+    }
+}
+
+function formatLogTime(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function getLogIcon(type) {
+    const icons = {
+        'xp_gain': '⭐', 'xp_loss': '📉', 'level_up': '🎉', 'level_down': '📉',
+        'coins_gain': '💰', 'coins_loss': '💸', 'work': '💼', 'casino_win': '🎰',
+        'casino_loss': '🎲', 'theft_success': '🦝', 'theft_fail': '🚔', 'theft_victim': '😢',
+        'mission_complete': '✅', 'item_gain': '🎁', 'item_use': '🔧', 'daily_reward': '📅',
+        'bank_deposit': '🏦', 'bank_withdraw': '💵', 'shop_purchase': '🛒',
+        'powerup_activate': '⚡', 'admin_action': '👑', 'minigame_win': '🏆', 'minigame_loss': '❌'
+    };
+    return icons[type] || '📋';
+}
+
+function getLogDescription(log) {
+    const descriptions = {
+        'xp_gain': 'gano XP', 'xp_loss': 'perdio XP', 'level_up': 'subio de nivel',
+        'level_down': 'bajo de nivel', 'coins_gain': 'gano Lagcoins', 'coins_loss': 'perdio Lagcoins',
+        'work': 'trabajo', 'casino_win': 'gano en el casino', 'casino_loss': 'perdio en el casino',
+        'theft_success': 'robo exitoso', 'theft_fail': 'robo fallido', 'theft_victim': 'fue robado',
+        'mission_complete': 'completo mision', 'item_gain': 'obtuvo item', 'item_use': 'uso item',
+        'daily_reward': 'reclamo diario', 'bank_deposit': 'deposito', 'bank_withdraw': 'retiro',
+        'shop_purchase': 'compro en tienda', 'powerup_activate': 'activo power-up',
+        'admin_action': 'accion admin', 'minigame_win': 'gano minijuego', 'minigame_loss': 'perdio minijuego'
+    };
+    return log.reason || descriptions[log.type] || log.type;
+}
+
+function initUserManagement() {
+    const searchBtn = document.getElementById('userSearchBtn');
+    const searchInput = document.getElementById('userSearchInput');
+    
+    if (searchBtn) {
+        searchBtn.onclick = searchUsers;
+    }
+    if (searchInput) {
+        searchInput.onkeypress = (e) => { if (e.key === 'Enter') searchUsers(); };
+    }
+}
+
+async function searchUsers() {
+    const query = document.getElementById('userSearchInput').value.trim();
+    if (!query) return;
+    
+    const resultsDiv = document.getElementById('searchResults');
+    resultsDiv.innerHTML = '<p class="loading-text">Buscando...</p>';
+    
+    try {
+        const data = await fetchAPI(`/api/admin/user/search?query=${encodeURIComponent(query)}`);
+        
+        if (!data.users || data.users.length === 0) {
+            resultsDiv.innerHTML = '<p class="no-results">No se encontraron usuarios</p>';
+            return;
+        }
+        
+        resultsDiv.innerHTML = data.users.map(user => `
+            <div class="search-result-item" onclick="selectUser('${user.guildId}', '${user.userId}')">
+                <img src="${user.avatar || '/img/default-avatar.png'}" alt="Avatar" class="result-avatar">
+                <div class="result-info">
+                    <span class="result-name">${user.displayName || user.username}</span>
+                    <span class="result-details">@${user.username} | Nivel ${user.level || 0} | ${user.guildName}</span>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error buscando usuarios:', error);
+        resultsDiv.innerHTML = '<p class="error-text">Error al buscar usuarios</p>';
+    }
+}
+
+async function selectUser(guildId, oderId) {
+    selectedUser = { guildId, oderId };
+    
+    try {
+        const data = await fetchAPI(`/api/admin/user/${guildId}/${oderId}`);
+        
+        document.getElementById('userDetailsSection').style.display = 'block';
+        document.getElementById('userAvatar').src = data.avatar || '/img/default-avatar.png';
+        document.getElementById('userDisplayName').textContent = data.displayName || 'Usuario';
+        document.getElementById('userUsername').textContent = `@${data.username}`;
+        document.getElementById('userGuild').textContent = data.guildName || 'Servidor';
+        
+        document.getElementById('userTotalXp').textContent = (data.user?.totalXp || 0).toLocaleString();
+        document.getElementById('userLevel').textContent = data.user?.level || 0;
+        document.getElementById('userLagcoins').textContent = (data.economy?.lagcoins || 0).toLocaleString();
+        document.getElementById('userBank').textContent = (data.economy?.bank || 0).toLocaleString();
+        
+        const rolesDiv = document.getElementById('userRoles');
+        if (data.roles && data.roles.length > 0) {
+            rolesDiv.innerHTML = data.roles.slice(0, 10).map(r => 
+                `<span class="role-badge" style="background: ${r.color}">${r.name}</span>`
+            ).join('');
+        } else {
+            rolesDiv.innerHTML = '<p>Sin roles</p>';
+        }
+        
+        const logsDiv = document.getElementById('userActivityLogs');
+        if (data.logs && data.logs.length > 0) {
+            logsDiv.innerHTML = data.logs.slice(0, 20).map(log => `
+                <div class="user-log-entry">
+                    <span class="log-icon">${getLogIcon(log.type)}</span>
+                    <span class="log-desc">${getLogDescription(log)}</span>
+                    <span class="log-time">${formatLogTime(log.timestamp)}</span>
+                </div>
+            `).join('');
+        } else {
+            logsDiv.innerHTML = '<p>Sin actividad registrada</p>';
+        }
+        
+    } catch (error) {
+        console.error('Error cargando usuario:', error);
+    }
+}
+
+async function modifyUser(field, action) {
+    if (!selectedUser) return;
+    
+    let value = 0;
+    if (action !== 'reset') {
+        const input = prompt(`Ingresa el valor para ${action} ${field}:`);
+        if (input === null) return;
+        value = parseInt(input);
+        if (isNaN(value) || value < 0) {
+            alert('Valor invalido');
+            return;
+        }
+    }
+    
+    const reason = prompt('Motivo del cambio (opcional):') || '';
+    
+    try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(`/api/admin/user/${selectedUser.guildId}/${selectedUser.oderId}/modify`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action, field, value, reason })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`${field} modificado: ${result.oldValue} -> ${result.newValue}`);
+            selectUser(selectedUser.guildId, selectedUser.oderId);
+        } else {
+            alert('Error: ' + (result.message || 'No se pudo modificar'));
+        }
+        
+    } catch (error) {
+        console.error('Error modificando usuario:', error);
+        alert('Error al modificar usuario');
+    }
+}
+
+document.getElementById('logTypeFilter')?.addEventListener('change', loadLogsData);
+document.getElementById('refreshLogs')?.addEventListener('click', loadLogsData);
+
+document.getElementById('autoRefreshLogs')?.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        logsRefreshInterval = setInterval(loadLogsData, 5000);
+    } else {
+        clearInterval(logsRefreshInterval);
+    }
+});
+
 window.addEventListener('load', () => {
     if (!checkAuthentication()) return;
     
@@ -489,4 +706,11 @@ window.addEventListener('load', () => {
     
     updateSessionTime();
     setInterval(updateSessionTime, 60000);
+    
+    logsRefreshInterval = setInterval(() => {
+        if (document.getElementById('logs-page')?.classList.contains('active') && 
+            document.getElementById('autoRefreshLogs')?.checked) {
+            loadLogsData();
+        }
+    }, 5000);
 });
