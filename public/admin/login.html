@@ -191,12 +191,27 @@
         });
         
         // Verificar si ya tiene sesión válida
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
             const token = localStorage.getItem('adminToken');
             const expiry = localStorage.getItem('tokenExpiry');
             
             if (token && expiry && Date.now() < parseInt(expiry)) {
-                window.location.href = '/admin/dashboard.html';
+                try {
+                    const response = await fetch('/api/admin/dashboard', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        window.location.href = '/admin/dashboard.html';
+                    } else {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('tokenExpiry');
+                        localStorage.removeItem('adminUsername');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('tokenExpiry');
+                    localStorage.removeItem('adminUsername');
+                }
             }
         });
     </script>

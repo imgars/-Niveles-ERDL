@@ -66,6 +66,9 @@ async function fetchAPI(endpoint) {
     
     if (!response.ok) {
         if (response.status === 401) {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('tokenExpiry');
+            localStorage.removeItem('adminUsername');
             window.location.href = '/admin/login.html';
         }
         throw new Error('API Error');
