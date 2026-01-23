@@ -699,10 +699,6 @@ app.get('/ping', (req, res) => {
   res.status(200).send('pong');
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
 app.get('/api/diff', async (req, res) => {
   res.json({
     message: "Comparación realizada con el repositorio de GitHub",
@@ -2774,6 +2770,14 @@ app.get('/api/admin/users/list', verifyAdminToken, (req, res) => {
 // ===== EXPORT LOG FUNCTION FOR OTHER MODULES =====
 globalThis.logBotActivity = logActivity;
 globalThis.LOG_TYPES = LOG_TYPES;
+
+// Catch-all route for SPA (must be after all API routes)
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ message: 'Endpoint no encontrado' });
+  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Conectar a Discord SI hay token disponible
 const token = process.env.DISCORD_BOT_TOKEN;

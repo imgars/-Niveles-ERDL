@@ -110,6 +110,7 @@ async function loadDashboardData() {
         
     } catch (error) {
         console.error('Error cargando dashboard:', error);
+        document.getElementById('botStatus').textContent = 'Error';
     }
 }
 
@@ -144,6 +145,7 @@ async function loadXPData() {
         }
     } catch (error) {
         console.error('Error cargando XP:', error);
+        document.getElementById('topXpUsers').innerHTML = '<p class="error-text">Error al cargar datos</p>';
     }
 }
 
@@ -193,6 +195,8 @@ async function loadLevelsData() {
         }
     } catch (error) {
         console.error('Error cargando niveles:', error);
+        document.getElementById('levelDistribution').innerHTML = '<p class="error-text">Error al cargar datos</p>';
+        document.getElementById('topLevelUsers').innerHTML = '<p class="error-text">Error al cargar datos</p>';
     }
 }
 
@@ -223,6 +227,7 @@ async function loadRolesData() {
         }
     } catch (error) {
         console.error('Error cargando roles:', error);
+        document.getElementById('levelRolesGrid').innerHTML = '<p class="error-text">Error al cargar datos</p>';
     }
 }
 
@@ -238,6 +243,7 @@ async function loadMissionsData() {
         document.getElementById('missionChannel').textContent = data.missionChannel || '-';
     } catch (error) {
         console.error('Error cargando misiones:', error);
+        document.getElementById('totalMissions').textContent = 'Error';
     }
 }
 
@@ -267,6 +273,7 @@ async function loadPowerupsData() {
         }
     } catch (error) {
         console.error('Error cargando powerups:', error);
+        document.getElementById('globalBoostsList').innerHTML = '<p class="error-text">Error al cargar datos</p>';
     }
 }
 
@@ -307,6 +314,7 @@ async function loadStatisticsData() {
         }
     } catch (error) {
         console.error('Error cargando estadisticas:', error);
+        document.getElementById('statsLevelBrackets').innerHTML = '<p class="error-text">Error al cargar datos</p>';
     }
 }
 
