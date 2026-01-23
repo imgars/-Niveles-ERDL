@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Panel Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/admin/css/admin.css">
 </head>
 <body>
@@ -43,6 +46,9 @@
                 </a>
                 <a href="#configuracion" class="nav-link" data-page="configuracion">
                     <span>⚙️</span> Configuracion
+                </a>
+                <a href="#personalizacion" class="nav-link" data-page="personalizacion">
+                    <span>🎨</span> Personalizar
                 </a>
             </nav>
             
@@ -571,6 +577,84 @@
                                 <span class="toggle-slider"></span>
                             </label>
                             <span id="maintenanceStatus">Desactivado</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="personalizacion-page" class="page">
+                    <div class="section-content">
+                        <h3>Personalizar Panel</h3>
+                        <p style="color: #666; margin-bottom: 20px;">Ajusta la apariencia del panel a tu gusto. Los cambios se guardan automaticamente.</p>
+                        
+                        <div class="customization-section">
+                            <h4>Tema de Colores</h4>
+                            <div class="theme-options">
+                                <div class="theme-option" data-theme="default">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                                    <span>Morado (Default)</span>
+                                </div>
+                                <div class="theme-option" data-theme="ocean">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);"></div>
+                                    <span>Oceano</span>
+                                </div>
+                                <div class="theme-option" data-theme="sunset">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                                    <span>Atardecer</span>
+                                </div>
+                                <div class="theme-option" data-theme="forest">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);"></div>
+                                    <span>Bosque</span>
+                                </div>
+                                <div class="theme-option" data-theme="dark">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);"></div>
+                                    <span>Oscuro</span>
+                                </div>
+                                <div class="theme-option" data-theme="fire">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);"></div>
+                                    <span>Fuego</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-section">
+                            <h4>Fuente de Letra</h4>
+                            <div class="font-options">
+                                <div class="font-option" data-font="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">
+                                    <span style="font-family: 'Segoe UI', sans-serif;">Segoe UI (Default)</span>
+                                </div>
+                                <div class="font-option" data-font="'Arial', Helvetica, sans-serif">
+                                    <span style="font-family: Arial, sans-serif;">Arial</span>
+                                </div>
+                                <div class="font-option" data-font="'Roboto', sans-serif">
+                                    <span style="font-family: Roboto, sans-serif;">Roboto</span>
+                                </div>
+                                <div class="font-option" data-font="'Open Sans', sans-serif">
+                                    <span style="font-family: 'Open Sans', sans-serif;">Open Sans</span>
+                                </div>
+                                <div class="font-option" data-font="'Poppins', sans-serif">
+                                    <span style="font-family: Poppins, sans-serif;">Poppins</span>
+                                </div>
+                                <div class="font-option" data-font="'Courier New', monospace">
+                                    <span style="font-family: 'Courier New', monospace;">Courier (Monospace)</span>
+                                </div>
+                                <div class="font-option" data-font="'Comic Sans MS', cursive">
+                                    <span style="font-family: 'Comic Sans MS', cursive;">Comic Sans</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-section">
+                            <h4>Vista Previa</h4>
+                            <div class="preview-box" id="previewBox">
+                                <div class="preview-sidebar"></div>
+                                <div class="preview-content">
+                                    <p>Asi se vera tu panel con los ajustes actuales.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-actions">
+                            <button class="btn-reset-theme" id="resetCustomization">Restaurar Default</button>
                         </div>
                     </div>
                 </div>

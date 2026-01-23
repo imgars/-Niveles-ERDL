@@ -43,7 +43,8 @@ document.querySelectorAll('.nav-link').forEach(link => {
             estadisticas: 'Estadisticas',
             logs: 'Logs en Tiempo Real',
             usuarios: 'Gestion de Usuarios',
-            configuracion: 'Configuracion'
+            configuracion: 'Configuracion',
+            personalizacion: 'Personalizar Panel'
         };
         document.getElementById('pageTitle').textContent = titles[page] || 'Panel Admin';
         
@@ -724,4 +725,98 @@ window.addEventListener('load', () => {
             loadLogsData();
         }
     }, 5000);
+    
+    initCustomization();
 });
+
+// ===== CUSTOMIZATION SYSTEM =====
+const themeGradients = {
+    default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    ocean: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+    sunset: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    forest: 'linear-gradient(135deg, #134e5e 0%, #71b280 100%)',
+    dark: 'linear-gradient(135deg, #232526 0%, #414345 100%)',
+    fire: 'linear-gradient(135deg, #f12711 0%, #f5af19 100%)'
+};
+
+function initCustomization() {
+    const savedTheme = localStorage.getItem('adminTheme') || 'default';
+    const savedFont = localStorage.getItem('adminFont') || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    
+    applyTheme(savedTheme);
+    applyFont(savedFont);
+    
+    document.querySelectorAll('.theme-option').forEach(option => {
+        const theme = option.dataset.theme;
+        if (theme === savedTheme) {
+            option.classList.add('active');
+        }
+        
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+            option.classList.add('active');
+            applyTheme(theme);
+            localStorage.setItem('adminTheme', theme);
+            updatePreview();
+        });
+    });
+    
+    document.querySelectorAll('.font-option').forEach(option => {
+        const font = option.dataset.font;
+        if (font === savedFont) {
+            option.classList.add('active');
+        }
+        
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.font-option').forEach(o => o.classList.remove('active'));
+            option.classList.add('active');
+            applyFont(font);
+            localStorage.setItem('adminFont', font);
+            updatePreview();
+        });
+    });
+    
+    document.getElementById('resetCustomization')?.addEventListener('click', () => {
+        localStorage.removeItem('adminTheme');
+        localStorage.removeItem('adminFont');
+        applyTheme('default');
+        applyFont("'Segoe UI', Tahoma, Geneva, Verdana, sans-serif");
+        
+        document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+        document.querySelectorAll('.font-option').forEach(o => o.classList.remove('active'));
+        document.querySelector('.theme-option[data-theme="default"]')?.classList.add('active');
+        document.querySelector('.font-option[data-font="\'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif"]')?.classList.add('active');
+        updatePreview();
+    });
+    
+    updatePreview();
+}
+
+function applyTheme(theme) {
+    document.body.className = document.body.className.replace(/theme-\w+/g, '');
+    if (theme !== 'default') {
+        document.body.classList.add(`theme-${theme}`);
+    }
+}
+
+function applyFont(font) {
+    document.body.style.fontFamily = font;
+}
+
+function updatePreview() {
+    const previewSidebar = document.querySelector('.preview-sidebar');
+    const previewContent = document.querySelector('.preview-content');
+    const currentTheme = localStorage.getItem('adminTheme') || 'default';
+    
+    if (previewSidebar) {
+        previewSidebar.style.background = themeGradients[currentTheme] || themeGradients.default;
+    }
+    
+    if (previewContent && currentTheme === 'dark') {
+        previewContent.style.background = '#1a1a1a';
+        previewContent.querySelector('p').style.color = '#ccc';
+    } else if (previewContent) {
+        previewContent.style.background = '#f5f7fa';
+        previewContent.querySelector('p').style.color = '#666';
+    }
+}
