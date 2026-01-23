@@ -1,6 +1,18 @@
 # -Niveles
 
 ## Recent Changes
+- **Panel Admin Completo (Enero 2026):**
+  - Se completaron todas las secciones del panel de administracion web.
+  - Nuevos endpoints API: XP, Niveles, Roles, Misiones, Power-ups, Estadisticas, Configuracion.
+  - Dashboard con estadisticas en tiempo real del bot.
+  - Sistema XP: muestra XP total, promedio, maximo, top 10 usuarios.
+  - Niveles: distribucion de usuarios por nivel, top 10 por nivel.
+  - Roles: muestra roles asignados por nivel y roles especiales.
+  - Misiones: estadisticas semanales de misiones completadas.
+  - Power-ups: boosts globales, de usuario y de canal activos.
+  - Estadisticas: metricas completas del sistema.
+  - Configuracion: visualizacion de la configuracion del bot y toggle de mantenimiento.
+  - Contrasena de admin ahora usa variable de entorno ADMIN_PASSWORD.
 - **Economy Rebalancing (Jan 2026):** 
   - Nerfed all job earnings by 40-50% to control inflation.
   - Increased shop prices (e.g., 100 XP now costs 3000 Lagcoins).
