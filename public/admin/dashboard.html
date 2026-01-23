@@ -509,64 +509,107 @@
                 
                 <div id="configuracion-page" class="page">
                     <div class="section-content">
+                        <div class="config-warning">
+                            <span>Los cambios en la configuracion afectan el funcionamiento del bot. Cada cambio requiere confirmacion.</span>
+                        </div>
+                        
                         <h3>Sistema de XP</h3>
                         <div class="config-grid">
-                            <div class="config-item">
-                                <span class="config-label">Cooldown</span>
-                                <span class="config-value" id="cfgCooldown">-</span>
+                            <div class="config-item editable" data-field="cooldown" data-category="xpSystem">
+                                <span class="config-label">Cooldown (segundos)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgCooldown" min="1" max="300">
+                                    <button class="config-save-btn" data-field="cooldown">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item">
+                            <div class="config-item editable" data-field="baseMin" data-category="xpSystem">
                                 <span class="config-label">XP Minimo</span>
-                                <span class="config-value" id="cfgXpMin">-</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgXpMin" min="1" max="100">
+                                    <button class="config-save-btn" data-field="baseMin">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item">
+                            <div class="config-item editable" data-field="baseMax" data-category="xpSystem">
                                 <span class="config-label">XP Maximo</span>
-                                <span class="config-value" id="cfgXpMax">-</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgXpMax" min="1" max="200">
+                                    <button class="config-save-btn" data-field="baseMax">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item">
+                            <div class="config-item editable" data-field="boosterMultiplier" data-category="xpSystem">
                                 <span class="config-label">Mult. Booster</span>
-                                <span class="config-value" id="cfgBoosterMult">-</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgBoosterMult" min="1" max="10" step="0.1">
+                                    <button class="config-save-btn" data-field="boosterMultiplier">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item">
+                            <div class="config-item editable" data-field="nightMultiplier" data-category="xpSystem">
                                 <span class="config-label">Mult. Nocturno</span>
-                                <span class="config-value" id="cfgNightMult">-</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgNightMult" min="0" max="5" step="0.1">
+                                    <button class="config-save-btn" data-field="nightMultiplier">Guardar</button>
+                                </div>
                             </div>
                         </div>
                         
                         <h3 style="margin-top: 30px;">Canales</h3>
                         <div class="config-grid">
-                            <div class="config-item wide">
-                                <span class="config-label">Canal Level Up</span>
-                                <span class="config-value" id="cfgLevelUpChannel">-</span>
+                            <div class="config-item wide editable" data-field="levelUp" data-category="channels">
+                                <span class="config-label">Canal Level Up (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgLevelUpChannel" placeholder="ID del canal">
+                                    <button class="config-save-btn" data-field="levelUp">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item wide">
-                                <span class="config-label">Canal Misiones</span>
-                                <span class="config-value" id="cfgMissionChannel">-</span>
+                            <div class="config-item wide editable" data-field="missionComplete" data-category="channels">
+                                <span class="config-label">Canal Misiones (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgMissionChannel" placeholder="ID del canal">
+                                    <button class="config-save-btn" data-field="missionComplete">Guardar</button>
+                                </div>
                             </div>
                         </div>
                         
                         <h3 style="margin-top: 30px;">Canales sin XP</h3>
-                        <div class="no-xp-channels" id="cfgNoXpChannels">
-                            <p class="loading-text">Cargando...</p>
+                        <div class="no-xp-channels-wrapper">
+                            <div class="no-xp-channels" id="cfgNoXpChannels">
+                                <p class="loading-text">Cargando...</p>
+                            </div>
+                            <div class="no-xp-add">
+                                <input type="text" id="newNoXpChannel" placeholder="ID del canal a agregar">
+                                <button class="btn-add-channel" id="addNoXpChannel">Agregar</button>
+                            </div>
                         </div>
                         
                         <h3 style="margin-top: 30px;">Roles Especiales</h3>
                         <div class="config-grid">
-                            <div class="config-item">
-                                <span class="config-label">Staff</span>
-                                <span class="config-value" id="cfgStaffRole">-</span>
+                            <div class="config-item editable" data-field="staff" data-category="roles">
+                                <span class="config-label">Staff (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgStaffRole" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="staff">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item">
-                                <span class="config-label">Booster</span>
-                                <span class="config-value" id="cfgBoosterRole">-</span>
+                            <div class="config-item editable" data-field="booster" data-category="roles">
+                                <span class="config-label">Booster (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgBoosterRole" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="booster">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item">
-                                <span class="config-label">VIP</span>
-                                <span class="config-value" id="cfgVipRole">-</span>
+                            <div class="config-item editable" data-field="vip" data-category="roles">
+                                <span class="config-label">VIP (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgVipRole" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="vip">Guardar</button>
+                                </div>
                             </div>
-                            <div class="config-item">
-                                <span class="config-label">Nivel 100</span>
-                                <span class="config-value" id="cfgLevel100Role">-</span>
+                            <div class="config-item editable" data-field="level100" data-category="roles">
+                                <span class="config-label">Nivel 100 (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgLevel100Role" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="level100">Guardar</button>
+                                </div>
                             </div>
                         </div>
                         
@@ -577,6 +620,18 @@
                                 <span class="toggle-slider"></span>
                             </label>
                             <span id="maintenanceStatus">Desactivado</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="confirmModal" class="modal-overlay" style="display: none;">
+                    <div class="modal-content confirm-modal">
+                        <h3>Confirmar Cambio</h3>
+                        <p id="confirmMessage">¿Estas seguro de que deseas cambiar esta configuracion?</p>
+                        <div class="confirm-details" id="confirmDetails"></div>
+                        <div class="modal-actions">
+                            <button class="btn-cancel" id="confirmCancel">Cancelar</button>
+                            <button class="btn-confirm" id="confirmAccept">Confirmar Cambio</button>
                         </div>
                     </div>
                 </div>

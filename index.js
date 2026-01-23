@@ -2467,6 +2467,121 @@ app.post('/api/admin/maintenance', verifyAdminToken, express.json(), (req, res) 
   }
 });
 
+// Update Bot Configuration
+app.post('/api/admin/config', verifyAdminToken, express.json(), (req, res) => {
+  try {
+    const { category, field, value } = req.body;
+    
+    if (!category || !field || value === undefined) {
+      return res.status(400).json({ message: 'Faltan parametros requeridos' });
+    }
+    
+    let updated = false;
+    let oldValue = null;
+    
+    if (category === 'xpSystem') {
+      switch (field) {
+        case 'cooldown':
+          oldValue = CONFIG.XP_COOLDOWN;
+          CONFIG.XP_COOLDOWN = parseInt(value) * 1000;
+          updated = true;
+          break;
+        case 'baseMin':
+          oldValue = CONFIG.BASE_XP_MIN;
+          CONFIG.BASE_XP_MIN = parseInt(value);
+          updated = true;
+          break;
+        case 'baseMax':
+          oldValue = CONFIG.BASE_XP_MAX;
+          CONFIG.BASE_XP_MAX = parseInt(value);
+          updated = true;
+          break;
+        case 'boosterMultiplier':
+          oldValue = CONFIG.BOOSTER_VIP_MULTIPLIER;
+          CONFIG.BOOSTER_VIP_MULTIPLIER = parseFloat(value);
+          updated = true;
+          break;
+        case 'nightMultiplier':
+          oldValue = CONFIG.NIGHT_BOOST_MULTIPLIER;
+          CONFIG.NIGHT_BOOST_MULTIPLIER = parseFloat(value);
+          updated = true;
+          break;
+      }
+    } else if (category === 'channels') {
+      switch (field) {
+        case 'levelUp':
+          oldValue = CONFIG.LEVEL_UP_CHANNEL_ID;
+          CONFIG.LEVEL_UP_CHANNEL_ID = value;
+          updated = true;
+          break;
+        case 'missionComplete':
+          oldValue = CONFIG.MISSION_COMPLETE_CHANNEL_ID;
+          CONFIG.MISSION_COMPLETE_CHANNEL_ID = value;
+          updated = true;
+          break;
+        case 'addNoXp':
+          if (!CONFIG.NO_XP_CHANNELS.includes(value)) {
+            CONFIG.NO_XP_CHANNELS.push(value);
+            updated = true;
+          }
+          break;
+        case 'removeNoXp':
+          const idx = CONFIG.NO_XP_CHANNELS.indexOf(value);
+          if (idx > -1) {
+            CONFIG.NO_XP_CHANNELS.splice(idx, 1);
+            updated = true;
+          }
+          break;
+      }
+    } else if (category === 'roles') {
+      switch (field) {
+        case 'staff':
+          oldValue = CONFIG.STAFF_ROLE_ID;
+          CONFIG.STAFF_ROLE_ID = value;
+          updated = true;
+          break;
+        case 'booster':
+          oldValue = CONFIG.BOOSTER_ROLE_ID;
+          CONFIG.BOOSTER_ROLE_ID = value;
+          updated = true;
+          break;
+        case 'vip':
+          oldValue = CONFIG.VIP_ROLE_ID;
+          CONFIG.VIP_ROLE_ID = value;
+          updated = true;
+          break;
+        case 'level100':
+          oldValue = CONFIG.LEVEL_100_ROLE_ID;
+          CONFIG.LEVEL_100_ROLE_ID = value;
+          updated = true;
+          break;
+      }
+    }
+    
+    if (updated) {
+      logActivity(LOG_TYPES.CONFIG_CHANGE, {
+        category,
+        field,
+        oldValue,
+        newValue: value,
+        changedBy: req.adminUsername
+      });
+      
+      res.json({ 
+        success: true, 
+        message: 'Configuracion actualizada',
+        field,
+        newValue: value
+      });
+    } else {
+      res.status(400).json({ message: 'Campo no reconocido' });
+    }
+  } catch (error) {
+    console.error('Error updating config:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
 // ===== ACTIVITY LOGS API =====
 app.get('/api/admin/logs', verifyAdminToken, (req, res) => {
   try {

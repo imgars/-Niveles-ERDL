@@ -322,43 +322,40 @@ async function loadStatisticsData() {
     }
 }
 
+let pendingConfigChange = null;
+
 async function loadConfigData() {
     try {
         const data = await fetchAPI('/api/admin/config');
         
         if (data.xpSystem) {
-            document.getElementById('cfgCooldown').textContent = `${data.xpSystem.cooldown / 1000}s`;
-            document.getElementById('cfgXpMin').textContent = data.xpSystem.baseMin;
-            document.getElementById('cfgXpMax').textContent = data.xpSystem.baseMax;
-            document.getElementById('cfgBoosterMult').textContent = `${data.xpSystem.boosterMultiplier}x`;
-            document.getElementById('cfgNightMult').textContent = `+${data.xpSystem.nightMultiplier}x`;
+            document.getElementById('cfgCooldown').value = data.xpSystem.cooldown / 1000;
+            document.getElementById('cfgXpMin').value = data.xpSystem.baseMin;
+            document.getElementById('cfgXpMax').value = data.xpSystem.baseMax;
+            document.getElementById('cfgBoosterMult').value = data.xpSystem.boosterMultiplier;
+            document.getElementById('cfgNightMult').value = data.xpSystem.nightMultiplier;
         }
         
         if (data.channels) {
-            document.getElementById('cfgLevelUpChannel').textContent = data.channels.levelUp;
-            document.getElementById('cfgMissionChannel').textContent = data.channels.missionComplete;
+            document.getElementById('cfgLevelUpChannel').value = data.channels.levelUp || '';
+            document.getElementById('cfgMissionChannel').value = data.channels.missionComplete || '';
             
-            const noXpContainer = document.getElementById('cfgNoXpChannels');
-            if (data.channels.noXp && data.channels.noXp.length > 0) {
-                noXpContainer.innerHTML = data.channels.noXp.map(ch => `
-                    <span class="channel-tag">${ch}</span>
-                `).join('');
-            } else {
-                noXpContainer.innerHTML = '<p class="empty-text">Ninguno</p>';
-            }
+            renderNoXpChannels(data.channels.noXp || []);
         }
         
         if (data.roles) {
-            document.getElementById('cfgStaffRole').textContent = data.roles.staff;
-            document.getElementById('cfgBoosterRole').textContent = data.roles.booster;
-            document.getElementById('cfgVipRole').textContent = data.roles.vip;
-            document.getElementById('cfgLevel100Role').textContent = data.roles.level100;
+            document.getElementById('cfgStaffRole').value = data.roles.staff || '';
+            document.getElementById('cfgBoosterRole').value = data.roles.booster || '';
+            document.getElementById('cfgVipRole').value = data.roles.vip || '';
+            document.getElementById('cfgLevel100Role').value = data.roles.level100 || '';
         }
         
         const maintenanceToggle = document.getElementById('maintenanceToggle');
         const maintenanceStatus = document.getElementById('maintenanceStatus');
         maintenanceToggle.checked = data.maintenanceMode || false;
         maintenanceStatus.textContent = data.maintenanceMode ? 'Activado' : 'Desactivado';
+        
+        setupConfigListeners();
         
         maintenanceToggle.addEventListener('change', async () => {
             try {
@@ -819,4 +816,161 @@ function updatePreview() {
         previewContent.style.background = '#f5f7fa';
         previewContent.querySelector('p').style.color = '#666';
     }
+}
+
+// ===== CONFIG EDITING SYSTEM =====
+const fieldLabels = {
+    cooldown: 'Cooldown (segundos)',
+    baseMin: 'XP Minimo',
+    baseMax: 'XP Maximo',
+    boosterMultiplier: 'Multiplicador Booster',
+    nightMultiplier: 'Multiplicador Nocturno',
+    levelUp: 'Canal Level Up',
+    missionComplete: 'Canal Misiones',
+    staff: 'Rol Staff',
+    booster: 'Rol Booster',
+    vip: 'Rol VIP',
+    level100: 'Rol Nivel 100'
+};
+
+function setupConfigListeners() {
+    document.querySelectorAll('.config-save-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const configItem = e.target.closest('.config-item');
+            const field = configItem.dataset.field;
+            const category = configItem.dataset.category;
+            const input = configItem.querySelector('.config-input');
+            const newValue = input.value;
+            
+            showConfigConfirmation(category, field, newValue);
+        });
+    });
+    
+    document.getElementById('addNoXpChannel')?.addEventListener('click', () => {
+        const input = document.getElementById('newNoXpChannel');
+        const channelId = input.value.trim();
+        if (channelId) {
+            showConfigConfirmation('channels', 'addNoXp', channelId);
+        }
+    });
+    
+    document.getElementById('confirmCancel')?.addEventListener('click', hideConfirmModal);
+    document.getElementById('confirmAccept')?.addEventListener('click', executeConfigChange);
+}
+
+function showConfigConfirmation(category, field, value) {
+    pendingConfigChange = { category, field, value };
+    
+    const modal = document.getElementById('confirmModal');
+    const details = document.getElementById('confirmDetails');
+    const message = document.getElementById('confirmMessage');
+    
+    const label = fieldLabels[field] || field;
+    
+    if (field === 'addNoXp') {
+        message.textContent = '¿Deseas agregar este canal a la lista de canales sin XP?';
+        details.innerHTML = `<strong>Canal ID:</strong> ${value}`;
+    } else if (field === 'removeNoXp') {
+        message.textContent = '¿Deseas eliminar este canal de la lista de canales sin XP?';
+        details.innerHTML = `<strong>Canal ID:</strong> ${value}`;
+    } else {
+        message.textContent = '¿Estas seguro de que deseas cambiar esta configuracion?';
+        details.innerHTML = `<strong>${label}:</strong> ${value}`;
+    }
+    
+    modal.style.display = 'flex';
+}
+
+function hideConfirmModal() {
+    const modal = document.getElementById('confirmModal');
+    modal.style.display = 'none';
+    pendingConfigChange = null;
+}
+
+async function executeConfigChange() {
+    if (!pendingConfigChange) return;
+    
+    const { category, field, value } = pendingConfigChange;
+    
+    try {
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch('/api/admin/config', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ category, field, value })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            hideConfirmModal();
+            
+            if (field === 'addNoXp') {
+                document.getElementById('newNoXpChannel').value = '';
+                loadConfigData();
+            } else if (field === 'removeNoXp') {
+                loadConfigData();
+            }
+            
+            showNotification('Configuracion actualizada correctamente', 'success');
+        } else {
+            showNotification(data.message || 'Error al actualizar', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating config:', error);
+        showNotification('Error de conexion', 'error');
+    }
+    
+    hideConfirmModal();
+}
+
+function renderNoXpChannels(channels) {
+    const container = document.getElementById('cfgNoXpChannels');
+    if (channels && channels.length > 0) {
+        container.innerHTML = channels.map(ch => `
+            <span class="channel-tag">
+                ${ch}
+                <button class="remove-channel" onclick="removeNoXpChannel('${ch}')">×</button>
+            </span>
+        `).join('');
+    } else {
+        container.innerHTML = '<p class="empty-text">Ninguno</p>';
+    }
+}
+
+function removeNoXpChannel(channelId) {
+    showConfigConfirmation('channels', 'removeNoXp', channelId);
+}
+
+function showNotification(message, type) {
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span>${type === 'success' ? '✓' : '✕'} ${message}</span>
+    `;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 2000;
+        animation: slideIn 0.3s ease;
+        background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
