@@ -2037,7 +2037,10 @@ client.on("messageCreate", async (message) => {
 });
 
 // ===== ADMIN PANEL API =====
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "cambiar-esto-en-produccion";
+const ADMIN_ACCOUNTS = {
+  'Gars': 'garcia14052012',
+  'Mazin': 'Mzin531'
+};
 const sessionTokens = new Map();
 
 // Middleware para verificar token
@@ -2060,25 +2063,27 @@ function verifyAdminToken(req, res, next) {
 
 // Autenticación
 app.post('/api/admin/auth', express.json(), (req, res) => {
-  const { password } = req.body;
+  const { username, password } = req.body;
   
-  if (!password) {
-    return res.status(400).json({ message: 'Contraseña requerida' });
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Usuario y contraseña requeridos' });
   }
   
-  if (password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ message: 'Contraseña incorrecta' });
+  const storedPassword = ADMIN_ACCOUNTS[username];
+  if (!storedPassword || password !== storedPassword) {
+    return res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
   }
   
   // Generar token
   const token = crypto.randomBytes(32).toString('hex');
   const expiry = Date.now() + 8 * 60 * 60 * 1000; // 8 horas
   
-  sessionTokens.set(token, { expiry });
+  sessionTokens.set(token, { expiry, username });
   
   res.json({
     token,
     expiry,
+    username,
     message: 'Autenticado correctamente'
   });
 });

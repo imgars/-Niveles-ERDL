@@ -12,8 +12,15 @@ function checkAuthentication() {
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('tokenExpiry');
+    localStorage.removeItem('adminUsername');
     window.location.href = '/admin/login.html';
 });
+
+const adminNameEl = document.getElementById('adminName');
+if (adminNameEl) {
+    const username = localStorage.getItem('adminUsername');
+    adminNameEl.textContent = username ? `👤 ${username}` : '';
+}
 
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
