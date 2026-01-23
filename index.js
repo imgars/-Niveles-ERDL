@@ -2609,16 +2609,29 @@ app.get('/api/admin/user/search', verifyAdminToken, (req, res) => {
     
     const allUsers = Object.values(db.users);
     let foundUsers = [];
+    const queryLower = query.toLowerCase();
     
     for (const user of allUsers) {
-      if (user.userId === query || user.username?.toLowerCase().includes(query.toLowerCase())) {
-        const guild = client.guilds.cache.get(user.guildId);
-        const member = guild?.members.cache.get(user.userId);
-        
+      const guild = client.guilds.cache.get(user.guildId);
+      const member = guild?.members.cache.get(user.userId);
+      
+      const username = member?.user?.username || user.username || '';
+      const displayName = member?.displayName || '';
+      const nickname = member?.nickname || '';
+      const globalName = member?.user?.globalName || '';
+      
+      const matchesId = user.userId === query;
+      const matchesUsername = username.toLowerCase().includes(queryLower);
+      const matchesDisplayName = displayName.toLowerCase().includes(queryLower);
+      const matchesNickname = nickname.toLowerCase().includes(queryLower);
+      const matchesGlobalName = globalName.toLowerCase().includes(queryLower);
+      
+      if (matchesId || matchesUsername || matchesDisplayName || matchesNickname || matchesGlobalName) {
         foundUsers.push({
           ...user,
-          username: member?.user?.username || user.username || 'Desconocido',
-          displayName: member?.displayName || user.username || 'Desconocido',
+          username: username || 'Desconocido',
+          displayName: displayName || username || 'Desconocido',
+          nickname: nickname || null,
           avatar: member?.user?.avatarURL() || null,
           guildName: guild?.name || 'Servidor'
         });

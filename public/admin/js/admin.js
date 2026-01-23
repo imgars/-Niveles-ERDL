@@ -739,9 +739,13 @@ const themeGradients = {
 function initCustomization() {
     const savedTheme = localStorage.getItem('adminTheme') || 'default';
     const savedFont = localStorage.getItem('adminFont') || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+    const savedBg = localStorage.getItem('adminBackground') || 'light';
     
     applyTheme(savedTheme);
     applyFont(savedFont);
+    applyBackground(savedBg);
+    
+    setupQuickCustomize();
     
     document.querySelectorAll('.theme-option').forEach(option => {
         const theme = option.dataset.theme;
@@ -754,6 +758,23 @@ function initCustomization() {
             option.classList.add('active');
             applyTheme(theme);
             localStorage.setItem('adminTheme', theme);
+            updateMiniThemes(theme);
+            updatePreview();
+        });
+    });
+    
+    document.querySelectorAll('.bg-option').forEach(option => {
+        const bg = option.dataset.bg;
+        if (bg === savedBg) {
+            option.classList.add('active');
+        }
+        
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.bg-option').forEach(o => o.classList.remove('active'));
+            option.classList.add('active');
+            applyBackground(bg);
+            localStorage.setItem('adminBackground', bg);
+            updateMiniBgs(bg);
             updatePreview();
         });
     });
@@ -776,17 +797,79 @@ function initCustomization() {
     document.getElementById('resetCustomization')?.addEventListener('click', () => {
         localStorage.removeItem('adminTheme');
         localStorage.removeItem('adminFont');
+        localStorage.removeItem('adminBackground');
         applyTheme('default');
         applyFont("'Segoe UI', Tahoma, Geneva, Verdana, sans-serif");
+        applyBackground('light');
         
         document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
         document.querySelectorAll('.font-option').forEach(o => o.classList.remove('active'));
+        document.querySelectorAll('.bg-option').forEach(o => o.classList.remove('active'));
         document.querySelector('.theme-option[data-theme="default"]')?.classList.add('active');
         document.querySelector('.font-option[data-font="\'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif"]')?.classList.add('active');
+        document.querySelector('.bg-option[data-bg="light"]')?.classList.add('active');
+        updateMiniThemes('default');
+        updateMiniBgs('light');
         updatePreview();
     });
     
+    updateMiniThemes(savedTheme);
+    updateMiniBgs(savedBg);
     updatePreview();
+}
+
+function setupQuickCustomize() {
+    const btn = document.getElementById('quickCustomizeBtn');
+    const dropdown = document.getElementById('customizeDropdown');
+    
+    btn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.quick-customize')) {
+            dropdown?.classList.remove('active');
+        }
+    });
+    
+    dropdown?.querySelectorAll('.mini-theme').forEach(theme => {
+        theme.addEventListener('click', () => {
+            const themeName = theme.dataset.theme;
+            applyTheme(themeName);
+            localStorage.setItem('adminTheme', themeName);
+            updateMiniThemes(themeName);
+            
+            document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+            document.querySelector(`.theme-option[data-theme="${themeName}"]`)?.classList.add('active');
+            updatePreview();
+        });
+    });
+    
+    dropdown?.querySelectorAll('.mini-bg').forEach(bg => {
+        bg.addEventListener('click', () => {
+            const bgName = bg.dataset.bg;
+            applyBackground(bgName);
+            localStorage.setItem('adminBackground', bgName);
+            updateMiniBgs(bgName);
+            
+            document.querySelectorAll('.bg-option').forEach(o => o.classList.remove('active'));
+            document.querySelector(`.bg-option[data-bg="${bgName}"]`)?.classList.add('active');
+            updatePreview();
+        });
+    });
+}
+
+function updateMiniThemes(activeTheme) {
+    document.querySelectorAll('.mini-theme').forEach(t => {
+        t.classList.toggle('active', t.dataset.theme === activeTheme);
+    });
+}
+
+function updateMiniBgs(activeBg) {
+    document.querySelectorAll('.mini-bg').forEach(b => {
+        b.classList.toggle('active', b.dataset.bg === activeBg);
+    });
 }
 
 function applyTheme(theme) {
@@ -794,6 +877,11 @@ function applyTheme(theme) {
     if (theme !== 'default') {
         document.body.classList.add(`theme-${theme}`);
     }
+}
+
+function applyBackground(bg) {
+    document.body.className = document.body.className.replace(/bg-\w+/g, '');
+    document.body.classList.add(`bg-${bg}`);
 }
 
 function applyFont(font) {

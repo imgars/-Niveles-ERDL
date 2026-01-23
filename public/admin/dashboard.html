@@ -60,9 +60,40 @@
         <main class="main-content">
             <header class="top-bar">
                 <h1 id="pageTitle">Dashboard Principal</h1>
-                <div class="user-info">
-                    <span id="adminName" style="font-weight: bold; margin-right: 15px;"></span>
-                    <span id="sessionTime">Sesion activa</span>
+                <div class="header-right">
+                    <div class="quick-customize">
+                        <button class="customize-btn" id="quickCustomizeBtn" title="Personalizar">
+                            🎨
+                        </button>
+                        <div class="customize-dropdown" id="customizeDropdown">
+                            <div class="dropdown-section">
+                                <h5>Tema Sidebar</h5>
+                                <div class="mini-themes">
+                                    <div class="mini-theme" data-theme="default" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Morado"></div>
+                                    <div class="mini-theme" data-theme="ocean" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);" title="Oceano"></div>
+                                    <div class="mini-theme" data-theme="sunset" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" title="Atardecer"></div>
+                                    <div class="mini-theme" data-theme="forest" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);" title="Bosque"></div>
+                                    <div class="mini-theme" data-theme="dark" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);" title="Oscuro"></div>
+                                    <div class="mini-theme" data-theme="fire" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);" title="Fuego"></div>
+                                </div>
+                            </div>
+                            <div class="dropdown-section">
+                                <h5>Fondo</h5>
+                                <div class="mini-backgrounds">
+                                    <div class="mini-bg" data-bg="light" style="background: #f5f7fa;" title="Claro"></div>
+                                    <div class="mini-bg" data-bg="dark" style="background: #1a1a2e;" title="Oscuro"></div>
+                                    <div class="mini-bg" data-bg="cream" style="background: #faf8f5;" title="Crema"></div>
+                                    <div class="mini-bg" data-bg="blue" style="background: #e8f4fc;" title="Azul Claro"></div>
+                                    <div class="mini-bg" data-bg="green" style="background: #e8f5e9;" title="Verde Claro"></div>
+                                    <div class="mini-bg" data-bg="purple" style="background: #f3e5f5;" title="Lila"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <span id="adminName" style="font-weight: bold; margin-right: 15px;"></span>
+                        <span id="sessionTime">Sesion activa</span>
+                    </div>
                 </div>
             </header>
             
@@ -639,10 +670,10 @@
                 <div id="personalizacion-page" class="page">
                     <div class="section-content">
                         <h3>Personalizar Panel</h3>
-                        <p style="color: #666; margin-bottom: 20px;">Ajusta la apariencia del panel a tu gusto. Los cambios se guardan automaticamente.</p>
+                        <p style="color: #666; margin-bottom: 20px;">Ajusta la apariencia del panel a tu gusto. Los cambios se guardan automaticamente. Tambien puedes usar el boton 🎨 en la barra superior para acceso rapido.</p>
                         
                         <div class="customization-section">
-                            <h4>Tema de Colores</h4>
+                            <h4>Tema de Sidebar</h4>
                             <div class="theme-options">
                                 <div class="theme-option" data-theme="default">
                                     <div class="theme-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
@@ -667,6 +698,36 @@
                                 <div class="theme-option" data-theme="fire">
                                     <div class="theme-preview" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);"></div>
                                     <span>Fuego</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-section">
+                            <h4>Color de Fondo</h4>
+                            <div class="bg-options">
+                                <div class="bg-option" data-bg="light">
+                                    <div class="bg-preview" style="background: #f5f7fa;"></div>
+                                    <span>Claro (Default)</span>
+                                </div>
+                                <div class="bg-option" data-bg="dark">
+                                    <div class="bg-preview" style="background: #1a1a2e;"></div>
+                                    <span>Oscuro</span>
+                                </div>
+                                <div class="bg-option" data-bg="cream">
+                                    <div class="bg-preview" style="background: #faf8f5;"></div>
+                                    <span>Crema</span>
+                                </div>
+                                <div class="bg-option" data-bg="blue">
+                                    <div class="bg-preview" style="background: #e8f4fc;"></div>
+                                    <span>Azul Claro</span>
+                                </div>
+                                <div class="bg-option" data-bg="green">
+                                    <div class="bg-preview" style="background: #e8f5e9;"></div>
+                                    <span>Verde Claro</span>
+                                </div>
+                                <div class="bg-option" data-bg="purple">
+                                    <div class="bg-preview" style="background: #f3e5f5;"></div>
+                                    <span>Lila</span>
                                 </div>
                             </div>
                         </div>
@@ -766,7 +827,7 @@
                         <div class="user-search-section">
                             <h3>Buscar Usuario</h3>
                             <div class="search-box">
-                                <input type="text" id="userSearchInput" placeholder="Nombre de usuario o ID de Discord">
+                                <input type="text" id="userSearchInput" placeholder="Nombre, apodo en el servidor o ID">
                                 <button id="userSearchBtn" class="btn-primary">Buscar</button>
                             </div>
                             <div id="searchResults" class="search-results"></div>
