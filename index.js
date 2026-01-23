@@ -2037,7 +2037,7 @@ client.on("messageCreate", async (message) => {
 });
 
 // ===== ADMIN PANEL API =====
-const ADMIN_PASSWORD = "V7f!Qm9R$Zc2@Lw#A8Kx\"";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "cambiar-esto-en-produccion";
 const sessionTokens = new Map();
 
 // Middleware para verificar token
@@ -2092,7 +2092,6 @@ app.get('/api/admin/dashboard', verifyAdminToken, (req, res) => {
     const mongoStatus = isMongoConnected() ? 'Conectado' : 'Desconectado';
     const nodeVersion = process.version;
     
-    // Estadísticas del día
     const today = new Date().toDateString();
     let xpToday = 0;
     let levelsToday = 0;
@@ -2110,11 +2109,9 @@ app.get('/api/admin/dashboard', verifyAdminToken, (req, res) => {
     const uptime = process.uptime() * 1000;
     const botStatus = client.isReady() ? 'Online' : 'Offline';
     
-    // Estadísticas de memoria
     const memUsage = process.memoryUsage();
     const memPercent = Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100);
     
-    // Actividad del servidor
     const startupTime = Date.now() - uptime;
     
     res.json({
@@ -2135,6 +2132,335 @@ app.get('/api/admin/dashboard', verifyAdminToken, (req, res) => {
     });
   } catch (error) {
     console.error('Error en dashboard API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// API XP System
+app.get('/api/admin/xp', verifyAdminToken, (req, res) => {
+  try {
+    const allUsers = Object.values(db.users);
+    const totalXp = allUsers.reduce((sum, u) => sum + (u.totalXp || 0), 0);
+    const avgXp = allUsers.length > 0 ? Math.round(totalXp / allUsers.length) : 0;
+    const maxXp = Math.max(...allUsers.map(u => u.totalXp || 0), 0);
+    
+    const topUsers = allUsers
+      .filter(u => u.totalXp > 0)
+      .sort((a, b) => b.totalXp - a.totalXp)
+      .slice(0, 10)
+      .map(u => ({
+        id: u.userId,
+        xp: u.totalXp,
+        level: u.level || 0
+      }));
+    
+    const activeBoosts = db.getActiveBoosts(null, null);
+    const globalBoosts = activeBoosts.filter(b => !b.userId && !b.channelId);
+    
+    res.json({
+      totalXp,
+      avgXp,
+      maxXp,
+      totalUsers: allUsers.length,
+      activeUsers: allUsers.filter(u => u.totalXp > 0).length,
+      topUsers,
+      config: {
+        cooldown: CONFIG.XP_COOLDOWN,
+        baseMin: CONFIG.BASE_XP_MIN,
+        baseMax: CONFIG.BASE_XP_MAX,
+        boosterMultiplier: CONFIG.BOOSTER_VIP_MULTIPLIER,
+        nightMultiplier: CONFIG.NIGHT_BOOST_MULTIPLIER
+      },
+      activeBoosts: globalBoosts.length,
+      noXpChannels: CONFIG.NO_XP_CHANNELS
+    });
+  } catch (error) {
+    console.error('Error en XP API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// API Levels
+app.get('/api/admin/levels', verifyAdminToken, (req, res) => {
+  try {
+    const allUsers = Object.values(db.users);
+    const levelDistribution = {};
+    
+    allUsers.forEach(u => {
+      const level = u.level || 0;
+      const bracket = Math.floor(level / 10) * 10;
+      const key = `${bracket}-${bracket + 9}`;
+      levelDistribution[key] = (levelDistribution[key] || 0) + 1;
+    });
+    
+    const maxLevel = Math.max(...allUsers.map(u => u.level || 0), 0);
+    const avgLevel = allUsers.length > 0 ? 
+      Math.round(allUsers.reduce((sum, u) => sum + (u.level || 0), 0) / allUsers.length) : 0;
+    
+    const levelRoles = Object.entries(CONFIG.LEVEL_ROLES).map(([level, roleId]) => ({
+      level: parseInt(level),
+      roleId
+    }));
+    
+    const topLevels = allUsers
+      .filter(u => u.level > 0)
+      .sort((a, b) => b.level - a.level)
+      .slice(0, 10)
+      .map(u => ({
+        id: u.userId,
+        level: u.level,
+        xp: u.totalXp
+      }));
+    
+    res.json({
+      maxLevel,
+      avgLevel,
+      levelDistribution,
+      levelRoles,
+      topLevels,
+      usersWithLevel100: allUsers.filter(u => u.level >= 100).length
+    });
+  } catch (error) {
+    console.error('Error en Levels API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// API Roles
+app.get('/api/admin/roles', verifyAdminToken, async (req, res) => {
+  try {
+    const levelRoles = Object.entries(CONFIG.LEVEL_ROLES).map(([level, roleId]) => {
+      let roleName = `Role ID: ${roleId}`;
+      let memberCount = 0;
+      
+      for (const guild of client.guilds.cache.values()) {
+        const role = guild.roles.cache.get(roleId);
+        if (role) {
+          roleName = role.name;
+          memberCount = role.members.size;
+          break;
+        }
+      }
+      
+      return {
+        level: parseInt(level),
+        roleId,
+        roleName,
+        memberCount
+      };
+    });
+    
+    res.json({
+      levelRoles: levelRoles.sort((a, b) => a.level - b.level),
+      specialRoles: {
+        staff: { id: CONFIG.STAFF_ROLE_ID, name: 'Staff' },
+        booster: { id: CONFIG.BOOSTER_ROLE_ID, name: 'Booster' },
+        vip: { id: CONFIG.VIP_ROLE_ID, name: 'VIP' },
+        level100: { id: CONFIG.LEVEL_100_ROLE_ID, name: 'Nivel 100' }
+      }
+    });
+  } catch (error) {
+    console.error('Error en Roles API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// API Missions
+app.get('/api/admin/missions', verifyAdminToken, async (req, res) => {
+  try {
+    const weekNumber = Math.ceil((new Date().getDate()) / 7);
+    const year = new Date().getFullYear();
+    
+    let totalMissions = 0;
+    let completedMissions = 0;
+    
+    const allUsers = Object.values(db.users);
+    for (const user of allUsers.slice(0, 50)) {
+      try {
+        const missions = await getUserMissions(user.guildId, user.userId, weekNumber, year);
+        if (missions && missions.missions) {
+          totalMissions += missions.missions.length;
+          completedMissions += missions.missions.filter(m => m.completed).length;
+        }
+      } catch (e) {}
+    }
+    
+    res.json({
+      weekNumber,
+      year,
+      totalMissions,
+      completedMissions,
+      completionRate: totalMissions > 0 ? Math.round((completedMissions / totalMissions) * 100) : 0,
+      missionChannel: CONFIG.MISSION_COMPLETE_CHANNEL_ID
+    });
+  } catch (error) {
+    console.error('Error en Missions API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// API Power-ups/Boosts
+app.get('/api/admin/powerups', verifyAdminToken, (req, res) => {
+  try {
+    const now = Date.now();
+    const allActiveBoosts = db.getActiveBoosts(null, null);
+    
+    const globalBoosts = allActiveBoosts
+      .filter(b => !b.userId && !b.channelId)
+      .map(boost => ({
+        type: 'global',
+        multiplier: boost.multiplier,
+        expiresAt: boost.expiresAt,
+        timeLeft: boost.expiresAt ? Math.max(0, boost.expiresAt - now) : null,
+        addedBy: boost.addedBy || 'Sistema'
+      }));
+    
+    let userBoostCount = 0;
+    let channelBoostCount = 0;
+    const userBoostDetails = [];
+    const channelBoostDetails = [];
+    
+    if (db.boosts && db.boosts.users) {
+      for (const [userId, boosts] of Object.entries(db.boosts.users)) {
+        const activeBoosts = boosts.filter(b => !b.expiresAt || b.expiresAt > now);
+        userBoostCount += activeBoosts.length;
+        activeBoosts.forEach(b => {
+          userBoostDetails.push({
+            userId,
+            multiplier: b.multiplier,
+            expiresAt: b.expiresAt
+          });
+        });
+      }
+    }
+    
+    if (db.boosts && db.boosts.channels) {
+      for (const [channelId, boosts] of Object.entries(db.boosts.channels)) {
+        const activeBoosts = boosts.filter(b => !b.expiresAt || b.expiresAt > now);
+        channelBoostCount += activeBoosts.length;
+        activeBoosts.forEach(b => {
+          channelBoostDetails.push({
+            channelId,
+            multiplier: b.multiplier,
+            expiresAt: b.expiresAt
+          });
+        });
+      }
+    }
+    
+    res.json({
+      globalBoosts,
+      userBoostCount,
+      channelBoostCount,
+      totalActive: globalBoosts.length + userBoostCount + channelBoostCount,
+      userBoostDetails: userBoostDetails.slice(0, 20),
+      channelBoostDetails: channelBoostDetails.slice(0, 20),
+      nightBoostMultiplier: CONFIG.NIGHT_BOOST_MULTIPLIER,
+      boosterVipMultiplier: CONFIG.BOOSTER_VIP_MULTIPLIER
+    });
+  } catch (error) {
+    console.error('Error en Powerups API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// API Statistics
+app.get('/api/admin/statistics', verifyAdminToken, async (req, res) => {
+  try {
+    const allUsers = Object.values(db.users);
+    const totalXp = allUsers.reduce((sum, u) => sum + (u.totalXp || 0), 0);
+    const totalLevels = allUsers.reduce((sum, u) => sum + (u.level || 0), 0);
+    
+    const levelBrackets = {
+      '1-10': 0, '11-25': 0, '26-50': 0, '51-75': 0, '76-100': 0, '100+': 0
+    };
+    
+    allUsers.forEach(u => {
+      const level = u.level || 0;
+      if (level === 0) return;
+      if (level <= 10) levelBrackets['1-10']++;
+      else if (level <= 25) levelBrackets['11-25']++;
+      else if (level <= 50) levelBrackets['26-50']++;
+      else if (level <= 75) levelBrackets['51-75']++;
+      else if (level <= 100) levelBrackets['76-100']++;
+      else levelBrackets['100+']++;
+    });
+    
+    const activeToday = allUsers.filter(u => {
+      if (!u.lastUpdate) return false;
+      return new Date(u.lastUpdate).toDateString() === new Date().toDateString();
+    }).length;
+    
+    const activeThisWeek = allUsers.filter(u => {
+      if (!u.lastUpdate) return false;
+      const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      return new Date(u.lastUpdate).getTime() > weekAgo;
+    }).length;
+    
+    res.json({
+      totalUsers: allUsers.length,
+      activeUsers: allUsers.filter(u => u.totalXp > 0).length,
+      totalXp,
+      totalLevels,
+      avgXpPerUser: allUsers.length > 0 ? Math.round(totalXp / allUsers.length) : 0,
+      avgLevelPerUser: allUsers.length > 0 ? (totalLevels / allUsers.length).toFixed(1) : 0,
+      levelBrackets,
+      activeToday,
+      activeThisWeek,
+      mongoConnected: isMongoConnected(),
+      memoryUsage: {
+        heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+        heapTotal: Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
+      },
+      uptime: process.uptime()
+    });
+  } catch (error) {
+    console.error('Error en Statistics API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// API Configuration
+app.get('/api/admin/config', verifyAdminToken, (req, res) => {
+  try {
+    res.json({
+      xpSystem: {
+        cooldown: CONFIG.XP_COOLDOWN,
+        baseMin: CONFIG.BASE_XP_MIN,
+        baseMax: CONFIG.BASE_XP_MAX,
+        boosterMultiplier: CONFIG.BOOSTER_VIP_MULTIPLIER,
+        nightMultiplier: CONFIG.NIGHT_BOOST_MULTIPLIER
+      },
+      channels: {
+        levelUp: CONFIG.LEVEL_UP_CHANNEL_ID,
+        missionComplete: CONFIG.MISSION_COMPLETE_CHANNEL_ID,
+        noXp: CONFIG.NO_XP_CHANNELS
+      },
+      roles: {
+        staff: CONFIG.STAFF_ROLE_ID,
+        booster: CONFIG.BOOSTER_ROLE_ID,
+        vip: CONFIG.VIP_ROLE_ID,
+        level100: CONFIG.LEVEL_100_ROLE_ID
+      },
+      levelRoles: CONFIG.LEVEL_ROLES,
+      timezone: CONFIG.VENEZUELA_TIMEZONE,
+      maintenanceMode: db.settings?.maintenanceMode || false
+    });
+  } catch (error) {
+    console.error('Error en Config API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// Toggle Maintenance Mode
+app.post('/api/admin/maintenance', verifyAdminToken, express.json(), (req, res) => {
+  try {
+    const { enabled } = req.body;
+    if (!db.settings) db.settings = {};
+    db.settings.maintenanceMode = !!enabled;
+    res.json({ success: true, maintenanceMode: db.settings.maintenanceMode });
+  } catch (error) {
+    console.error('Error toggling maintenance:', error);
     res.status(500).json({ message: 'Error del servidor' });
   }
 });
