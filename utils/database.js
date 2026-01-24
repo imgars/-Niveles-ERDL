@@ -67,7 +67,7 @@ class Database {
     }
   }
 
-  getUser(guildId, userId) {
+  getUser(guildId, userId, memberInfo = null) {
     const key = `${guildId}-${userId}`;
     if (!this.users[key]) {
       this.users[key] = {
@@ -80,8 +80,18 @@ class Database {
         afk: { status: false, reason: null, timestamp: null },
         lastActivity: Date.now(),
         inactivityMessages: 0,
-        isInactive: false
+        isInactive: false,
+        username: null,
+        displayName: null,
+        avatar: null
       };
+    }
+    
+    if (memberInfo) {
+      const user = this.users[key];
+      user.username = memberInfo.username || user.username;
+      user.displayName = memberInfo.displayName || user.displayName;
+      user.avatar = memberInfo.avatar || user.avatar;
     }
     
     const user = this.users[key];

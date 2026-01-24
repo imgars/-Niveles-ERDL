@@ -1068,10 +1068,18 @@ client.on('messageCreate', async (message) => {
   if (cooldown) return;
   
   const member = message.member;
-  const userData = db.getUser(message.guild.id, message.author.id);
+  const memberInfo = {
+    username: message.author.username,
+    displayName: member?.displayName || message.author.globalName || message.author.username,
+    avatar: message.author.displayAvatarURL({ size: 64 })
+  };
+  const userData = db.getUser(message.guild.id, message.author.id, memberInfo);
   
   // Actualizar última actividad
   userData.lastActivity = Date.now();
+  userData.username = memberInfo.username;
+  userData.displayName = memberInfo.displayName;
+  userData.avatar = memberInfo.avatar;
   
   // Lógica de recuperación de inactividad
   if (userData.isInactive) {
@@ -2159,8 +2167,8 @@ app.get('/api/admin/xp', verifyAdminToken, (req, res) => {
           xp: u.totalXp,
           level: u.level || 0,
           username: member?.user?.username || u.username || 'Usuario',
-          displayName: member?.displayName || member?.user?.globalName || u.username || 'Usuario',
-          avatar: member?.user?.displayAvatarURL({ size: 64 }) || null
+          displayName: member?.displayName || member?.user?.globalName || u.displayName || u.username || 'Usuario',
+          avatar: member?.user?.displayAvatarURL({ size: 64 }) || u.avatar || null
         };
       });
     
@@ -2225,8 +2233,8 @@ app.get('/api/admin/levels', verifyAdminToken, (req, res) => {
           level: u.level,
           xp: u.totalXp,
           username: member?.user?.username || u.username || 'Usuario',
-          displayName: member?.displayName || member?.user?.globalName || u.username || 'Usuario',
-          avatar: member?.user?.displayAvatarURL({ size: 64 }) || null
+          displayName: member?.displayName || member?.user?.globalName || u.displayName || u.username || 'Usuario',
+          avatar: member?.user?.displayAvatarURL({ size: 64 }) || u.avatar || null
         };
       });
     
@@ -2632,23 +2640,25 @@ app.get('/api/admin/user/search', verifyAdminToken, (req, res) => {
       const member = guild?.members.cache.get(user.userId);
       
       const username = member?.user?.username || user.username || '';
-      const displayName = member?.displayName || '';
+      const displayName = member?.displayName || user.displayName || '';
       const nickname = member?.nickname || '';
       const globalName = member?.user?.globalName || '';
+      const savedDisplayName = user.displayName || '';
       
       const matchesId = user.userId === query;
       const matchesUsername = username.toLowerCase().includes(queryLower);
       const matchesDisplayName = displayName.toLowerCase().includes(queryLower);
       const matchesNickname = nickname.toLowerCase().includes(queryLower);
       const matchesGlobalName = globalName.toLowerCase().includes(queryLower);
+      const matchesSavedDisplayName = savedDisplayName.toLowerCase().includes(queryLower);
       
-      if (matchesId || matchesUsername || matchesDisplayName || matchesNickname || matchesGlobalName) {
+      if (matchesId || matchesUsername || matchesDisplayName || matchesNickname || matchesGlobalName || matchesSavedDisplayName) {
         foundUsers.push({
           ...user,
-          username: username || 'Desconocido',
-          displayName: displayName || username || 'Desconocido',
+          username: username || user.username || 'Desconocido',
+          displayName: displayName || user.displayName || username || 'Desconocido',
           nickname: nickname || null,
-          avatar: member?.user?.avatarURL() || null,
+          avatar: member?.user?.avatarURL() || user.avatar || null,
           guildName: guild?.name || 'Servidor'
         });
       }
