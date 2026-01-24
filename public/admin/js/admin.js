@@ -9,12 +9,33 @@ function checkAuthentication() {
     return true;
 }
 
-document.getElementById('logoutBtn')?.addEventListener('click', () => {
+function handleLogout() {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('tokenExpiry');
     localStorage.removeItem('adminUsername');
     window.location.href = '/admin/login.html';
-});
+}
+
+document.getElementById('headerLogoutBtn')?.addEventListener('click', handleLogout);
+
+const adminInfoBtn = document.getElementById('adminInfoBtn');
+const adminDropdownWrapper = document.querySelector('.admin-dropdown-wrapper');
+
+if (adminInfoBtn && adminDropdownWrapper) {
+    adminInfoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        adminDropdownWrapper.classList.toggle('open');
+        
+        const customizeDropdown = document.getElementById('customizeDropdown');
+        if (customizeDropdown) customizeDropdown.classList.remove('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!adminDropdownWrapper.contains(e.target)) {
+            adminDropdownWrapper.classList.remove('open');
+        }
+    });
+}
 
 const adminNameEl = document.getElementById('adminName');
 if (adminNameEl) {

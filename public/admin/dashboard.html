@@ -52,9 +52,6 @@
                 </a>
             </nav>
             
-            <div class="sidebar-footer">
-                <button id="logoutBtn" class="logout-btn">Cerrar sesion</button>
-            </div>
         </aside>
         
         <main class="main-content">
@@ -90,9 +87,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="user-info">
-                        <span id="adminName" style="font-weight: bold; margin-right: 15px;"></span>
-                        <span id="sessionTime">Sesion activa</span>
+                    <div class="admin-dropdown-wrapper">
+                        <div class="admin-info" id="adminInfoBtn">
+                            <span id="adminName"></span>
+                            <span class="admin-arrow">▼</span>
+                        </div>
+                        <div class="admin-dropdown" id="adminDropdown">
+                            <div class="admin-dropdown-item" id="sessionTimeItem">
+                                <span>⏱️</span>
+                                <span id="sessionTime">Sesion activa</span>
+                            </div>
+                            <div class="admin-dropdown-divider"></div>
+                            <div class="admin-dropdown-item logout-item" id="headerLogoutBtn">
+                                <span>🚪</span>
+                                <span>Cerrar sesion</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
