@@ -505,6 +505,109 @@ body {
     text-align: right;
 }
 
+/* ===== TOP USER CARDS ===== */
+.top-item-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    background: white;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+}
+
+.top-item-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.top-rank-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.top-item-card:nth-child(1) .top-rank-badge {
+    background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+}
+
+.top-item-card:nth-child(2) .top-rank-badge {
+    background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+}
+
+.top-item-card:nth-child(3) .top-rank-badge {
+    background: linear-gradient(135deg, #cd6133 0%, #a04000 100%);
+}
+
+.top-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.top-user-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.top-username {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top-stats {
+    font-size: 13px;
+    color: #666;
+}
+
+.top-edit-btn {
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+
+.top-edit-btn:hover {
+    background: #5a6fd6;
+}
+
+body.bg-dark .top-item-card {
+    background: #16213e;
+}
+
+body.bg-dark .top-username {
+    color: #fff;
+}
+
+body.bg-dark .top-stats {
+    color: #aaa;
+}
+
 .distribution-section {
     margin-top: 25px;
 }

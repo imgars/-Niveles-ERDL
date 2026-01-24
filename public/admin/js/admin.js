@@ -137,11 +137,14 @@ async function loadXPData() {
         const topContainer = document.getElementById('topXpUsers');
         if (data.topUsers && data.topUsers.length > 0) {
             topContainer.innerHTML = data.topUsers.map((user, i) => `
-                <div class="top-item">
-                    <span class="top-rank">#${i + 1}</span>
-                    <span class="top-id">${user.id}</span>
-                    <span class="top-value">${user.xp.toLocaleString()} XP</span>
-                    <span class="top-level">Nv. ${user.level}</span>
+                <div class="top-item-card">
+                    <div class="top-rank-badge">${i + 1}</div>
+                    <img class="top-avatar" src="${user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}" alt="Avatar">
+                    <div class="top-user-info">
+                        <span class="top-username">${user.displayName}</span>
+                        <span class="top-stats">${user.xp.toLocaleString()} XP · Nivel ${user.level}</span>
+                    </div>
+                    <button class="top-edit-btn" onclick="editTopUser('${user.guildId}', '${user.id}', '${user.displayName.replace(/'/g, "\\'")}')">Editar</button>
                 </div>
             `).join('');
         } else {
@@ -189,11 +192,14 @@ async function loadLevelsData() {
         const topContainer = document.getElementById('topLevelUsers');
         if (data.topLevels && data.topLevels.length > 0) {
             topContainer.innerHTML = data.topLevels.map((user, i) => `
-                <div class="top-item">
-                    <span class="top-rank">#${i + 1}</span>
-                    <span class="top-id">${user.id}</span>
-                    <span class="top-value">Nivel ${user.level}</span>
-                    <span class="top-xp">${user.xp.toLocaleString()} XP</span>
+                <div class="top-item-card">
+                    <div class="top-rank-badge">${i + 1}</div>
+                    <img class="top-avatar" src="${user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}" alt="Avatar">
+                    <div class="top-user-info">
+                        <span class="top-username">${user.displayName}</span>
+                        <span class="top-stats">Nivel ${user.level} · ${user.xp.toLocaleString()} XP</span>
+                    </div>
+                    <button class="top-edit-btn" onclick="editTopUser('${user.guildId}', '${user.id}', '${user.displayName.replace(/'/g, "\\'")}')">Editar</button>
                 </div>
             `).join('');
         }
@@ -577,6 +583,18 @@ function initUserManagement() {
     if (searchInput) {
         searchInput.onkeypress = (e) => { if (e.key === 'Enter') searchUsers(); };
     }
+}
+
+function editTopUser(guildId, userId, displayName) {
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector('.nav-link[data-page="usuarios"]')?.classList.add('active');
+    
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('usuarios-page')?.classList.add('active');
+    
+    document.getElementById('pageTitle').textContent = 'Gestion Usuarios';
+    
+    selectUser(guildId, userId);
 }
 
 async function searchUsers() {

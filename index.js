@@ -2150,11 +2150,19 @@ app.get('/api/admin/xp', verifyAdminToken, (req, res) => {
       .filter(u => u.totalXp > 0)
       .sort((a, b) => b.totalXp - a.totalXp)
       .slice(0, 10)
-      .map(u => ({
-        id: u.userId,
-        xp: u.totalXp,
-        level: u.level || 0
-      }));
+      .map(u => {
+        const guild = client.guilds.cache.get(u.guildId);
+        const member = guild?.members.cache.get(u.userId);
+        return {
+          id: u.userId,
+          guildId: u.guildId,
+          xp: u.totalXp,
+          level: u.level || 0,
+          username: member?.user?.username || u.username || 'Usuario',
+          displayName: member?.displayName || member?.user?.globalName || u.username || 'Usuario',
+          avatar: member?.user?.displayAvatarURL({ size: 64 }) || null
+        };
+      });
     
     const activeBoosts = db.getActiveBoosts(null, null);
     const globalBoosts = activeBoosts.filter(b => !b.userId && !b.channelId);
@@ -2208,11 +2216,19 @@ app.get('/api/admin/levels', verifyAdminToken, (req, res) => {
       .filter(u => u.level > 0)
       .sort((a, b) => b.level - a.level)
       .slice(0, 10)
-      .map(u => ({
-        id: u.userId,
-        level: u.level,
-        xp: u.totalXp
-      }));
+      .map(u => {
+        const guild = client.guilds.cache.get(u.guildId);
+        const member = guild?.members.cache.get(u.userId);
+        return {
+          id: u.userId,
+          guildId: u.guildId,
+          level: u.level,
+          xp: u.totalXp,
+          username: member?.user?.username || u.username || 'Usuario',
+          displayName: member?.displayName || member?.user?.globalName || u.username || 'Usuario',
+          avatar: member?.user?.displayAvatarURL({ size: 64 }) || null
+        };
+      });
     
     res.json({
       maxLevel,
