@@ -131,8 +131,8 @@ app.use((req, res, next) => {
       return res.status(503).json({ error: 'Sitio en mantenimiento' });
     }
 
-    // De lo contrario, mostrar página de mantenimiento
-    return res.status(503).send(`
+    // De lo contrario, mostrar página de mantenimiento (status 200 para que UptimeRobot no marque como caído)
+    return res.status(200).send(`
       <!DOCTYPE html>
       <html lang="es">
       <head>
