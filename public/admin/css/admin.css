@@ -1769,22 +1769,24 @@ body.theme-dark .confirm-details {
 }
 
 .customize-btn {
-    background: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     display: flex;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
 }
 
 .customize-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
 }
 
 .customize-dropdown {
