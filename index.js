@@ -105,6 +105,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // 3. Middleware de mantenimiento
 app.use((req, res, next) => {
+  // Excluir endpoints de salud para UptimeRobot (SIEMPRE deben responder)
+  if (req.path === '/health' || req.path === '/ping') {
+    return next();
+  }
+
   // Ruta para desbloquear (bypass)
   if (req.path === '/unlock-maintenance' && req.method === 'POST') {
     const { password } = req.body;
@@ -121,7 +126,7 @@ app.use((req, res, next) => {
   }
 
   if (db.settings && db.settings.maintenanceMode) {
-    // Si es una petición API, devolver JSON (excepto health/ping que ya se manejaron)
+    // Si es una petición API, devolver JSON
     if (req.path.startsWith('/api/')) {
       return res.status(503).json({ error: 'Sitio en mantenimiento' });
     }
@@ -689,14 +694,6 @@ app.get('/api/user-stats', async (req, res) => {
     console.error('Error obteniendo estadísticas de usuario:', error);
     res.status(500).json({ error: 'Error al obtener estadísticas' });
   }
-});
-
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-app.get('/ping', (req, res) => {
-  res.status(200).send('pong');
 });
 
 app.get('/api/diff', async (req, res) => {
