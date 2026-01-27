@@ -1,6 +1,15 @@
 # -Niveles
 
 ## Recent Changes
+- **Comando /gamecard con IA (Enero 2026):**
+  - Reconstruido completamente el comando `/gamecard` con generación de imágenes por IA.
+  - Dos subcomandos: `/gamecard profile` (tarjeta de perfil) y `/gamecard battle` (tarjeta de batalla).
+  - Soporte para 8 videojuegos: Roblox, Minecraft, Brawl Stars, Geometry Dash, Fortnite, Clash Royale/CoC, Genshin Impact, Valorant.
+  - Opción de petición personalizada para que la IA genere exactamente lo que el usuario quiere.
+  - Usa Gemini AI (Replit AI Integrations) para generar las imágenes.
+  - Manejo de errores mejorado con reintentos para rate limits.
+  - Requiere variables de entorno: `AI_INTEGRATIONS_GEMINI_API_KEY`, `AI_INTEGRATIONS_GEMINI_BASE_URL`.
+
 - **Panel Admin Completo v2 (Enero 2026):**
   - Sistema de cuentas de administrador (Gars y Mazin).
   - Logs en tiempo real: XP, niveles, Lagcoins, trabajo, casino, robos, misiones, items.

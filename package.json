@@ -17,12 +17,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.38.0",
     "@napi-rs/canvas": "^0.1.88",
     "cookie-parser": "^1.4.7",
     "discord.js": "^14.25.1",
+    "drizzle-zod": "^0.8.3",
     "express": "^4.22.1",
     "moment-timezone": "^0.5.48",
     "mongoose": "^9.1.5",
-    "node-cron": "^3.0.3"
+    "node-cron": "^3.0.3",
+    "p-limit": "^7.2.0",
+    "p-retry": "^7.1.1",
+    "zod": "^4.3.6",
+    "zod-validation-error": "^5.0.0"
   }
 }

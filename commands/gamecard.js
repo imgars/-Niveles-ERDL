@@ -1,127 +1,140 @@
 import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } from 'discord.js';
-import { createCanvas, loadImage } from '@napi-rs/canvas';
-
-async function fetchMinecraftProfile(username) {
-  try {
-    const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`);
-    
-    if (!response.ok) {
-      return null;
-    }
-    
-    const data = await response.json();
-    
-    return {
-      uuid: data.id,
-      username: data.name,
-      avatarUrl: `https://mc-heads.net/avatar/${data.id}/150`,
-      bodyUrl: `https://mc-heads.net/body/${data.id}/150`,
-      skinUrl: `https://mc-heads.net/skin/${data.id}`
-    };
-  } catch (error) {
-    console.error('Error fetching Minecraft profile:', error);
-    return null;
-  }
-}
-
-async function generateMinecraftCard(profile) {
-  const width = 600;
-  const height = 300;
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-  
-  const dirtColors = ['#8B5A2B', '#6B4226', '#5D3A1A', '#7A4A23'];
-  const pixelSize = 12;
-  
-  for (let y = 0; y < height; y += pixelSize) {
-    for (let x = 0; x < width; x += pixelSize) {
-      ctx.fillStyle = dirtColors[Math.floor(Math.random() * dirtColors.length)];
-      ctx.fillRect(x, y, pixelSize, pixelSize);
-    }
-  }
-  
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-  ctx.fillRect(20, 20, width - 40, height - 40);
-  
-  ctx.fillStyle = '#555555';
-  ctx.fillRect(18, 18, width - 36, 4);
-  ctx.fillRect(18, height - 22, width - 36, 4);
-  ctx.fillRect(18, 18, 4, height - 36);
-  ctx.fillRect(width - 22, 18, 4, height - 36);
-  
-  if (profile.avatarUrl) {
-    try {
-      const avatar = await loadImage(profile.avatarUrl);
-      ctx.fillStyle = '#3a3a3a';
-      ctx.fillRect(35, 50, 130, 130);
-      ctx.drawImage(avatar, 40, 55, 120, 120);
-    } catch (e) {
-      console.error('Error loading Minecraft avatar:', e);
-    }
-  }
-  
-  ctx.fillStyle = '#55FF55';
-  ctx.font = 'bold 28px Arial, sans-serif';
-  ctx.fillText('MINECRAFT', 185, 70);
-  
-  ctx.fillStyle = '#FFFFFF';
-  ctx.font = 'bold 26px Arial, sans-serif';
-  ctx.fillText(profile.username, 185, 110);
-  
-  ctx.fillStyle = '#AAAAAA';
-  ctx.font = '14px Arial, sans-serif';
-  ctx.fillText(`UUID: ${profile.uuid.substring(0, 8)}...`, 185, 140);
-  
-  ctx.fillStyle = '#55FF55';
-  ctx.font = 'bold 14px Arial, sans-serif';
-  ctx.fillText('✓ Cuenta Premium', 185, 170);
-  
-  ctx.fillStyle = '#FFD700';
-  ctx.font = '14px Arial, sans-serif';
-  ctx.fillText('⛏️ Jugador de Java Edition', 185, 200);
-  
-  ctx.fillStyle = '#888888';
-  ctx.font = '10px Arial, sans-serif';
-  ctx.fillText('Generado por - Niveles Bot', width - 180, height - 35);
-  
-  return canvas.toBuffer('image/png');
-}
+import { generateGameImage, SUPPORTED_GAMES, isGeminiConfigured } from '../utils/geminiImageGenerator.js';
 
 export default {
   data: new SlashCommandBuilder()
     .setName('gamecard')
-    .setDescription('Genera tarjeta de perfil de Minecraft')
-    .addStringOption(option =>
-      option.setName('username')
-        .setDescription('Nombre de usuario de Minecraft (Java)')
-        .setRequired(true)
+    .setDescription('Genera tarjetas de videojuegos con IA')
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('profile')
+        .setDescription('Genera una tarjeta de perfil de videojuego')
+        .addStringOption(option =>
+          option.setName('juego')
+            .setDescription('Elige el videojuego')
+            .setRequired(true)
+            .addChoices(...SUPPORTED_GAMES)
+        )
+        .addStringOption(option =>
+          option.setName('nombre')
+            .setDescription('Nombre del jugador/personaje')
+            .setRequired(true)
+        )
+        .addStringOption(option =>
+          option.setName('peticion')
+            .setDescription('Petición personalizada (opcional) - ej: "con armadura dorada"')
+            .setRequired(false)
+        )
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('battle')
+        .setDescription('Genera una tarjeta de batalla épica')
+        .addStringOption(option =>
+          option.setName('juego')
+            .setDescription('Elige el videojuego')
+            .setRequired(true)
+            .addChoices(...SUPPORTED_GAMES)
+        )
+        .addStringOption(option =>
+          option.setName('nombre')
+            .setDescription('Nombre del jugador/personaje')
+            .setRequired(true)
+        )
+        .addStringOption(option =>
+          option.setName('peticion')
+            .setDescription('Petición personalizada (opcional) - ej: "peleando contra un dragón"')
+            .setRequired(false)
+        )
     ),
   
   async execute(interaction) {
-    await interaction.deferReply();
-    
-    try {
-      const username = interaction.options.getString('username');
-      const profile = await fetchMinecraftProfile(username);
-      
-      if (!profile) {
-        return interaction.editReply('❌ No se encontró el perfil de Minecraft. Verifica el nombre de usuario (solo Java Edition).');
-      }
-      
-      const imageBuffer = await generateMinecraftCard(profile);
-      const attachment = new AttachmentBuilder(imageBuffer, { name: 'minecraft_profile.png' });
-      
-      return interaction.editReply({
+    const subcommand = interaction.options.getSubcommand();
+    const juego = interaction.options.getString('juego');
+    const nombre = interaction.options.getString('nombre');
+    const peticion = interaction.options.getString('peticion') || '';
+
+    if (!isGeminiConfigured()) {
+      return interaction.reply({
         embeds: [{
-          color: 0x55FF55,
-          title: `⛏️ Perfil de Minecraft: ${profile.username}`,
-          image: { url: 'attachment://minecraft_profile.png' }
+          color: 0xFF0000,
+          title: '❌ Servicio no disponible',
+          description: 'El servicio de generación de imágenes con IA no está configurado. Contacta al administrador del bot.'
         }],
+        ephemeral: true
+      });
+    }
+
+    await interaction.deferReply();
+
+    const gameNames = {
+      roblox: 'Roblox',
+      minecraft: 'Minecraft',
+      brawlstars: 'Brawl Stars',
+      geometrydash: 'Geometry Dash',
+      fortnite: 'Fortnite',
+      clash: 'Clash Royale/CoC',
+      genshin: 'Genshin Impact',
+      valorant: 'Valorant'
+    };
+
+    const gameEmojis = {
+      roblox: '🟦',
+      minecraft: '⛏️',
+      brawlstars: '⭐',
+      geometrydash: '⚡',
+      fortnite: '🎯',
+      clash: '⚔️',
+      genshin: '🌸',
+      valorant: '🔫'
+    };
+
+    const cardTypeNames = {
+      profile: 'Perfil',
+      battle: 'Batalla'
+    };
+
+    try {
+      await interaction.editReply({
+        embeds: [{
+          color: 0x9B59B6,
+          title: '🎨 Generando tu tarjeta...',
+          description: `Creando tarjeta de **${cardTypeNames[subcommand]}** para **${nombre}**\n\n🎮 Juego: ${gameEmojis[juego]} ${gameNames[juego]}\n${peticion ? `✨ Petición: ${peticion}` : ''}\n\n⏳ Esto puede tomar unos segundos...`,
+        }]
+      });
+
+      const imageBuffer = await generateGameImage(juego, nombre, subcommand, peticion);
+      const attachment = new AttachmentBuilder(imageBuffer, { name: `${subcommand}_card_${nombre}.png` });
+
+      const embed = new EmbedBuilder()
+        .setColor(subcommand === 'battle' ? 0xFF4444 : 0x44FF44)
+        .setTitle(`${gameEmojis[juego]} Tarjeta de ${cardTypeNames[subcommand]}: ${nombre}`)
+        .setDescription(`🎮 **Juego:** ${gameNames[juego]}\n${peticion ? `✨ **Petición:** ${peticion}` : ''}`)
+        .setImage(`attachment://${subcommand}_card_${nombre}.png`)
+        .setFooter({ text: `Generado con IA por Niveles Bot • /gamecard ${subcommand}` })
+        .setTimestamp();
+
+      return interaction.editReply({
+        embeds: [embed],
         files: [attachment]
       });
     } catch (error) {
       console.error('Error en gamecard:', error);
-      return interaction.editReply('❌ Error al generar la tarjeta de perfil.');
+      
+      let errorMessage = '❌ Error al generar la tarjeta.';
+      if (error.message?.includes('quota') || error.message?.includes('rate')) {
+        errorMessage = '❌ Se ha alcanzado el límite de generación. Intenta de nuevo en unos minutos.';
+      } else if (error.message?.includes('API')) {
+        errorMessage = '❌ Error de conexión con el servicio de IA. Intenta de nuevo.';
+      }
+      
+      return interaction.editReply({
+        embeds: [{
+          color: 0xFF0000,
+          title: '❌ Error',
+          description: `${errorMessage}\n\nDetalles: ${error.message || 'Error desconocido'}`
+        }]
+      });
     }
   }
 };
