@@ -769,17 +769,6 @@ export async function updateJobStats(guildId, userId, jobName) {
 export async function getNationalityFromMongo(guildId, userId) {
   if (!isConnected) return null;
   try {
-    const nationality = await Nationality.findOne({ guildId, userId });
-    return nationality;
-  } catch (error) {
-    console.error('Error obteniendo nacionalidad:', error.message);
-    return null;
-  }
-}
-
-export async function getNationalityFromMongo(guildId, userId) {
-  if (!isConnected) return null;
-  try {
     const nationality = await Nationality.findOne({ guildId, userId }).lean();
     return nationality;
   } catch (error) {

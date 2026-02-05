@@ -1713,7 +1713,7 @@ export async function doWork(guildId, userId, jobId = 'basico') {
     let bonus = Math.random() > 0.9 ? Math.floor(earnings * 0.5) : 0;
     
     // Aplicar multiplicador de nacionalidad
-    const nationality = getUserNationality(guildId, userId);
+    const nationality = await getUserNationality(guildId, userId);
     if (nationality && nationality.currentCountry) {
       const country = COUNTRIES[nationality.currentCountry];
       if (country) {
