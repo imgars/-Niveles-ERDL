@@ -359,6 +359,7 @@ export async function saveUserEconomy(guildId, userId, data) {
       userId,
       lagcoins: data.lagcoins !== undefined ? data.lagcoins : (existingData.lagcoins || 100),
       bankBalance: data.bankBalance !== undefined ? data.bankBalance : (existingData.bankBalance || 0),
+      bankUpgrades: data.bankUpgrades || existingData.bankUpgrades || [],
       marriedTo: data.marriedTo !== undefined ? data.marriedTo : (existingData.marriedTo || null),
       items: data.items || existingData.items || [],
       inventory: data.inventory || existingData.inventory || [],
@@ -394,6 +395,7 @@ export async function saveUserEconomy(guildId, userId, data) {
 // Sistema de trabajos mejorado con más trabajos
 export const JOBS = {
   basico: { name: 'Trabajo Básico', emoji: '💼', minEarnings: 30, maxEarnings: 80, itemsNeeded: [], cooldown: 60000, countryMultiplier: 1.0 },
+  // NOTA: Los cooldowns de trabajos se aplican consistentemente en doWork()
   pescar: { name: 'Pescador', emoji: '🎣', minEarnings: 70, maxEarnings: 180, itemsNeeded: ['cana_pesca'], cooldown: 45000, countryMultiplier: 1.0 },
   talar: { name: 'Leñador', emoji: '🪓', minEarnings: 80, maxEarnings: 220, itemsNeeded: ['hacha'], cooldown: 45000, countryMultiplier: 1.0 },
   minar: { name: 'Minero', emoji: '⛏️', minEarnings: 100, maxEarnings: 300, itemsNeeded: ['pico'], cooldown: 45000, countryMultiplier: 1.2 },
@@ -458,9 +460,9 @@ export const ITEMS = {
   semillas: { name: 'Pack de Semillas', emoji: '🌱', price: 400, unlocks: 'granja', description: 'Para cultivar', category: 'granja' },
   
   // Consumibles y buffs básicos
-  energia: { name: 'Bebida Energética', emoji: '⚡', price: 150, unlocks: null, description: 'Reduce cooldown de trabajo 50% por 1h', category: 'consumible', effect: { type: 'cooldown_reduction', value: 0.5, duration: 3600000 } },
-  suerte: { name: 'Trébol de la Suerte', emoji: '🍀', price: 500, unlocks: null, description: '+20% probabilidad en casino por 30min', category: 'consumible', effect: { type: 'luck_boost', value: 0.2, duration: 1800000 } },
-  escudo: { name: 'Escudo Anti-Robo', emoji: '🛡️', price: 800, unlocks: null, description: 'Protege tus Lagcoins de robos por 2h', category: 'consumible', effect: { type: 'rob_protection', duration: 7200000 } },
+  energia: { name: 'Bebida Energética', emoji: '⚡', price: 3000, unlocks: null, description: 'Reduce cooldown de trabajo 50% por 1h', category: 'consumible', effect: { type: 'cooldown_reduction', value: 0.5, duration: 3600000 } },
+  suerte: { name: 'Trébol de la Suerte', emoji: '🍀', price: 6000, unlocks: null, description: '+20% probabilidad en casino por 30min', category: 'consumible', effect: { type: 'luck_boost', value: 0.2, duration: 1800000 } },
+  escudo: { name: 'Escudo Anti-Robo', emoji: '🛡️', price: 15000, unlocks: null, description: 'Protege tus Lagcoins de robos por 2h', category: 'consumible', effect: { type: 'rob_protection', value: 1.0, duration: 7200000 } },
   
   // Coleccionables
   corona: { name: 'Corona Dorada', emoji: '👑', price: 10000, unlocks: null, description: 'Símbolo de riqueza', category: 'coleccionable' },
@@ -761,8 +763,8 @@ export async function buyItem(guildId, userId, itemId) {
     
     // Para consumibles/powerups/seguros, activar el efecto
     if (item.effect) {
-      if (item.category === 'seguro') {
-        activateInsurance(guildId, userId, item.effect.value, item.effect.duration);
+      if (item.category === 'seguro' || item.effect.type === 'rob_protection' || item.effect.type === 'anti_rob') {
+        activateInsurance(guildId, userId, item.effect.value || 1.0, item.effect.duration);
       } else {
         activatePowerup(guildId, userId, item.effect.type, item.effect.value, item.effect.duration);
       }
@@ -1316,7 +1318,7 @@ export async function robUser(guildId, robberUserId, victimUserId) {
     
     const now = Date.now();
     const lastRob = robber.lastRobAttempt ? new Date(robber.lastRobAttempt).getTime() : 0;
-    const cooldown = 300000;
+    const cooldown = 30000; // 30 segundos de cooldown
     
     if (now - lastRob < cooldown) {
       const remaining = Math.ceil((cooldown - (now - lastRob)) / 1000);
@@ -1345,7 +1347,7 @@ export async function robUser(guildId, robberUserId, victimUserId) {
       robBonus += adminBoost.percentage;
     }
     
-    const baseSuccess = 0.25;
+    const baseSuccess = 0.15; // Reducido 10% de 0.25 a 0.15
     let finalSuccessProb = baseSuccess + robBonus;
 
     // Nerf para víctimas ricas (>= 5000 Lagcoins)
@@ -1663,7 +1665,7 @@ export async function robBank(guildId, userId) {
     
     const now = Date.now();
     const lastRob = economy.lastBankRob ? new Date(economy.lastBankRob).getTime() : 0;
-    const cooldown = 180000; // 3 minutos
+    const cooldown = 120000; // 2 minutos de cooldown
     
     if (now - lastRob < cooldown) {
       const remaining = Math.ceil((cooldown - (now - lastRob)) / 1000);
@@ -1686,8 +1688,8 @@ export async function robBank(guildId, userId) {
       robBonus += adminBoost.percentage;
     }
     
-    // 15% base + bonus de éxito
-    const success = Math.random() < (0.15 + robBonus * 0.3);
+    // 5% base + bonus de éxito (reducido 10%)
+    const success = Math.random() < (0.05 + robBonus * 0.3);
     
     if (success) {
       let stolen = Math.floor(Math.random() * 2000) + 500;

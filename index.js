@@ -1772,6 +1772,17 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.reply({ content: '❌ Error al procesar la compra', flags: 64 });
     }
   }
+
+  // Manejador para expansiones de banco
+  if (interaction.customId === 'bank_upgrade') {
+    try {
+      const { handleBankUpgrade } = await import('./commands/bank.js');
+      return await handleBankUpgrade(interaction);
+    } catch (error) {
+      console.error('Error en expansión de banco:', error);
+      return interaction.reply({ content: '❌ Error al procesar la expansión', flags: 64 });
+    }
+  }
 });
 
 // Auditoría

@@ -10,9 +10,9 @@ if (!fs.existsSync(DATA_DIR)) {
 
 const CASINO_COOLDOWNS = {
   slots: 30000,
-  blackjack: 45000,
-  coinflip: 20000,
-  dice: 25000,
+  blackjack: 40000,
+  coinflip: 40000,
+  dice: 60000,
   roulette: 60000,
   poker: 90000,
   crash: 40000,
