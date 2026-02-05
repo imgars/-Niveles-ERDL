@@ -647,6 +647,7 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
   
   let currentPlayer = Math.random() < 0.5 ? player1 : player2;
   let shotsFired = 0;
+  let timedOut = false;
   
   await interaction.update({
     embeds: [{
@@ -675,7 +676,7 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
       embeds: [{
         color: 0xFF4444,
         title: '🔫 Tu Turno',
-        description: `<@${currentPlayer.id}>, es tu turno...\n\n**Cámaras restantes:** ${remaining}\n**Probabilidad de BANG:** ${probability}%`,
+        description: `<@${currentPlayer.id}>, es tu turno...\n\n**Cámaras restantes:** ${remaining}\n**Probabilidad de BANG:** ${probability}%\n\n⏱️ Tienes **30 segundos** para disparar o el gatillo se apretará solo y perderás el **DOBLE**.`,
       }],
       components: [row]
     });
@@ -688,7 +689,7 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
         return i.reply({ content: '❌ No es tu turno.', ephemeral: true });
       }
       
-      collector.stop();
+      collector.stop('shot');
       
       if (chamber[shotsFired]) {
         await i.update({
@@ -700,7 +701,7 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
           components: []
         });
         
-        setTimeout(() => endRouletteGame(currentPlayer === player1 ? player2 : player1, currentPlayer), 2000);
+        setTimeout(() => endRouletteGame(currentPlayer === player1 ? player2 : player1, currentPlayer, false), 2000);
       } else {
         await i.update({
           embeds: [{
@@ -716,9 +717,31 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
         setTimeout(() => takeTurn(), 2000);
       }
     });
+
+    collector.on('end', async (collected, reason) => {
+      if (reason === 'shot') return;
+      
+      timedOut = true;
+      const coward = currentPlayer;
+      const winner = currentPlayer === player1 ? player2 : player1;
+      
+      await interaction.editReply({
+        embeds: [{
+          color: 0xFF0000,
+          title: '⏱️💥 ¡TIEMPO AGOTADO!',
+          description: `<@${coward.id}> no tuvo el valor de disparar...\n\n¡El gatillo se apretó SOLO!\n\n💀 **<@${coward.id}> pierde el DOBLE por cobarde!**`,
+        }],
+        components: []
+      });
+      
+      setTimeout(() => endRouletteGame(winner, coward, true), 2000);
+    });
   }
   
-  async function endRouletteGame(winner, loser) {
+  async function endRouletteGame(winner, loser, wasTimeout) {
+    const levelPenalty = wasTimeout ? 6 : 3;
+    const lagcoinPenalty = wasTimeout ? 600 : 300;
+    
     if (hasReward) {
       const winnerData = db.getUser(interaction.guild.id, winner.id);
       const loserData = db.getUser(interaction.guild.id, loser.id);
@@ -726,24 +749,26 @@ async function startRouletteGame(interaction, player1, player2, hasReward) {
       winnerData.totalXp = addLevels(winnerData.totalXp, 2.5);
       winnerData.level = calculateLevel(winnerData.totalXp);
       
-      loserData.totalXp = removeLevels(loserData.totalXp, 3);
+      loserData.totalXp = removeLevels(loserData.totalXp, levelPenalty);
       loserData.level = calculateLevel(loserData.totalXp);
       
       db.saveUser(interaction.guild.id, winner.id, winnerData);
       db.saveUser(interaction.guild.id, loser.id, loserData);
       
       await addUserLagcoins(interaction.guild.id, winner.id, 800, 'roulette_win');
-      await addUserLagcoins(interaction.guild.id, loser.id, -300, 'roulette_loss');
+      await addUserLagcoins(interaction.guild.id, loser.id, -lagcoinPenalty, 'roulette_loss');
       
       db.setCooldown('minigame_roulette', player1.id, 24 * 60 * 60 * 1000);
       db.setCooldown('minigame_roulette', player2.id, 24 * 60 * 60 * 1000);
     }
     
+    const timeoutPenaltyText = wasTimeout ? `\n\n⚠️ **PENALIZACIÓN POR COBARDÍA:** ¡Perdiste el **DOBLE**!` : '';
+    
     await interaction.editReply({
       embeds: [{
         color: 0xFFD700,
         title: '🏆 ¡Juego Terminado!',
-        description: `**Ganador:** <@${winner.id}>\n**Perdedor:** <@${loser.id}>${hasReward ? `\n\n✨ <@${winner.id}> ha ganado **2.5 niveles**\n💚 +800 Lagcoins\n💔 <@${loser.id}> ha perdido **3 niveles**\n💚 -300 Lagcoins` : ''}`,
+        description: `**Ganador:** <@${winner.id}>\n**Perdedor:** <@${loser.id}>${hasReward ? `\n\n✨ <@${winner.id}> ha ganado **2.5 niveles**\n💚 +800 Lagcoins\n💔 <@${loser.id}> ha perdido **${levelPenalty} niveles**\n💔 -${lagcoinPenalty} Lagcoins${timeoutPenaltyText}` : ''}`,
       }],
       components: []
     });

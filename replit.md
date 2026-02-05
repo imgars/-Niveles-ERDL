@@ -8,6 +8,7 @@
   - Probabilidad de robo reducida 10%: Usuario 15%, Banco 5%.
   - Escudo Anti-Robo ahora activa correctamente la protección de seguro.
   - Panel de estadísticas movido antes del leaderboard en el dashboard web.
+  - Ruleta Rusa: timeout de 30s por turno, si no disparas pierde el DOBLE (6 niveles, 600 LC).
 
 - **Comando /gamecard con IA (Enero 2026):**
   - Reconstruido completamente el comando `/gamecard` con generación de imágenes por IA.
