@@ -1,6 +1,14 @@
 # -Niveles
 
 ## Recent Changes
+- **Balance Update (Febrero 2026):**
+  - Cooldowns actualizados: Casino 30-60s, Trabajo 1min, Robo 30s, Robo Banco 2min.
+  - Sistema de límite de banco: Base 10k, expansiones comprables (+5k, +10k, +20k).
+  - Precios de consumibles ajustados: Bebida 3k, Trébol 6k, Escudo 15k.
+  - Probabilidad de robo reducida 10%: Usuario 15%, Banco 5%.
+  - Escudo Anti-Robo ahora activa correctamente la protección de seguro.
+  - Panel de estadísticas movido antes del leaderboard en el dashboard web.
+
 - **Comando /gamecard con IA (Enero 2026):**
   - Reconstruido completamente el comando `/gamecard` con generación de imágenes por IA.
   - Dos subcomandos: `/gamecard profile` (tarjeta de perfil) y `/gamecard battle` (tarjeta de batalla).
