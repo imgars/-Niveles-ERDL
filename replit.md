@@ -1,6 +1,13 @@
 # -Niveles
 
 ## Recent Changes
+- **Persistencia de Nacionalidades en MongoDB (Febrero 2026):**
+  - Las nacionalidades ahora se guardan en MongoDB en lugar de solo archivo JSON.
+  - Las funciones `getUserNationality`, `assignRandomNationality`, y `travelToCountry` ahora son async.
+  - Cuando MongoDB está conectado, los datos se guardan ahí y sobreviven a reinicios de Render.
+  - Si MongoDB falla, el sistema usa JSON local como fallback.
+  - Requiere variable de entorno: `MONGODB_URI` con credenciales válidas.
+
 - **Balance Update (Febrero 2026):**
   - Cooldowns actualizados: Casino 30-60s, Trabajo 1min, Robo 30s, Robo Banco 2min.
   - Sistema de límite de banco: Base 10k, expansiones comprables (+5k, +10k, +20k).
