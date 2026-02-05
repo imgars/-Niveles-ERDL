@@ -283,7 +283,7 @@ export default {
       const country = COUNTRIES[pais];
       
       // Forzar nacionalidad
-      const result = travelToCountry(interaction.guildId, targetUser.id, pais);
+      const result = await travelToCountry(interaction.guildId, targetUser.id, pais);
       
       const embed = new EmbedBuilder()
         .setColor('#00FF00')

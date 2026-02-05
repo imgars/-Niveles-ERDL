@@ -541,7 +541,7 @@ app.get('/api/user-stats', async (req, res) => {
     }
     
     // Obtener nacionalidad
-    const nationality = getUserNationality(guildId, targetUserId);
+    const nationality = await getUserNationality(guildId, targetUserId);
     
     // Calcular estadísticas de robos (desde transacciones)
     const transactions = economy.transactions || [];

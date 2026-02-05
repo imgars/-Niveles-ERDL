@@ -63,7 +63,7 @@ export default {
     const subcommand = interaction.options.getSubcommand();
     
     if (subcommand === 'obtener') {
-      const existing = getUserNationality(interaction.guildId, interaction.user.id);
+      const existing = await getUserNationality(interaction.guildId, interaction.user.id);
       
       if (existing) {
         const country = COUNTRIES[existing.country];
@@ -73,7 +73,7 @@ export default {
         });
       }
       
-      const nationality = assignRandomNationality(interaction.guildId, interaction.user.id);
+      const nationality = await assignRandomNationality(interaction.guildId, interaction.user.id);
       const country = COUNTRIES[nationality.country];
       
       const rarityText = country.probability <= 0.1 ? '✨ ¡ULTRA RARO!' : 
@@ -96,7 +96,7 @@ export default {
     }
     
     if (subcommand === 'ver') {
-      const nationality = getUserNationality(interaction.guildId, interaction.user.id);
+      const nationality = await getUserNationality(interaction.guildId, interaction.user.id);
       
       if (!nationality) {
         return interaction.reply({ 
@@ -133,7 +133,7 @@ export default {
     }
     
     if (subcommand === 'viajar') {
-      const nationality = getUserNationality(interaction.guildId, interaction.user.id);
+      const nationality = await getUserNationality(interaction.guildId, interaction.user.id);
       
       if (!nationality) {
         return interaction.reply({ 
@@ -184,7 +184,7 @@ export default {
       
       // Descontar costo y viajar
       await removeUserLagcoins(interaction.guildId, interaction.user.id, travelCost, 'travel');
-      const result = travelToCountry(interaction.guildId, interaction.user.id, destino);
+      const result = await travelToCountry(interaction.guildId, interaction.user.id, destino);
       
       if (result.error) {
         return interaction.reply({ content: `❌ Error al viajar: ${result.error}`, flags: 64 });

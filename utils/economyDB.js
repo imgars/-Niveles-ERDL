@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { getEconomy, addLagcoins, removeLagcoins, transferLagcoins, isMongoConnected, saveEconomyToMongo, addItemToInventory, updateCasinoStats, updateJobStats, depositToBank, withdrawFromBank, giveItemToUser } from './mongoSync.js';
+import { getEconomy, addLagcoins, removeLagcoins, transferLagcoins, isMongoConnected, saveEconomyToMongo, addItemToInventory, updateCasinoStats, updateJobStats, depositToBank, withdrawFromBank, giveItemToUser, getNationalityFromMongo, saveNationalityToMongo, updateNationalityTravelHistory } from './mongoSync.js';
 
 const DATA_DIR = './data';
 const ECONOMY_FILE = path.join(DATA_DIR, 'economy.json');
@@ -657,67 +657,176 @@ export function deactivateInsurance(guildId, userId) {
 }
 
 // Obtener nacionalidad del usuario
-export function getUserNationality(guildId, userId) {
-  const nationalities = loadNationalitiesFile();
-  const key = `${guildId}-${userId}`;
-  return nationalities[key] || null;
+export async function getUserNationality(guildId, userId) {
+  try {
+    const mongoConnected = isMongoConnected();
+    
+    if (mongoConnected) {
+      const result = await getNationalityFromMongo(guildId, userId);
+      if (result) {
+        // Sincronizar con JSON local
+        const nationalities = loadNationalitiesFile();
+        const key = `${guildId}-${userId}`;
+        nationalities[key] = {
+          country: result.country,
+          currentCountry: result.currentCountry,
+          assignedAt: result.assignedAt,
+          travelHistory: result.travelHistory || []
+        };
+        saveNationalitiesFile(nationalities);
+        return nationalities[key];
+      }
+    }
+    
+    // Fallback a JSON local
+    const nationalities = loadNationalitiesFile();
+    const key = `${guildId}-${userId}`;
+    return nationalities[key] || null;
+  } catch (error) {
+    console.error('Error in getUserNationality:', error);
+    const nationalities = loadNationalitiesFile();
+    const key = `${guildId}-${userId}`;
+    return nationalities[key] || null;
+  }
 }
 
 // Asignar nacionalidad aleatoria
-export function assignRandomNationality(guildId, userId) {
-  const nationalities = loadNationalitiesFile();
-  const key = `${guildId}-${userId}`;
-  
-  // Calcular probabilidades acumuladas
-  const countries = Object.entries(COUNTRIES);
-  let totalProb = countries.reduce((sum, [_, c]) => sum + c.probability, 0);
-  
-  // Normalizar probabilidades
-  let random = Math.random() * totalProb;
-  let selectedCountry = 'venezuela';
-  
-  for (const [countryId, country] of countries) {
-    random -= country.probability;
-    if (random <= 0) {
-      selectedCountry = countryId;
-      break;
+export async function assignRandomNationality(guildId, userId) {
+  try {
+    const nationalities = loadNationalitiesFile();
+    const key = `${guildId}-${userId}`;
+    
+    // Calcular probabilidades acumuladas
+    const countries = Object.entries(COUNTRIES);
+    let totalProb = countries.reduce((sum, [_, c]) => sum + c.probability, 0);
+    
+    // Normalizar probabilidades
+    let random = Math.random() * totalProb;
+    let selectedCountry = 'venezuela';
+    
+    for (const [countryId, country] of countries) {
+      random -= country.probability;
+      if (random <= 0) {
+        selectedCountry = countryId;
+        break;
+      }
     }
+    
+    const nationalityData = {
+      country: selectedCountry,
+      currentCountry: selectedCountry,
+      assignedAt: new Date().toISOString(),
+      travelHistory: []
+    };
+    
+    nationalities[key] = nationalityData;
+    saveNationalitiesFile(nationalities);
+    
+    // Guardar en MongoDB si está conectado
+    const mongoConnected = isMongoConnected();
+    if (mongoConnected) {
+      await saveNationalityToMongo(guildId, userId, nationalityData);
+    }
+    
+    return nationalities[key];
+  } catch (error) {
+    console.error('Error in assignRandomNationality:', error);
+    // Fallback a JSON local
+    const nationalities = loadNationalitiesFile();
+    const key = `${guildId}-${userId}`;
+    
+    const countries = Object.entries(COUNTRIES);
+    let totalProb = countries.reduce((sum, [_, c]) => sum + c.probability, 0);
+    let random = Math.random() * totalProb;
+    let selectedCountry = 'venezuela';
+    
+    for (const [countryId, country] of countries) {
+      random -= country.probability;
+      if (random <= 0) {
+        selectedCountry = countryId;
+        break;
+      }
+    }
+    
+    nationalities[key] = {
+      country: selectedCountry,
+      currentCountry: selectedCountry,
+      assignedAt: new Date().toISOString(),
+      travelHistory: []
+    };
+    
+    saveNationalitiesFile(nationalities);
+    return nationalities[key];
   }
-  
-  nationalities[key] = {
-    country: selectedCountry,
-    currentCountry: selectedCountry,
-    assignedAt: new Date().toISOString(),
-    travelHistory: []
-  };
-  
-  saveNationalitiesFile(nationalities);
-  return nationalities[key];
 }
 
 // Viajar a otro país
-export function travelToCountry(guildId, userId, destinationCountry) {
-  const nationalities = loadNationalitiesFile();
-  const key = `${guildId}-${userId}`;
-  
-  if (!nationalities[key]) return { error: 'no_nationality' };
-  
-  const country = COUNTRIES[destinationCountry];
-  if (!country) return { error: 'invalid_country' };
-  
-  nationalities[key].currentCountry = destinationCountry;
-  nationalities[key].travelHistory.push({
-    country: destinationCountry,
-    date: new Date().toISOString()
-  });
-  
-  saveNationalitiesFile(nationalities);
-  return nationalities[key];
+export async function travelToCountry(guildId, userId, destinationCountry) {
+  try {
+    const nationalities = loadNationalitiesFile();
+    const key = `${guildId}-${userId}`;
+    
+    // Primero verificar en MongoDB si está conectado
+    const mongoConnected = isMongoConnected();
+    let userNationality = nationalities[key];
+    
+    if (mongoConnected && !userNationality) {
+      const mongoNationality = await getNationalityFromMongo(guildId, userId);
+      if (mongoNationality) {
+        userNationality = {
+          country: mongoNationality.country,
+          currentCountry: mongoNationality.currentCountry,
+          assignedAt: mongoNationality.assignedAt,
+          travelHistory: mongoNationality.travelHistory || []
+        };
+        nationalities[key] = userNationality;
+      }
+    }
+    
+    if (!userNationality) return { error: 'no_nationality' };
+    
+    const country = COUNTRIES[destinationCountry];
+    if (!country) return { error: 'invalid_country' };
+    
+    nationalities[key].currentCountry = destinationCountry;
+    nationalities[key].travelHistory.push({
+      country: destinationCountry,
+      date: new Date().toISOString()
+    });
+    
+    saveNationalitiesFile(nationalities);
+    
+    // Actualizar en MongoDB si está conectado
+    if (mongoConnected) {
+      await updateNationalityTravelHistory(guildId, userId, destinationCountry);
+    }
+    
+    return nationalities[key];
+  } catch (error) {
+    console.error('Error in travelToCountry:', error);
+    // Fallback a JSON local
+    const nationalities = loadNationalitiesFile();
+    const key = `${guildId}-${userId}`;
+    
+    if (!nationalities[key]) return { error: 'no_nationality' };
+    
+    const country = COUNTRIES[destinationCountry];
+    if (!country) return { error: 'invalid_country' };
+    
+    nationalities[key].currentCountry = destinationCountry;
+    nationalities[key].travelHistory.push({
+      country: destinationCountry,
+      date: new Date().toISOString()
+    });
+    
+    saveNationalitiesFile(nationalities);
+    return nationalities[key];
+  }
 }
 
 export async function getUserProfile(guildId, userId) {
   const economy = await getUserEconomy(guildId, userId);
-  const nationality = getUserNationality(guildId, userId);
+  const nationality = await getUserNationality(guildId, userId);
   const activePowerups = getUserActivePowerups(guildId, userId);
   const insurance = getUserInsurance(guildId, userId);
   
