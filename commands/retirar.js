@@ -9,6 +9,7 @@ export default {
       option.setName('cantidad')
         .setDescription('Cantidad a retirar (usa 0 para todo)')
         .setMinValue(0)
+        .setMaxValue(999999999999)
         .setRequired(true)
     ),
   

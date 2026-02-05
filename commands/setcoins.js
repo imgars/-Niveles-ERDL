@@ -15,6 +15,7 @@ export default {
       option.setName('cantidad')
         .setDescription('Nueva cantidad de Lagcoins')
         .setMinValue(0)
+        .setMaxValue(999999999999)
         .setRequired(true)
     ),
   

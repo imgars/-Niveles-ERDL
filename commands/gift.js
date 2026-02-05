@@ -35,6 +35,7 @@ export default {
             .setDescription('Cantidad de Lagcoins')
             .setRequired(true)
             .setMinValue(1)
+            .setMaxValue(999999999999)
         )
     )
     .addSubcommand(subcommand =>

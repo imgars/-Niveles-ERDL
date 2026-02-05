@@ -15,6 +15,7 @@ export default {
       option.setName('cantidad')
         .setDescription('Cantidad de Lagcoins a añadir')
         .setMinValue(1)
+        .setMaxValue(999999999999)
         .setRequired(true)
     )
     .addStringOption(option =>
