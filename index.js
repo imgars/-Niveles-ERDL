@@ -2978,11 +2978,49 @@ const token = process.env.DISCORD_BOT_TOKEN;
 if (token) {
   console.log('🔑 Token de Discord encontrado, intentando conectar...');
   
+  client.on('debug', (info) => {
+    if (info.includes('Heartbeat') || info.includes('Session Limit')) return;
+    console.log(`[Discord Debug] ${info}`);
+  });
+
+  const loginTimeout = setTimeout(() => {
+    console.error('⏰ TIMEOUT: client.login() no respondió en 30 segundos');
+    console.error('   Posibles causas:');
+    console.error('   1. El token podría ser inválido o estar mal formateado');
+    console.error('   2. Discord podría estar bloqueando la conexión');
+    console.error('   3. Problema de red en el servidor');
+    console.error('   Intentando verificar el token manualmente...');
+    
+    fetch('https://discord.com/api/v10/users/@me', {
+      headers: { 'Authorization': `Bot ${token}` }
+    })
+    .then(res => {
+      console.log(`   Verificación manual - Status HTTP: ${res.status}`);
+      if (res.status === 401) {
+        console.error('   ❌ Token INVÁLIDO (401 Unauthorized)');
+        console.error('   💡 Regenera el token en Discord Developer Portal');
+      } else if (res.status === 200) {
+        return res.json().then(data => {
+          console.log(`   ✅ Token válido - Bot: ${data.username}#${data.discriminator}`);
+          console.error('   ⚠️ El token es válido pero el WebSocket no conecta');
+          console.error('   💡 Puede ser un problema de red o de intents');
+        });
+      } else {
+        console.error(`   ⚠️ Respuesta inesperada: ${res.status}`);
+      }
+    })
+    .catch(err => {
+      console.error('   ❌ Error verificando token:', err.message);
+    });
+  }, 30000);
+
   client.login(token)
     .then(() => {
+      clearTimeout(loginTimeout);
       console.log('✅ Login exitoso - conectado a Discord');
     })
     .catch((error) => {
+      clearTimeout(loginTimeout);
       console.error('❌ Error al intentar login en Discord:');
       console.error(`   Mensaje: ${error.message}`);
       console.error(`   Código: ${error.code || 'N/A'}`);
