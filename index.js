@@ -2941,10 +2941,64 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Conectar a Discord SI hay token disponible
+client.on('error', (error) => {
+  console.error('❌ Error en el cliente de Discord:', error.message);
+  console.error('   Detalles:', error);
+});
+
+client.on('warn', (warning) => {
+  console.warn('⚠️ Advertencia de Discord:', warning);
+});
+
+client.on('disconnect', (event) => {
+  console.log('🔌 Bot desconectado de Discord. Código:', event?.code || 'desconocido');
+});
+
+client.on('reconnecting', () => {
+  console.log('🔄 Intentando reconectar a Discord...');
+});
+
+client.on('shardError', (error) => {
+  console.error('❌ Error en el shard de Discord:', error.message);
+});
+
+client.on('shardDisconnect', (event, shardId) => {
+  console.log(`🔌 Shard ${shardId} desconectado. Código: ${event?.code || 'desconocido'}`);
+});
+
+client.on('shardReconnecting', (shardId) => {
+  console.log(`🔄 Shard ${shardId} reconectando...`);
+});
+
+client.on('shardReady', (shardId) => {
+  console.log(`✅ Shard ${shardId} listo`);
+});
+
 const token = process.env.DISCORD_BOT_TOKEN;
 if (token) {
-  client.login(token);
+  console.log('🔑 Token de Discord encontrado, intentando conectar...');
+  
+  client.login(token)
+    .then(() => {
+      console.log('✅ Login exitoso - conectado a Discord');
+    })
+    .catch((error) => {
+      console.error('❌ Error al intentar login en Discord:');
+      console.error(`   Mensaje: ${error.message}`);
+      console.error(`   Código: ${error.code || 'N/A'}`);
+      if (error.message.includes('TOKEN_INVALID') || error.message.includes('An invalid token was provided')) {
+        console.error('   💡 El token es inválido. Verifica que:');
+        console.error('      1. El token no haya sido regenerado en el panel de Discord');
+        console.error('      2. No haya espacios extra al inicio o final del token');
+        console.error('      3. El bot no haya sido eliminado de la aplicación');
+      }
+      if (error.message.includes('disallowed intents') || error.message.includes('DISALLOWED_INTENTS')) {
+        console.error('   💡 Los intents no están habilitados. Ve a:');
+        console.error('      Discord Developer Portal > Tu App > Bot > Privileged Gateway Intents');
+        console.error('      Y activa: PRESENCE INTENT, SERVER MEMBERS INTENT, MESSAGE CONTENT INTENT');
+      }
+      console.error('   Stack completo:', error.stack);
+    });
 } else {
   console.error('❌ DISCORD_BOT_TOKEN is not set in environment variables!');
   console.log('⚠️  El panel admin funcionará, pero el bot no se conectará a Discord');
