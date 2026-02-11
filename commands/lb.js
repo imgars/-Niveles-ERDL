@@ -36,7 +36,7 @@ export default {
       const viewFullButton = new ButtonBuilder()
         .setLabel('Ver leaderboard completo')
         .setStyle(ButtonStyle.Link)
-        .setURL('https://niveles-wul5.onrender.com/#leaderboard');
+        .setURL('https://niveleserdl.onrender.com/#leaderboard');
       
       const row = new ActionRowBuilder().addComponents(viewFullButton);
       

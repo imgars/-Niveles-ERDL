@@ -78,7 +78,7 @@ export default {
         new ButtonBuilder()
           .setLabel('Dashboard Web')
           .setStyle(ButtonStyle.Link)
-          .setURL('https://niveles-wul5.onrender.com/#inicio')
+          .setURL('https://niveleserdl.onrender.com/#inicio')
           .setEmoji('🌐')
       );
 
