@@ -1,6 +1,18 @@
 # -Niveles
 
 ## Recent Changes
+- **Sistema de Auditoría Avanzado (Febrero 2026):**
+  - Reescritura completa de `activityLogger.js` con persistencia MongoDB y 30+ tipos de log.
+  - 13 categorías de sistema: economía, niveles, casino, minijuegos, misiones, nacionalidades, social, admin, tienda, powerups, robos, seguridad, general.
+  - 4 niveles de importancia: low, medium, high, critical.
+  - Logging detallado en 28 archivos de comandos con montos, saldos, y resultados.
+  - Interceptor global de comandos en `index.js` que registra cada uso de comando.
+  - Filtros avanzados en API: por tipo, sistema, importancia, período (hora/día/semana), paginación.
+  - Detección automática de actividad sospechosa: abuso de robos, rachas de casino, uso excesivo de admin.
+  - Exportación de logs en CSV y JSON desde el panel admin.
+  - Panel admin actualizado con dropdowns de filtros, alertas, paginación, indicadores de importancia.
+  - Almacenamiento dual: memoria (1000 entradas) + MongoDB (persistente).
+
 - **Persistencia de Nacionalidades en MongoDB (Febrero 2026):**
   - Las nacionalidades ahora se guardan en MongoDB en lugar de solo archivo JSON.
   - Las funciones `getUserNationality`, `assignRandomNationality`, y `travelToCountry` ahora son async.
