@@ -1,239 +1,339 @@
-# -Niveles
+# Bot de Niveles - Discord
 
-Un bot de Discord completo con sistema de niveles, XP, minijuegos y tarjetas de rango personalizadas con pixel art.
+Bot avanzado de Discord con sistema de niveles, economía virtual (Lagcoins), casino, minijuegos, power-ups, tarjetas de rango en pixel art y mucho más. Diseñado para comunidades de habla hispana que buscan gamificación e interacción social.
 
-## 🌟 Características
+## Tabla de Contenidos
 
-### Sistema de Niveles
-- **Sistema de XP progresivo**: Los primeros 5 niveles son muy rápidos, luego la velocidad disminuye gradualmente hasta el nivel 90+
-- **Cooldown de XP**: 10 segundos entre mensajes para evitar spam
-- **Ganancia de XP**: Por mensajes, imágenes, videos y reacciones
-- **Recompensas automáticas**: Roles asignados automáticamente al alcanzar niveles específicos (1, 5, 10, 20, 25, 30, 35, 40, 50, 75, 100)
-
-### Sistema de Boosts
-- **Boosts acumulables**: Los boosts se suman entre sí
-- **Boost de Boosters/VIPs**: 200% automático para usuarios con roles especiales
-- **Boost nocturno**: 25% durante la noche (18:00 - 06:00 hora de Venezuela)
-- **Boosts personalizados**: Para usuarios, canales o todo el servidor
-- **Boosts de minijuegos**: Gana boosts temporales jugando
-
-### Minijuegos
-1. **Trivia**: 5 preguntas, recompensa de 20% boost por 12h o 1.5 niveles
-2. **Piedra, Papel o Tijeras**: Mejor de 3, ganador recibe 30% boost por 2h
-3. **Ruleta Rusa**: Ganador +2.5 niveles, perdedor -3 niveles (¡riesgoso!)
-4. **Ahorcado** (próximamente): Modo solitario y multijugador
-
-### Tarjetas Personalizadas
-- **Pixel Art**: Diferentes temas según el rango del usuario
-- **Temas disponibles**:
-  - Normal: Pixel art básico
-  - Activo (Nivel 25+): Tema oceánico
-  - Super Activo (Nivel 35+): Tema Zelda
-  - Nivel 100+: Tema Pokémon
-  - Boosters: Tema Geometry Dash
-  - VIPs: Tema nocturno con estrellas
-  - Usuario especial: Temas aleatorios (Roblox, Minecraft, Zelda, FNAF, Geometry Dash)
-
-## 🎮 Comandos
-
-### Comandos de Usuarios
-
-| Comando | Descripción |
-|---------|-------------|
-| `/level [usuario]` | Muestra el nivel y XP (con tarjeta personalizada) |
-| `/nivel [usuario]` | Alias de /level |
-| `/rank [usuario]` | Alias de /level |
-| `/leaderboard` | Tabla de clasificación top 10 |
-| `/lb` | Alias de /leaderboard |
-| `/rewards list` | Muestra las recompensas por nivel |
-| `/boost list` | Ver boosts activos |
-| `/boost status` | Ver estado de todos los boosts |
-| `/minigame trivia` | Jugar trivia |
-| `/minigame rps <oponente>` | Piedra, Papel o Tijeras |
-| `/minigame roulette <oponente>` | Ruleta Rusa |
-| `/help` | Muestra todos los comandos |
-
-### Comandos de Staff
-
-| Comando | Descripción |
-|---------|-------------|
-| `/addlevel <usuario> <cantidad>` | Añadir niveles |
-| `/removelevel <usuario> <cantidad>` | Quitar niveles |
-| `/setlevel <usuario> <nivel>` | Establecer nivel exacto |
-| `/xp add/remove/reset <usuario>` | Gestionar XP |
-| `/boost add <usuario/canal> <multiplicador> <duración>` | Añadir boost |
-| `/globalboost <multiplicador> <duración>` | Boost global |
-| `/removeglobalboost` | Quitar boost global |
-| `/banxp user/channel` | Banear de ganar XP |
-| `/unbanxp user/channel` | Desbanear |
-| `/resettemporada` | Resetear toda la XP del servidor |
-| `/clearlevelroles` | Quitar todos los roles de nivel |
-| `/embed` | Crear embed personalizado |
-| `/mensaje <texto>` | Enviar mensaje plano |
-| `/help staff` | Comandos de staff |
-
-## 🚀 Configuración
-
-### 1. Configurar el Bot en Discord
-
-1. Ve a [Discord Developer Portal](https://discord.com/developers/applications)
-2. Crea una nueva aplicación
-3. Ve a la sección "Bot" y crea un bot
-4. Activa los siguientes **Privileged Gateway Intents**:
-   - Server Members Intent
-   - Message Content Intent
-5. Copia el token del bot
-
-### 2. Invitar el Bot a tu Servidor
-
-Usa este enlace (reemplaza `CLIENT_ID` con tu Application ID):
-```
-https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&permissions=8&scope=bot%20applications.commands
-```
-
-### 3. Configurar Variables de Entorno
-
-En Replit, ve a "Secrets" (icono de candado) y añade:
-```
-DISCORD_BOT_TOKEN=tu_token_aquí
-```
-
-### 4. Personalizar Configuración
-
-Edita `config.js` para ajustar:
-- IDs de roles de staff, boosters y VIPs
-- IDs de roles de recompensa por nivel
-- Canales bloqueados de XP
-- Canal de anuncios de subida de nivel
-- Multiplicadores de XP
-
-## 📦 Despliegue a Render
-
-### Opción 1: Desde Replit
-
-1. En Replit, descarga el proyecto como ZIP
-2. Sube el código a GitHub
-3. Conecta el repositorio a Render
-
-### Opción 2: Directo a Render
-
-1. Crea una cuenta en [Render](https://render.com)
-2. Crea un nuevo "Web Service"
-3. Conecta tu repositorio de GitHub
-4. Configura:
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Environment Variables**: Añade `DISCORD_BOT_TOKEN`
-5. Despliega
-
-### Importante para Render
-
-Para que el bot funcione 24/7 en Render:
-
-1. Elige el plan apropiado (el gratuito se duerme después de 15 minutos de inactividad)
-2. Para el plan gratuito, puedes usar un servicio de "ping" para mantenerlo activo
-3. O mejor aún, usa el plan de pago para tener el bot siempre activo
-
-## 🗂️ Estructura del Proyecto
-
-```
-.
-├── index.js              # Archivo principal del bot
-├── config.js             # Configuración (IDs, roles, etc)
-├── package.json          # Dependencias
-├── commands/             # Comandos slash
-│   ├── level.js
-│   ├── leaderboard.js
-│   ├── minigame.js
-│   └── ...
-├── utils/                # Utilidades
-│   ├── database.js       # Sistema de persistencia JSON
-│   ├── xpSystem.js       # Cálculos de XP y niveles
-│   ├── cardGenerator.js  # Generación de tarjetas
-│   ├── timeBoost.js      # Sistema de boost nocturno
-│   └── helpers.js        # Funciones auxiliares
-└── data/                 # Datos persistentes (JSON)
-    ├── users.json
-    ├── boosts.json
-    ├── cooldowns.json
-    └── bans.json
-```
-
-## 🔧 Tecnologías
-
-- **Node.js** v20
-- **Discord.js** v14
-- **@napi-rs/canvas** - Generación de imágenes
-- **node-cron** - Tareas programadas
-- **moment-timezone** - Manejo de zonas horarias
-
-## 📊 Fórmula de XP
-
-El sistema usa una fórmula progresiva:
-
-- **Niveles 1-5**: MUY rápido (100 XP base)
-- **Niveles 6-10**: Muy rápido (150 XP base)
-- **Niveles 11-15**: Rápido (250 XP base)
-- **Niveles 16-20**: Medianamente rápido (400 XP base)
-- **Niveles 21-35**: Normal (600 XP base)
-- **Niveles 36-40**: Medianamente lento (850 XP base)
-- **Niveles 41-50**: Lento (1200 XP base)
-- **Niveles 51-75**: Medianamente lento (1800 XP base)
-- **Niveles 76-90**: Lento (2500 XP base)
-- **Niveles 90+**: MUY lento (3500 XP base)
-
-Cada nivel multiplica la XP base por `1 + (nivel * 0.1)`
-
-## 💾 Persistencia de Datos
-
-Todos los datos se guardan en archivos JSON en la carpeta `data/`:
-- Los datos sobreviven a reinicios del bot
-- Sistema de guardado automático
-- Backups recomendados para producción
-
-## 🎨 Personalización
-
-### Cambiar Temas de Tarjetas
-
-Edita `utils/cardGenerator.js` función `getThemeColors()` para personalizar:
-- Colores de fondo
-- Colores de acento
-- Colores de barra de progreso
-
-### Añadir Preguntas de Trivia
-
-Edita `commands/minigame.js` array `triviaQuestions` para añadir/modificar preguntas.
-
-## 📝 Notas Importantes
-
-- **Intents**: Asegúrate de tener activados los intents necesarios en el portal de Discord
-- **Permisos**: El bot necesita permisos de administrador para gestionar roles
-- **Backups**: Haz copias de seguridad de la carpeta `data/` regularmente
-- **Rate Limits**: Discord tiene límites de tasa, el bot maneja esto automáticamente
-
-## 🆘 Solución de Problemas
-
-### El bot no responde a comandos
-- Verifica que el token sea correcto
-- Asegúrate de que los intents estén activados
-- Revisa que el bot tenga permisos en el servidor
-
-### Las tarjetas no se generan
-- Verifica que `@napi-rs/canvas` esté instalado correctamente
-- Revisa los logs para errores de generación de imágenes
-
-### Los boosts no funcionan
-- Verifica que la zona horaria de Venezuela esté correcta
-- Revisa el archivo `data/boosts.json` para ver boosts activos
-
-## 📄 Licencia
-
-ISC
-
-## 🤝 Contribuciones
-
-¡Las contribuciones son bienvenidas! Siéntete libre de abrir issues o pull requests.
+- [Características](#características)
+- [Requisitos](#requisitos)
+- [Instalación](#instalación)
+- [Variables de Entorno](#variables-de-entorno)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Comandos](#comandos)
+- [Dashboard Web](#dashboard-web)
+- [Panel de Administración](#panel-de-administración)
+- [Despliegue en Render](#despliegue-en-render)
+- [Tecnologías](#tecnologías)
 
 ---
 
-Desarrollado con ❤️ por Sirgio Team
+## Características
+
+### Sistema de Niveles y XP
+- Fórmula progresiva de XP con cooldowns.
+- Roles automáticos al alcanzar niveles específicos (1, 5, 10, 20, 25, 30, 35, 40, 50, 75, 100).
+- Tarjetas de rango personalizadas en **pixel art** con 10 temas desbloqueables: Pixel, Ocean, Zelda, Pokémon, Geometry Dash, Night, Roblox, Minecraft, FNAF y Default.
+- Multiplicadores de XP para Boosters, VIPs y horario nocturno.
+
+### Economía Virtual (Lagcoins)
+- Moneda virtual: **Lagcoins (LC)**.
+- Sistema bancario con depósitos, retiros y límite expandible.
+- Más de 24 trabajos disponibles con cooldowns.
+- Tienda con más de 50 ítems comprables.
+- Sistema de regalos entre usuarios (ítems, Lagcoins, XP).
+- Impuestos semanales progresivos basados en la riqueza total.
+- Rachas diarias con recompensas crecientes.
+
+### Casino
+- **Ruleta** con apuestas a color, número y rangos.
+- **Tragamonedas (Slots)** con jackpot.
+- **Blackjack** con mecánicas completas.
+- **Coinflip** (cara o cruz).
+- **Dados** con múltiples modos de apuesta.
+- **Carreras de caballos** con apuestas.
+- **Póker** simplificado.
+- **Duelos** entre usuarios.
+- Casino extendido y modo multi.
+
+### Minijuegos
+- **Trivia** con preguntas variadas.
+- **Ahorcado** con palabras en español.
+- **Piedra, Papel o Tijeras.**
+- **Ruleta Rusa** con apuestas de niveles y Lagcoins.
+
+### Sistema de Robos
+- Robo a usuarios con probabilidad base del 15%.
+- Asalto al banco con probabilidad del 5%.
+- **Seguro Anti-Robo** con 4 niveles de protección (50% a 100%).
+
+### Power-Ups
+- 12 power-ups en 4 categorías: trabajo, casino, robo y XP.
+- Duración temporal con activación manual.
+- Boosts globales configurables por staff.
+
+### Nacionalidades
+- Más de 30 países asignables con probabilidades variables.
+- Multiplicadores de salario según país.
+- Sistema de viaje con pasaportes y visas para países desarrollados.
+- Persistencia en MongoDB.
+
+### Subastas
+- Sistema de subastas entre usuarios para intercambiar ítems.
+
+### Streaks
+- Sistema de rachas de mensajes entre usuarios.
+- Seguimiento diario con notificaciones de ruptura.
+
+### Generación de Tarjetas con IA
+- Comando `/gamecard` con generación de imágenes por IA (Gemini).
+- Soporte para 8 videojuegos: Roblox, Minecraft, Brawl Stars, Geometry Dash, Fortnite, Clash Royale/CoC, Genshin Impact, Valorant.
+- Tarjetas de perfil y de batalla.
+
+### Matrimonios
+- Sistema de matrimonio y divorcio entre usuarios.
+
+---
+
+## Requisitos
+
+- **Node.js** v20 o superior
+- **MongoDB** (Atlas o instancia propia)
+- **Token de Discord Bot** con los intents necesarios
+- **API Key de Gemini** (para generación de imágenes con IA)
+
+---
+
+## Instalación
+
+1. Clona el repositorio:
+   ```bash
+   git clone <url-del-repositorio>
+   cd discord-leveling-bot
+   ```
+
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+
+3. Configura las variables de entorno (ver sección siguiente).
+
+4. Inicia el bot:
+   ```bash
+   npm start
+   ```
+
+---
+
+## Variables de Entorno
+
+| Variable | Descripción | Requerida |
+|----------|-------------|-----------|
+| `DISCORD_TOKEN` | Token del bot de Discord | Sí |
+| `CLIENT_ID` | ID de la aplicación de Discord | Sí |
+| `GUILD_ID` | ID del servidor de Discord | Sí |
+| `MONGODB_URI` | URI de conexión a MongoDB | Sí |
+| `AI_INTEGRATIONS_GEMINI_API_KEY` | API Key de Google Gemini | Sí |
+| `AI_INTEGRATIONS_GEMINI_BASE_URL` | URL base de la API de Gemini | Sí |
+| `ADMIN_SECRET` | Clave secreta para el panel de administración | Sí |
+
+---
+
+## Estructura del Proyecto
+
+```
+├── index.js                  # Archivo principal del bot y servidor Express
+├── config.js                 # Configuración de IDs, roles, canales y constantes
+├── package.json              # Dependencias y scripts
+├── Procfile                  # Configuración para Render
+│
+├── commands/                 # 80 comandos del bot
+│   ├── level.js              # Ver nivel y XP
+│   ├── rank.js               # Tarjeta de rango pixel art
+│   ├── leaderboard.js        # Tabla de clasificación
+│   ├── work.js               # Sistema de trabajos
+│   ├── shop.js / tienda.js   # Tienda de ítems
+│   ├── balance.js            # Ver balance de Lagcoins
+│   ├── bank.js               # Operaciones bancarias
+│   ├── blackjack.js          # Juego de Blackjack
+│   ├── slots.js              # Tragamonedas
+│   ├── robar.js / rob.js     # Sistema de robos
+│   ├── gamecard.js           # Tarjetas generadas con IA
+│   ├── mision.js             # Misiones semanales
+│   ├── powerups.js           # Gestión de power-ups
+│   ├── nacionalidad.js       # Sistema de nacionalidades
+│   ├── marry.js / divorce.js # Sistema de matrimonios
+│   ├── help.js               # Ayuda y lista de comandos
+│   ├── info.js               # Información del bot
+│   └── ...                   # Y muchos más
+│
+├── utils/                    # Utilidades y módulos del sistema
+│   ├── database.js           # Persistencia JSON local (fallback)
+│   ├── mongoSync.js          # Sincronización con MongoDB
+│   ├── xpSystem.js           # Cálculos de XP y niveles
+│   ├── cardGenerator.js      # Generador de tarjetas pixel art
+│   ├── geminiImageGenerator.js # Generación de imágenes con Gemini AI
+│   ├── economyDB.js          # Base de datos de economía
+│   ├── activityLogger.js     # Registro de actividad
+│   ├── streakService.js      # Servicio de rachas
+│   ├── timeBoost.js          # Boost nocturno
+│   ├── casinoCooldowns.js    # Cooldowns del casino
+│   ├── easterEggs.js         # Easter eggs
+│   └── helpers.js            # Funciones auxiliares
+│
+├── data/                     # Datos estáticos y persistencia JSON
+│   ├── users.json            # Datos de usuarios (fallback)
+│   ├── economy.json          # Datos de economía
+│   ├── boosts.json           # Boosts activos
+│   ├── cooldowns.json        # Cooldowns activos
+│   ├── shop_items.js         # Definición de ítems de tienda
+│   ├── missions_templates.js # Plantillas de misiones
+│   ├── trivia_questions.js   # Preguntas de trivia
+│   └── hangman_words.js      # Palabras del ahorcado
+│
+├── public/                   # Dashboard web público
+│   ├── index.html            # Página principal del dashboard
+│   ├── css/style.css         # Estilos del dashboard
+│   ├── js/main.js            # Lógica del dashboard
+│   ├── js/minigame-gd.js     # Minijuego de Geometry Dash
+│   ├── assets/cards/         # Imágenes de las tarjetas pixel art
+│   └── admin/                # Panel de administración
+│       ├── login.html        # Login del panel admin
+│       ├── dashboard.html    # Dashboard de administración
+│       ├── css/admin.css     # Estilos del panel admin
+│       └── js/admin.js       # Lógica del panel admin
+```
+
+---
+
+## Comandos
+
+### Niveles y XP
+| Comando | Descripción |
+|---------|-------------|
+| `/level` `/nivel` | Ver tu nivel y XP actual |
+| `/rank` `/profile` | Generar tu tarjeta de rango pixel art |
+| `/leaderboard` `/lb` | Ver la tabla de clasificación |
+| `/rankcard` | Cambiar el tema de tu tarjeta de rango |
+| `/xp` | Ver XP detallado |
+| `/rewards` | Ver recompensas por nivel |
+
+### Economía
+| Comando | Descripción |
+|---------|-------------|
+| `/work` `/trabajar` | Trabajar para ganar Lagcoins |
+| `/balance` | Ver tu balance de Lagcoins |
+| `/bank` `/depositar` `/retirar` | Operaciones bancarias |
+| `/shop` `/tienda` | Ver y comprar ítems |
+| `/inventario` | Ver tu inventario |
+| `/daily` | Recompensa diaria |
+| `/streak` | Ver tu racha diaria |
+| `/gift` | Regalar ítems, Lagcoins o XP |
+| `/trade` | Intercambiar con otros usuarios |
+| `/tax` | Ver información de impuestos |
+
+### Casino
+| Comando | Descripción |
+|---------|-------------|
+| `/blackjack` | Jugar Blackjack |
+| `/slots` | Jugar Tragamonedas |
+| `/coinflip` | Cara o cruz |
+| `/dice` | Jugar dados |
+| `/casinoextendido` | Casino con más juegos |
+| `/casinomulti` | Casino multijugador |
+
+### Social
+| Comando | Descripción |
+|---------|-------------|
+| `/marry` | Pedir matrimonio |
+| `/divorce` | Divorciarse |
+| `/nacionalidad` | Ver o cambiar nacionalidad |
+| `/afk` | Establecer estado AFK |
+| `/8ball` | Bola 8 mágica |
+
+### Robos y Seguridad
+| Comando | Descripción |
+|---------|-------------|
+| `/robar` `/rob` | Intentar robar a un usuario |
+| `/bankheist` | Asaltar el banco |
+| `/seguro` | Comprar seguro anti-robo |
+
+### Minijuegos
+| Comando | Descripción |
+|---------|-------------|
+| `/minigame` | Trivia, ahorcado, RPS, ruleta rusa |
+| `/gamecard` | Generar tarjeta de videojuego con IA |
+
+### Power-Ups y Boosts
+| Comando | Descripción |
+|---------|-------------|
+| `/powerups` | Ver y activar power-ups |
+| `/boost` | Ver boosts activos |
+| `/cooldowns` | Ver todos los cooldowns activos |
+
+### Administración
+| Comando | Descripción |
+|---------|-------------|
+| `/addcoins` `/removecoins` `/setcoins` | Gestionar Lagcoins |
+| `/addlevel` `/removelevel` `/setlevel` | Gestionar niveles |
+| `/globalboost` | Activar boost global |
+| `/banxp` `/unbanxp` | Banear/desbanear del sistema XP |
+| `/embed` | Enviar embeds personalizados |
+| `/systemtoggle` | Activar/desactivar sistemas |
+
+---
+
+## Dashboard Web
+
+El bot incluye un dashboard web público accesible en:
+
+**[https://niveleserdl.onrender.com](https://niveleserdl.onrender.com)**
+
+Incluye:
+- Tabla de clasificación con paginación.
+- Búsqueda de usuarios por nombre o ID.
+- Estadísticas del servidor en tiempo real.
+- Minijuego de Geometry Dash integrado.
+
+---
+
+## Panel de Administración
+
+Accesible en `/admin/login.html`, el panel permite:
+
+- **Dashboard** con estadísticas en tiempo real del bot.
+- **Logs** de actividad: XP, niveles, Lagcoins, trabajo, casino, robos, misiones, ítems.
+- **Gestión de usuarios**: búsqueda, modificación de XP/nivel/Lagcoins, historial.
+- **Configuración**: visualización y toggle de mantenimiento.
+- Auto-refresh de logs cada 5 segundos.
+
+Cuentas de administrador preconfiguradas (Gars y Mazin).
+
+---
+
+## Despliegue en Render
+
+1. Sube el proyecto a un repositorio de GitHub.
+
+2. Crea un nuevo **Web Service** en [Render](https://render.com).
+
+3. Conecta tu repositorio de GitHub.
+
+4. Configura:
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+
+5. Agrega todas las variables de entorno necesarias en la sección **Environment**.
+
+6. Despliega. El bot se iniciará automáticamente y el dashboard web estará disponible en la URL proporcionada por Render.
+
+---
+
+## Tecnologías
+
+| Tecnología | Uso |
+|------------|-----|
+| **Node.js v20** | Runtime del bot |
+| **Discord.js v14** | Integración con la API de Discord |
+| **Express.js** | Servidor web para el dashboard y APIs |
+| **MongoDB / Mongoose** | Base de datos principal |
+| **@napi-rs/canvas** | Generación de imágenes pixel art |
+| **Google Gemini AI** | Generación de tarjetas con IA |
+| **node-cron** | Tareas programadas (impuestos, streaks) |
+| **moment-timezone** | Manejo de zonas horarias (Venezuela) |
+
+---
+
+## Licencia
+
+ISC
