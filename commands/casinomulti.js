@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { getUserEconomy, saveUserEconomy, getUserActivePowerups, getAdminBoost, COUNTRIES } from '../utils/economyDB.js';
 import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const activeGames = new Map();
 
@@ -244,6 +245,21 @@ async function handleHorseRace(interaction) {
   }
   
   await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
+
+  logActivity({
+    type: won ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+    userId: interaction.user.id,
+    username: interaction.user.username,
+    guildId: interaction.guildId,
+    guildName: interaction.guild?.name,
+    command: 'casinomulti carreras',
+    commandOptions: { apuesta: bet, caballo: horseNumber },
+    amount: winnings,
+    balanceAfter: economy.lagcoins,
+    importance: 'low',
+    result: 'success',
+    details: { caballo: horseNumber, ganador: winnerIndex + 1 }
+  });
   
   embed.setColor(won ? '#00FF00' : '#FF0000');
   const fianzaStatus = won ? ' (Devuelta)' : ' (Perdida)';
@@ -404,6 +420,21 @@ async function handlePoker(interaction) {
   }
   
   await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
+
+  logActivity({
+    type: won ? LOG_TYPES.CASINO_WIN : (tie ? LOG_TYPES.CASINO_LOSS : LOG_TYPES.CASINO_LOSS),
+    userId: interaction.user.id,
+    username: interaction.user.username,
+    guildId: interaction.guildId,
+    guildName: interaction.guild?.name,
+    command: 'casinomulti poker',
+    commandOptions: { apuesta: bet },
+    amount: winnings,
+    balanceAfter: economy.lagcoins,
+    importance: 'low',
+    result: 'success',
+    details: { manoJugador: playerEval.name, manoCasa: dealerEval.name, multiplicador: multiplier }
+  });
   
   const formatHand = (hand) => hand.map(c => `${c.value}${c.suit}`).join(' ');
   
@@ -492,6 +523,21 @@ async function handleRuleta(interaction) {
   }
   
   await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
+
+  logActivity({
+    type: won ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+    userId: interaction.user.id,
+    username: interaction.user.username,
+    guildId: interaction.guildId,
+    guildName: interaction.guild?.name,
+    command: 'casinomulti ruleta',
+    commandOptions: { apuesta: bet, tipo },
+    amount: winnings,
+    balanceAfter: economy.lagcoins,
+    importance: 'low',
+    result: 'success',
+    details: { numero: result, tipo, fianza }
+  });
   
   const tipoNames = {
     'rojo': '🔴 Rojo', 'negro': '⚫ Negro', 'verde': '🟢 Verde/0',

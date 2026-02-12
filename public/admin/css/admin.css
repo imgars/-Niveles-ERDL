@@ -1071,6 +1071,18 @@ input:checked + .toggle-slider:before {
 .log-type-theft_fail { border-left-color: #64748b; }
 .log-type-admin_action { border-left-color: #ec4899; }
 
+.logs-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.logs-filters select { background: #40444b; border: 1px solid #202225; color: #dcddde; padding: 6px 10px; border-radius: 4px; font-size: 0.85rem; }
+.logs-actions { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.btn-secondary { background: #4f545c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+.btn-secondary:hover { background: #5d6269; }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+.alerts-container { background: #2a1515; border: 1px solid #ff4444; border-radius: 8px; padding: 12px 16px; margin-bottom: 15px; }
+.logs-pagination { display: flex; justify-content: center; align-items: center; padding: 15px 0; gap: 10px; }
+.log-importance-critical { border-left: 3px solid #ff4444 !important; }
+.log-importance-high { border-left: 3px solid #ffaa00 !important; }
+.log-meta { display: flex; align-items: center; gap: 6px; min-width: 80px; justify-content: flex-end; }
+
 .user-search-section {
     margin-bottom: 30px;
 }

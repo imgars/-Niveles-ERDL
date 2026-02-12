@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } from 'discord.js';
 import db from '../utils/database.js';
 import { getAvailableThemes, getCardTheme, getThemeButtonStyle } from '../utils/cardGenerator.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const THEME_NAMES = {
   pixel: '🎮 Pixel Art',

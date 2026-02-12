@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getUserActivePowerups, ITEMS, buyItem, getUserEconomy } from '../utils/economyDB.js';
 import { formatDuration } from '../utils/helpers.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -139,6 +140,21 @@ export default {
       
       const durationMinutes = Math.round(item.effect.duration / 60000);
       const boostPercent = Math.round(item.effect.value * 100);
+
+      logActivity({
+        type: LOG_TYPES.POWERUP_ACTIVATE,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'powerups comprar',
+        commandOptions: { powerup: powerupId },
+        amount: -item.price,
+        balanceAfter: result.economy.lagcoins,
+        importance: 'medium',
+        result: 'success',
+        details: { efecto: `+${boostPercent}%`, duracion: `${durationMinutes}min`, tipo: item.effect.type }
+      });
       
       const embed = new EmbedBuilder()
         .setColor('#00FF00')

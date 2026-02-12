@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { removeUserLagcoins, saveUserEconomy, getUserEconomy } from '../utils/economyDB.js';
 import db from '../utils/database.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -86,6 +87,21 @@ export default {
       user.selectedCardTheme = itemData.card;
       db.saveUser(interaction.guildId, interaction.user.id, user);
     }
+
+    logActivity({
+      type: LOG_TYPES.SHOP_PURCHASE,
+      userId: interaction.user.id,
+      username: interaction.user.username,
+      guildId: interaction.guildId,
+      guildName: interaction.guild?.name,
+      command: 'shop',
+      commandOptions: { item },
+      amount: -itemData.price,
+      balanceAfter: updated.lagcoins,
+      importance: itemData.price > 10000 ? 'medium' : 'low',
+      result: 'success',
+      details: { item: itemData.name, precio: itemData.price }
+    });
 
     const embed = new EmbedBuilder()
       .setColor('#00FF00')

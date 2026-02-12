@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { robBank } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -26,6 +27,19 @@ export default {
     }
 
     if (result && result.success) {
+      logActivity({
+        type: LOG_TYPES.BANK_HEIST,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'robar_banco',
+        amount: result.stolen,
+        importance: 'high',
+        result: 'success',
+        details: { robado: result.stolen }
+      });
+
       const embed = new EmbedBuilder()
         .setColor('#00FF00')
         .setTitle('🏦 ¡ROBO EXITOSO!')
@@ -36,6 +50,19 @@ export default {
         );
       return interaction.editReply({ embeds: [embed] });
     } else {
+      logActivity({
+        type: LOG_TYPES.BANK_HEIST,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'robar_banco',
+        amount: -(result.penalty || 0),
+        importance: 'medium',
+        result: 'failure',
+        details: { multa: result.penalty }
+      });
+
       const embed = new EmbedBuilder()
         .setColor('#FF0000')
         .setTitle('🚓 ¡TE ATRAPARON!')

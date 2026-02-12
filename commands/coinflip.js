@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { playCoinflip } from '../utils/economyDB.js';
 import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -42,6 +43,21 @@ export default {
       }
 
       setCasinoCooldown(interaction.user.id, 'coinflip');
+
+      logActivity({
+        type: result.won ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'coinflip',
+        commandOptions: { apuesta: bet, eleccion: choice },
+        amount: result.winnings,
+        balanceAfter: result.newBalance,
+        importance: 'low',
+        result: 'success',
+        details: { resultado: result.result, ganado: result.won }
+      });
 
       const coinEmoji = result.result === 'cara' ? '🪙' : '⭐';
       const choiceEmoji = choice === 'cara' ? '🪙' : '⭐';

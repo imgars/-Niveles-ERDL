@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getActiveAuctions, getAuction, createAuction, placeBid, endAuction, ITEMS, getUserEconomy } from '../utils/economyDB.js';
 import { isStaff } from '../utils/helpers.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -105,6 +106,19 @@ export default {
         };
         return interaction.reply({ content: errorMessages[result.error] || `❌ Error: ${result.error}`, flags: 64 });
       }
+
+      logActivity({
+        type: LOG_TYPES.AUCTION_CREATE,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'subasta crear',
+        commandOptions: { item: itemId, precio_inicial: startingBid, duracion: duration },
+        importance: 'medium',
+        result: 'success',
+        details: { item: result.auction.itemName, precioInicial: startingBid, duracion: duration }
+      });
       
       const embed = new EmbedBuilder()
         .setColor('#FFD700')
@@ -142,6 +156,20 @@ export default {
         };
         return interaction.reply({ content: errorMessages[result.error] || `❌ Error: ${result.error}`, flags: 64 });
       }
+
+      logActivity({
+        type: LOG_TYPES.AUCTION_BID,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'subasta ofertar',
+        commandOptions: { id: auctionId, cantidad: bidAmount },
+        amount: -bidAmount,
+        importance: 'medium',
+        result: 'success',
+        details: { subasta: auctionId, item: result.auction.itemName, oferta: bidAmount }
+      });
       
       const embed = new EmbedBuilder()
         .setColor('#00FF00')

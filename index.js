@@ -6,7 +6,7 @@ import { generateRankCard } from './utils/cardGenerator.js';
 import { initializeNightBoost, getNightBoostMultiplier } from './utils/timeBoost.js';
 import { isStaff } from './utils/helpers.js';
 import { connectMongoDB, saveUserToMongo, saveBoostsToMongo, isMongoConnected, saveQuestionToMongo, getQuestionsFromMongo, answerQuestionInMongo, getAllStreaksFromMongo, getUserMissions, updateMissionProgress, getEconomy, addLagcoins } from './utils/mongoSync.js';
-import { logActivity, getLogs, getUserLogs, getLogStats, LOG_TYPES } from './utils/activityLogger.js';
+import { logActivity, getLogs, getUserLogs, getLogStats, LOG_TYPES, loadLogsFromMongo, getLogsFromMongo, getAlerts, exportLogs, getSystemsList, SYSTEMS } from './utils/activityLogger.js';
 import { checkAndBreakExpiredStreaks, acceptStreakRequest, rejectStreakRequest, recordMessage, deleteStreak, getStreakBetween, getAllActiveStreaks, STREAK_BREAK_CHANNEL_ID } from './utils/streakService.js';
 import express from 'express';
 import cookieParser from 'cookie-parser';
@@ -53,6 +53,9 @@ if (mongoConnected) {
     if (mongoStreaks && mongoStreaks.length > 0) {
       console.log(`✅ Cargadas ${mongoStreaks.length} rachas desde MongoDB`);
     }
+
+    // Cargar logs de actividad desde MongoDB
+    await loadLogsFromMongo();
   } catch (error) {
     console.error('Error cargando datos desde MongoDB:', error.message);
   }
@@ -1863,7 +1866,29 @@ client.on('interactionCreate', async (interaction) => {
   // Log de auditoría para comandos slash (en segundo plano para no bloquear el comando)
   const options = interaction.options.data.map(opt => `${opt.name}: ${opt.value}`).join(', ') || 'Sin opciones';
   sendAuditLog(client, interaction, 'Comando Slash Usado', `**Comando:** /${interaction.commandName}\n**Opciones:** ${options}`).catch(console.error);
-  
+
+  const commandOptions = {};
+  interaction.options.data.forEach(opt => {
+    if (opt.type === 1) {
+      commandOptions.subcommand = opt.name;
+      opt.options?.forEach(subOpt => { commandOptions[subOpt.name] = subOpt.value; });
+    } else {
+      commandOptions[opt.name] = opt.value;
+    }
+  });
+
+  logActivity({
+    type: LOG_TYPES.COMMAND_USE,
+    userId: interaction.user.id,
+    username: interaction.user.username,
+    guildId: interaction.guildId,
+    guildName: interaction.guild?.name,
+    command: interaction.commandName,
+    commandOptions,
+    importance: 'low',
+    result: 'success'
+  });
+
   try {
     await command.execute(interaction);
   } catch (error) {
@@ -2615,18 +2640,76 @@ app.post('/api/admin/config', verifyAdminToken, express.json(), (req, res) => {
 });
 
 // ===== ACTIVITY LOGS API =====
-app.get('/api/admin/logs', verifyAdminToken, (req, res) => {
+app.get('/api/admin/logs', verifyAdminToken, async (req, res) => {
   try {
-    const { type, limit, userId } = req.query;
-    const logs = getLogs({
-      type,
-      userId,
-      limit: parseInt(limit) || 100
-    });
+    const { type, limit, userId, system, importance, period, page, sortBy, source } = req.query;
+    
+    const options = {
+      type: type || undefined,
+      userId: userId || undefined,
+      system: system || undefined,
+      importance: importance || undefined,
+      period: period || 'all',
+      page: parseInt(page) || 1,
+      limit: parseInt(limit) || 100,
+      sortBy: sortBy || 'recent'
+    };
+    
+    let result;
+    if (source === 'mongo') {
+      result = await getLogsFromMongo(options);
+    } else {
+      result = getLogs(options);
+    }
+    
     const stats = getLogStats();
-    res.json({ logs, stats });
+    const alerts = getAlerts();
+    const systems = getSystemsList();
+    
+    res.json({ 
+      logs: result.logs, 
+      stats, 
+      alerts,
+      systems,
+      pagination: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages
+      }
+    });
   } catch (error) {
     console.error('Error en Logs API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.get('/api/admin/logs/export', verifyAdminToken, (req, res) => {
+  try {
+    const { type, system, period, format } = req.query;
+    const logs = exportLogs({ type, system, period, limit: 5000 });
+    
+    if (format === 'csv') {
+      if (logs.length === 0) {
+        return res.status(200).send('No hay logs para exportar');
+      }
+      const headers = Object.keys(logs[0]);
+      const csvRows = [headers.join(',')];
+      for (const log of logs) {
+        csvRows.push(headers.map(h => {
+          let val = log[h] ?? '';
+          val = String(val).replace(/"/g, '""');
+          return `"${val}"`;
+        }).join(','));
+      }
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=logs_${Date.now()}.csv`);
+      return res.send(csvRows.join('\n'));
+    }
+    
+    res.json({ logs, total: logs.length });
+  } catch (error) {
+    console.error('Error exportando logs:', error);
     res.status(500).json({ message: 'Error del servidor' });
   }
 });

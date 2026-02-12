@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { bankDeposit, getUserEconomy } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -40,6 +41,21 @@ export default {
       if (!result) {
         return interaction.reply({ content: '❌ No tienes suficientes Lagcoins para depositar', flags: 64 });
       }
+
+      logActivity({
+        type: LOG_TYPES.BANK_DEPOSIT,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'depositar',
+        commandOptions: { cantidad: amount },
+        amount: amount,
+        balanceAfter: result.lagcoins,
+        importance: amount > 10000 ? 'medium' : 'low',
+        result: 'success',
+        details: { cartera: result.lagcoins, banco: result.bankBalance }
+      });
 
       const embed = new EmbedBuilder()
         .setColor('#00FF00')

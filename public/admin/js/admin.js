@@ -528,38 +528,112 @@ function updateSessionTime() {
 let logsRefreshInterval = null;
 let selectedUser = null;
 
-async function loadLogsData() {
+let currentLogsPage = 1;
+
+async function loadLogsData(page) {
     try {
+        if (page) currentLogsPage = page;
         const typeFilter = document.getElementById('logTypeFilter')?.value || '';
-        const url = typeFilter ? `/api/admin/logs?type=${typeFilter}` : '/api/admin/logs';
+        const systemFilter = document.getElementById('logSystemFilter')?.value || '';
+        const importanceFilter = document.getElementById('logImportanceFilter')?.value || '';
+        const periodFilter = document.getElementById('logPeriodFilter')?.value || 'all';
+        
+        let url = `/api/admin/logs?page=${currentLogsPage}&limit=100&period=${periodFilter}`;
+        if (typeFilter) url += `&type=${typeFilter}`;
+        if (systemFilter) url += `&system=${systemFilter}`;
+        if (importanceFilter) url += `&importance=${importanceFilter}`;
+        
         const data = await fetchAPI(url);
         
         document.getElementById('logsTotal').textContent = data.stats?.total || 0;
         document.getElementById('logsLastHour').textContent = data.stats?.lastHour || 0;
         document.getElementById('logsLastDay').textContent = data.stats?.lastDay || 0;
         
+        if (data.alerts && data.alerts.length > 0) {
+            const alertsContainer = document.getElementById('alertsContainer');
+            const alertsList = document.getElementById('alertsList');
+            alertsContainer.style.display = 'block';
+            alertsList.innerHTML = data.alerts.slice(0, 5).map(alert => `
+                <div class="alert-item" style="background: #3a1515; border: 1px solid #ff4444; border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; font-size: 0.85rem;">
+                    <span style="color: #ff6b6b; font-weight: bold;">${alert.type === 'theft_abuse' ? '🦝 Abuso de Robos' : alert.type === 'casino_streak' ? '🎰 Racha Casino' : '👑 Uso Admin'}</span>
+                    <span style="color: #ccc; margin-left: 8px;">${alert.username} - ${alert.message}</span>
+                    <span style="color: #888; float: right; font-size: 0.75rem;">${formatLogTime(alert.timestamp)}</span>
+                </div>
+            `).join('');
+        } else {
+            const alertsContainer = document.getElementById('alertsContainer');
+            if (alertsContainer) alertsContainer.style.display = 'none';
+        }
+        
         const container = document.getElementById('logsContainer');
         if (!data.logs || data.logs.length === 0) {
-            container.innerHTML = '<p class="no-logs">No hay logs disponibles. Los logs aparecen cuando hay actividad en el bot.</p>';
+            container.innerHTML = '<p class="no-logs">No hay logs disponibles con estos filtros.</p>';
+            document.getElementById('logsPagination').style.display = 'none';
             return;
         }
         
         container.innerHTML = data.logs.map(log => `
-            <div class="log-entry log-type-${log.type}">
+            <div class="log-entry log-type-${log.type} log-importance-${log.importance || 'low'}">
                 <div class="log-time">${formatLogTime(log.timestamp)}</div>
                 <div class="log-icon">${getLogIcon(log.type)}</div>
                 <div class="log-content">
-                    <span class="log-user">${log.username}</span>
+                    <span class="log-user">${log.username || 'Sistema'}</span>
                     <span class="log-action">${getLogDescription(log)}</span>
+                    ${log.command ? `<span class="log-command" style="background: #40444b; padding: 1px 6px; border-radius: 3px; font-size: 0.8rem; color: #7289da;">/${log.command}</span>` : ''}
                     ${log.amount ? `<span class="log-amount ${log.amount >= 0 ? 'positive' : 'negative'}">${log.amount >= 0 ? '+' : ''}${log.amount.toLocaleString()}</span>` : ''}
+                    ${log.balanceAfter !== undefined && log.balanceAfter !== null ? `<span style="color: #888; font-size: 0.8rem; margin-left: 4px;">(Saldo: ${log.balanceAfter.toLocaleString()})</span>` : ''}
                 </div>
-                <div class="log-server">${log.guildName || 'Servidor'}</div>
+                <div class="log-meta">
+                    ${log.system ? `<span class="log-system" style="background: #2d3436; padding: 1px 5px; border-radius: 3px; font-size: 0.7rem; color: #a0a0a0;">${log.system}</span>` : ''}
+                    ${log.importance === 'high' || log.importance === 'critical' ? `<span style="color: ${log.importance === 'critical' ? '#ff4444' : '#ffaa00'}; font-size: 0.75rem;">●</span>` : ''}
+                </div>
             </div>
         `).join('');
+        
+        const pagination = data.pagination;
+        const paginationDiv = document.getElementById('logsPagination');
+        if (pagination && pagination.totalPages > 1) {
+            paginationDiv.style.display = 'flex';
+            document.getElementById('logsPageInfo').textContent = `Pagina ${pagination.page} de ${pagination.totalPages} (${pagination.total} logs)`;
+            document.getElementById('logsPrevPage').disabled = pagination.page <= 1;
+            document.getElementById('logsNextPage').disabled = pagination.page >= pagination.totalPages;
+        } else {
+            paginationDiv.style.display = 'none';
+        }
         
     } catch (error) {
         console.error('Error cargando logs:', error);
         document.getElementById('logsContainer').innerHTML = '<p class="error-text">Error al cargar los logs</p>';
+    }
+}
+
+async function exportLogsCSV() {
+    try {
+        const typeFilter = document.getElementById('logTypeFilter')?.value || '';
+        const systemFilter = document.getElementById('logSystemFilter')?.value || '';
+        const periodFilter = document.getElementById('logPeriodFilter')?.value || 'all';
+        
+        let url = `/api/admin/logs/export?format=csv&period=${periodFilter}`;
+        if (typeFilter) url += `&type=${typeFilter}`;
+        if (systemFilter) url += `&system=${systemFilter}`;
+        
+        const token = localStorage.getItem('adminToken');
+        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        
+        if (!response.ok) throw new Error('Error exportando');
+        
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `logs_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+        console.error('Error exportando CSV:', error);
+        alert('Error al exportar logs');
     }
 }
 
@@ -570,26 +644,39 @@ function formatLogTime(timestamp) {
 
 function getLogIcon(type) {
     const icons = {
-        'xp_gain': '⭐', 'xp_loss': '📉', 'level_up': '🎉', 'level_down': '📉',
+        'command_use': '⌨️', 'xp_gain': '⭐', 'xp_loss': '📉', 'level_up': '🎉', 'level_down': '📉',
         'coins_gain': '💰', 'coins_loss': '💸', 'work': '💼', 'casino_win': '🎰',
         'casino_loss': '🎲', 'theft_success': '🦝', 'theft_fail': '🚔', 'theft_victim': '😢',
         'mission_complete': '✅', 'item_gain': '🎁', 'item_use': '🔧', 'daily_reward': '📅',
         'bank_deposit': '🏦', 'bank_withdraw': '💵', 'shop_purchase': '🛒',
-        'powerup_activate': '⚡', 'admin_action': '👑', 'minigame_win': '🏆', 'minigame_loss': '❌'
+        'powerup_activate': '⚡', 'admin_action': '👑', 'minigame_win': '🏆', 'minigame_loss': '❌',
+        'gift_sent': '🎁', 'gift_received': '📨', 'insurance_buy': '🛡️', 'insurance_expire': '⏰',
+        'marriage': '💍', 'divorce': '💔', 'nationality_change': '🌍', 'travel': '✈️',
+        'bank_heist': '🏴‍☠️', 'trade': '🤝', 'auction_create': '📢', 'auction_bid': '💎',
+        'streak_gain': '🔥', 'tax_paid': '📊', 'gamecard_generate': '🃏', 'rankcard_unlock': '🎨'
     };
     return icons[type] || '📋';
 }
 
 function getLogDescription(log) {
     const descriptions = {
+        'command_use': `uso /${log.command || '?'}`,
         'xp_gain': 'gano XP', 'xp_loss': 'perdio XP', 'level_up': 'subio de nivel',
         'level_down': 'bajo de nivel', 'coins_gain': 'gano Lagcoins', 'coins_loss': 'perdio Lagcoins',
-        'work': 'trabajo', 'casino_win': 'gano en el casino', 'casino_loss': 'perdio en el casino',
+        'work': 'trabajo', 'casino_win': 'gano en casino', 'casino_loss': 'perdio en casino',
         'theft_success': 'robo exitoso', 'theft_fail': 'robo fallido', 'theft_victim': 'fue robado',
         'mission_complete': 'completo mision', 'item_gain': 'obtuvo item', 'item_use': 'uso item',
-        'daily_reward': 'reclamo diario', 'bank_deposit': 'deposito', 'bank_withdraw': 'retiro',
+        'daily_reward': 'reclamo diario', 'bank_deposit': 'deposito al banco', 'bank_withdraw': 'retiro del banco',
         'shop_purchase': 'compro en tienda', 'powerup_activate': 'activo power-up',
-        'admin_action': 'accion admin', 'minigame_win': 'gano minijuego', 'minigame_loss': 'perdio minijuego'
+        'admin_action': 'accion admin', 'minigame_win': 'gano minijuego', 'minigame_loss': 'perdio minijuego',
+        'gift_sent': 'envio regalo', 'gift_received': 'recibio regalo',
+        'insurance_buy': 'compro seguro', 'insurance_expire': 'seguro expirado',
+        'marriage': 'matrimonio', 'divorce': 'divorcio',
+        'nationality_change': 'cambio nacionalidad', 'travel': 'viajo',
+        'bank_heist': 'atraco al banco', 'trade': 'intercambio',
+        'auction_create': 'creo subasta', 'auction_bid': 'oferto en subasta',
+        'streak_gain': 'racha', 'tax_paid': 'pago impuestos',
+        'gamecard_generate': 'genero carta', 'rankcard_unlock': 'desbloqueo tema'
     };
     return log.reason || descriptions[log.type] || log.type;
 }
@@ -735,8 +822,14 @@ async function modifyUser(field, action) {
     }
 }
 
-document.getElementById('logTypeFilter')?.addEventListener('change', loadLogsData);
-document.getElementById('refreshLogs')?.addEventListener('click', loadLogsData);
+document.getElementById('logTypeFilter')?.addEventListener('change', () => loadLogsData(1));
+document.getElementById('logSystemFilter')?.addEventListener('change', () => loadLogsData(1));
+document.getElementById('logImportanceFilter')?.addEventListener('change', () => loadLogsData(1));
+document.getElementById('logPeriodFilter')?.addEventListener('change', () => loadLogsData(1));
+document.getElementById('refreshLogs')?.addEventListener('click', () => loadLogsData());
+document.getElementById('logsPrevPage')?.addEventListener('click', () => { if (currentLogsPage > 1) loadLogsData(currentLogsPage - 1); });
+document.getElementById('logsNextPage')?.addEventListener('click', () => loadLogsData(currentLogsPage + 1));
+document.getElementById('exportLogsCSV')?.addEventListener('click', exportLogsCSV);
 
 document.getElementById('autoRefreshLogs')?.addEventListener('change', (e) => {
     if (e.target.checked) {

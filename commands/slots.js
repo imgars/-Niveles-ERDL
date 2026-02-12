@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { playSlots } from '../utils/economyDB.js';
 import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -57,6 +58,21 @@ export default {
         const logType = result.jackpot ? 'Slots (JACKPOT)' : (result.won ? 'Slots (Ganancia)' : 'Slots (Pérdida)');
         await sendEconomyLog(interaction.client, interaction, logType, amount, `Apuesta: ${bet}\nMultiplicador: x${result.multiplier}`);
       } catch (e) {}
+
+      logActivity({
+        type: result.won ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'slots',
+        commandOptions: { apuesta: bet },
+        amount: result.won ? result.winnings : -bet,
+        balanceAfter: result.newBalance,
+        importance: result.jackpot ? 'high' : 'low',
+        result: 'success',
+        details: { jackpot: result.jackpot, multiplicador: result.multiplier, reels: result.reels }
+      });
 
       const embed = new EmbedBuilder()
         .setColor(color)

@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getUserEconomy, robUser, saveUserEconomy } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -43,6 +44,21 @@ export default {
     }
 
     if (result.success) {
+      logActivity({
+        type: LOG_TYPES.THEFT_SUCCESS,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'rob',
+        commandOptions: { victima: targetUser.id },
+        amount: result.stolen,
+        balanceAfter: result.newBalance,
+        importance: result.stolen > 5000 ? 'high' : 'medium',
+        result: 'success',
+        details: { victima: targetUser.username, robado: result.stolen }
+      });
+
       const embed = new EmbedBuilder()
         .setColor('#FF0000')
         .setTitle('💰 ¡Robo Exitoso!')
@@ -52,6 +68,20 @@ export default {
 
       return interaction.editReply({ embeds: [embed] });
     } else {
+      logActivity({
+        type: LOG_TYPES.THEFT_FAIL,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'rob',
+        commandOptions: { victima: targetUser.id },
+        amount: -result.fine,
+        importance: 'medium',
+        result: 'failure',
+        details: { victima: targetUser.username, multa: result.fine }
+      });
+
       const embed = new EmbedBuilder()
         .setColor('#FFD700')
         .setTitle('❌ ¡Robo Fallido!')

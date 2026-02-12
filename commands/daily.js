@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getDailyReward } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,6 +13,19 @@ export default {
     if (result === null) {
       return interaction.reply({ content: '❌ Ya reclamaste tu recompensa diaria. Vuelve mañana!', flags: 64 });
     }
+
+    logActivity({
+      type: LOG_TYPES.DAILY_REWARD,
+      userId: interaction.user.id,
+      username: interaction.user.username,
+      guildId: interaction.guildId,
+      guildName: interaction.guild?.name,
+      command: 'daily',
+      amount: result.reward + (result.streakBonus || 0),
+      importance: 'low',
+      result: 'success',
+      details: { racha: result.streak, bonus: result.streakBonus || 0 }
+    });
 
     const embed = new EmbedBuilder()
       .setColor('#00FF00')

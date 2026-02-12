@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getUserInsurance, activateInsurance, deactivateInsurance, ITEMS, buyItem, getUserEconomy } from '../utils/economyDB.js';
 import { CONFIG } from '../config.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const INSURANCE_COOLDOWN = 7200000; // 2 horas entre activaciones
 
@@ -75,6 +76,21 @@ export default {
       
       const durationMinutes = Math.round(item.effect.duration / 60000);
       const protectionPercent = Math.round(item.effect.value * 100);
+
+      logActivity({
+        type: LOG_TYPES.INSURANCE_BUY,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'seguro activar',
+        commandOptions: { tipo },
+        amount: -item.price,
+        balanceAfter: result.economy.lagcoins,
+        importance: 'medium',
+        result: 'success',
+        details: { proteccion: `${protectionPercent}%`, duracion: `${durationMinutes}min` }
+      });
       
       const embed = new EmbedBuilder()
         .setColor('#00FF00')

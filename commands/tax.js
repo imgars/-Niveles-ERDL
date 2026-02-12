@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getUserEconomy, saveUserEconomy, removeUserLagcoins } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const TAX_RATES = {
   weekly: 0.02,
@@ -155,6 +156,20 @@ export default {
         updatedEconomy.totalTaxesPaid = (updatedEconomy.totalTaxesPaid || 0) + totalToPay;
         await saveUserEconomy(interaction.guildId, interaction.user.id, updatedEconomy);
         
+        logActivity({
+          type: LOG_TYPES.TAX_PAID,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'impuestos pagar',
+          amount: -totalToPay,
+          balanceAfter: updatedEconomy.lagcoins,
+          importance: totalToPay > 5000 ? 'medium' : 'low',
+          result: 'success',
+          details: { impuesto: taxAmount, deuda: taxDebt, totalPagado: totalToPay }
+        });
+
         const embed = new EmbedBuilder()
           .setColor('#00FF00')
           .setTitle('✅ Impuestos Pagados')

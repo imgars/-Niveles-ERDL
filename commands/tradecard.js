@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import db from '../utils/database.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const pendingTrades = new Map();
 
@@ -88,6 +89,18 @@ export default {
       content: `<@${target.id}>`,
       embeds: [embed], 
       components: [row] 
+    });
+
+    logActivity({
+      type: LOG_TYPES.TRADE,
+      userId: interaction.user.id,
+      username: interaction.user.username,
+      guildId: interaction.guildId,
+      guildName: interaction.guild?.name,
+      command: 'tradecard',
+      importance: 'low',
+      result: 'success',
+      details: { receptor: target.username, tarjeta: cardName, estado: 'propuesta' }
     });
 
     setTimeout(() => {

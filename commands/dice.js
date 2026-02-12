@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { playDice } from '../utils/economyDB.js';
 import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -44,6 +45,21 @@ export default {
       }
 
       setCasinoCooldown(interaction.user.id, 'dice');
+
+      logActivity({
+        type: result.won ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'dice',
+        commandOptions: { apuesta: bet, prediccion: guess },
+        amount: result.winnings,
+        balanceAfter: result.newBalance,
+        importance: 'low',
+        result: 'success',
+        details: { dado1: result.dice1, dado2: result.dice2, total: result.total, multiplicador: result.multiplier }
+      });
 
       const diceEmojis = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
       const dice1Emoji = diceEmojis[result.dice1];

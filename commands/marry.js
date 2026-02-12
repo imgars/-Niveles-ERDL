@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { getUserEconomy, saveUserEconomy } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const pendingProposals = new Map();
 
@@ -67,6 +68,19 @@ export default {
       content: `<@${target.id}>`,
       embeds: [embed], 
       components: [row] 
+    });
+
+    logActivity({
+      type: LOG_TYPES.MARRIAGE,
+      userId: interaction.user.id,
+      username: interaction.user.username,
+      guildId: interaction.guildId,
+      guildName: interaction.guild?.name,
+      command: 'marry',
+      commandOptions: { usuario: target.id },
+      importance: 'medium',
+      result: 'success',
+      details: { pareja: target.username, estado: 'propuesta' }
     });
 
     setTimeout(() => {

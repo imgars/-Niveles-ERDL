@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
 import { doWork, getUserEconomy, JOBS } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const jobChoices = Object.entries(JOBS).map(([id, job]) => ({
   name: `${job.emoji} ${job.name}`,
@@ -36,6 +37,21 @@ export default {
       if (result.error === 'invalid_job') {
         return interaction.editReply('❌ Trabajo no válido');
       }
+
+      logActivity({
+        type: LOG_TYPES.WORK,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'trabajar',
+        commandOptions: { trabajo: result.job.name },
+        amount: result.total,
+        balanceAfter: result.newBalance,
+        importance: 'low',
+        result: 'success',
+        details: { trabajo: result.job.name, ganancia: result.earnings, bonus: result.bonus || 0 }
+      });
 
       const embed = new EmbedBuilder()
         .setColor('#00FF00')

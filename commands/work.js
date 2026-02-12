@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { getUserEconomy, JOBS, ITEMS, doWork } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -120,6 +121,21 @@ export default {
         } catch (e) {
           console.error('Error enviando log de economía en work:', e);
         }
+
+        logActivity({
+          type: LOG_TYPES.WORK,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'work',
+          commandOptions: { trabajo: result.job.name },
+          amount: result.total,
+          balanceAfter: result.newBalance,
+          importance: 'low',
+          result: 'success',
+          details: { trabajo: result.job.name, ganancia: result.earnings, bonus: result.bonus || 0 }
+        });
         
         const resultEmbed = new EmbedBuilder()
           .setColor('#00FF00')

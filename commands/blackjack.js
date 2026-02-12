@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { playBlackjack } from '../utils/economyDB.js';
 import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -32,6 +33,21 @@ export default {
       }
 
       setCasinoCooldown(interaction.user.id, 'blackjack');
+
+      logActivity({
+        type: result.result === 'lose' ? LOG_TYPES.CASINO_LOSS : LOG_TYPES.CASINO_WIN,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'blackjack',
+        commandOptions: { apuesta: bet },
+        amount: result.winnings,
+        balanceAfter: result.newBalance,
+        importance: Math.abs(result.winnings) > 5000 ? 'high' : 'low',
+        result: 'success',
+        details: { playerTotal: result.playerTotal, dealerTotal: result.dealerTotal, outcome: result.result }
+      });
 
       const cardEmojis = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
       const playerCardsStr = result.playerCards.map(c => cardEmojis[c] || c).join(' + ');

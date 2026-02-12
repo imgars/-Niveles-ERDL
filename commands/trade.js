@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { transferUserLagcoins } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -38,6 +39,21 @@ export default {
     if (!result) {
       return interaction.reply({ content: '❌ No tienes suficientes Lagcoins para esta transferencia', flags: 64 });
     }
+
+    logActivity({
+      type: LOG_TYPES.TRADE,
+      userId: interaction.user.id,
+      username: interaction.user.username,
+      guildId: interaction.guildId,
+      guildName: interaction.guild?.name,
+      command: 'trade',
+      commandOptions: { usuario: targetUser.id, cantidad: amount },
+      amount: -amount,
+      balanceAfter: result.from.lagcoins,
+      importance: amount > 10000 ? 'high' : 'low',
+      result: 'success',
+      details: { receptor: targetUser.username, cantidad: amount }
+    });
 
     const embed = new EmbedBuilder()
       .setColor('#00BFFF')

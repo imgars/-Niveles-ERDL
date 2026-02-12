@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { playCasino, getUserEconomy, saveUserEconomy } from '../utils/economyDB.js';
 import { checkCasinoCooldown, setCasinoCooldown, formatCooldownTime } from '../utils/casinoCooldowns.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -156,6 +157,21 @@ export default {
 
         setCasinoCooldown(interaction.user.id, 'slots');
 
+        logActivity({
+          type: won ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'casino_juegos tragaperras',
+          commandOptions: { apuesta: bet },
+          amount: winnings,
+          balanceAfter: savedEconomy.lagcoins,
+          importance: 'low',
+          result: 'success',
+          details: { multiplicador: multiplier, reels: roll }
+        });
+
         const embed = new EmbedBuilder()
           .setColor(won ? '#00FF00' : '#FF0000')
           .setTitle('🎰 TRAGAPERRAS 🎰')
@@ -211,6 +227,21 @@ export default {
         });
 
         setCasinoCooldown(interaction.user.id, 'dice');
+
+        logActivity({
+          type: gana ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'casino_juegos dados',
+          commandOptions: { apuesta: bet },
+          amount: winnings,
+          balanceAfter: savedEconomy.lagcoins,
+          importance: 'low',
+          result: 'success',
+          details: { dado1, dado2, suma }
+        });
 
         const embed = new EmbedBuilder()
           .setColor(gana ? '#00FF00' : '#FF0000')
@@ -270,6 +301,21 @@ export default {
 
         const savedEconomy = await saveUserEconomy(interaction.guildId, interaction.user.id, economy);
         setCasinoCooldown(interaction.user.id, 'roulette');
+
+        logActivity({
+          type: won ? LOG_TYPES.CASINO_WIN : LOG_TYPES.CASINO_LOSS,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'casino_juegos ruleta',
+          commandOptions: { apuesta: bet },
+          amount: winnings,
+          balanceAfter: savedEconomy.lagcoins,
+          importance: 'low',
+          result: 'success',
+          details: { color: colorRandom, fianza }
+        });
 
         const embed = new EmbedBuilder()
           .setColor(won ? (colorRandom === 'Rojo' ? '#FF0000' : colorRandom === 'Negro' ? '#000000' : '#00FF00') : '#888888')

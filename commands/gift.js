@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getUserEconomy, saveUserEconomy, transferUserLagcoins, ITEMS } from '../utils/economyDB.js';
 import db from '../utils/database.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -92,6 +93,31 @@ export default {
         if (!receiverEconomy.items) receiverEconomy.items = [];
         receiverEconomy.items.push(itemId);
         await saveUserEconomy(interaction.guildId, targetUser.id, receiverEconomy);
+
+        logActivity({
+          type: LOG_TYPES.GIFT_SENT,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'gift item',
+          amount: 0,
+          importance: 'low',
+          result: 'success',
+          details: { receptor: targetUser.username, tipo: 'item', item: item.name }
+        });
+        logActivity({
+          type: LOG_TYPES.GIFT_RECEIVED,
+          userId: targetUser.id,
+          username: targetUser.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'gift item',
+          amount: 0,
+          importance: 'low',
+          result: 'success',
+          details: { emisor: interaction.user.username, tipo: 'item', item: item.name }
+        });
         
         const embed = new EmbedBuilder()
           .setColor('#00FF00')
@@ -116,6 +142,33 @@ export default {
         if (!result) {
           return interaction.editReply('❌ Error al transferir Lagcoins.');
         }
+
+        logActivity({
+          type: LOG_TYPES.GIFT_SENT,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'gift lagcoins',
+          amount: -amount,
+          balanceAfter: result.from.lagcoins,
+          importance: amount > 10000 ? 'high' : 'low',
+          result: 'success',
+          details: { receptor: targetUser.username, tipo: 'lagcoins', cantidad: amount }
+        });
+        logActivity({
+          type: LOG_TYPES.GIFT_RECEIVED,
+          userId: targetUser.id,
+          username: targetUser.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'gift lagcoins',
+          amount: amount,
+          balanceAfter: result.to.lagcoins,
+          importance: 'low',
+          result: 'success',
+          details: { emisor: interaction.user.username, tipo: 'lagcoins', cantidad: amount }
+        });
         
         const embed = new EmbedBuilder()
           .setColor('#FFD700')
@@ -145,6 +198,31 @@ export default {
         receiverData.totalXp = (receiverData.totalXp || 0) + amount;
         receiverData.currentXp = (receiverData.currentXp || 0) + amount;
         db.setUser(interaction.guildId, targetUser.id, receiverData);
+
+        logActivity({
+          type: LOG_TYPES.GIFT_SENT,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'gift xp',
+          amount: -amount,
+          importance: 'low',
+          result: 'success',
+          details: { receptor: targetUser.username, tipo: 'xp', cantidad: amount }
+        });
+        logActivity({
+          type: LOG_TYPES.GIFT_RECEIVED,
+          userId: targetUser.id,
+          username: targetUser.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'gift xp',
+          amount: amount,
+          importance: 'low',
+          result: 'success',
+          details: { emisor: interaction.user.username, tipo: 'xp', cantidad: amount }
+        });
         
         const embed = new EmbedBuilder()
           .setColor('#9B59B6')

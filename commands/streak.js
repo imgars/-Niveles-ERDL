@@ -9,6 +9,7 @@ import {
   getStreakLeaderboard,
   deleteStreak
 } from '../utils/streakService.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -91,6 +92,20 @@ export default {
       }
       
       const result = await createStreakRequest(interaction.guildId, interaction.user.id, targetUser.id);
+
+      if (!result.error) {
+        logActivity({
+          type: LOG_TYPES.STREAK_GAIN,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'racha crear',
+          importance: 'low',
+          result: 'success',
+          details: { compañero: targetUser.username, estado: 'solicitud' }
+        });
+      }
       
       if (result.error) {
         const errorMessages = {

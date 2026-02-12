@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } from 'discord.js';
 import { generateGameImage, SUPPORTED_GAMES, isGeminiConfigured } from '../utils/geminiImageGenerator.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -105,6 +106,18 @@ export default {
 
       const imageBuffer = await generateGameImage(juego, nombre, subcommand, peticion);
       const attachment = new AttachmentBuilder(imageBuffer, { name: `${subcommand}_card_${nombre}.png` });
+
+      logActivity({
+        type: LOG_TYPES.GAMECARD_GENERATE,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: `gamecard ${subcommand}`,
+        importance: 'low',
+        result: 'success',
+        details: { juego: gameNames[juego], nombre, tipo: subcommand, peticion: peticion || '' }
+      });
 
       const embed = new EmbedBuilder()
         .setColor(subcommand === 'battle' ? 0xFF4444 : 0x44FF44)

@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { getUserMissions, createUserMissions, getMissionsStats } from '../utils/mongoSync.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -43,6 +44,18 @@ export default {
         if (!missions) {
           return interaction.editReply({ content: '❌ Error creando tus misiones - MongoDB no está disponible' });
         }
+
+        logActivity({
+          type: LOG_TYPES.MISSION_COMPLETE,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'mision empezar',
+          importance: 'low',
+          result: 'success',
+          details: { estado: 'iniciadas', semana: weekNumber }
+        });
         
         const embed = new EmbedBuilder()
           .setColor('#FF10F0')

@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
 import { getUserNationality, assignRandomNationality, travelToCountry, COUNTRIES, getUserEconomy, removeUserLagcoins, ITEMS } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 const TRAVEL_COST_BASE = 500;
 
@@ -75,6 +76,18 @@ export default {
       
       const nationality = await assignRandomNationality(interaction.guildId, interaction.user.id);
       const country = COUNTRIES[nationality.country];
+
+      logActivity({
+        type: LOG_TYPES.NATIONALITY_CHANGE,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'nacionalidad obtener',
+        importance: country.probability <= 0.1 ? 'high' : 'low',
+        result: 'success',
+        details: { pais: country.name, multiplicador: country.jobMultiplier }
+      });
       
       const rarityText = country.probability <= 0.1 ? '✨ ¡ULTRA RARO!' : 
                          country.probability <= 0.2 ? '⭐ ¡Raro!' : 
@@ -189,6 +202,20 @@ export default {
       if (result.error) {
         return interaction.reply({ content: `❌ Error al viajar: ${result.error}`, flags: 64 });
       }
+
+      logActivity({
+        type: LOG_TYPES.TRAVEL,
+        userId: interaction.user.id,
+        username: interaction.user.username,
+        guildId: interaction.guildId,
+        guildName: interaction.guild?.name,
+        command: 'nacionalidad viajar',
+        commandOptions: { destino },
+        amount: -travelCost,
+        importance: 'medium',
+        result: 'success',
+        details: { destino: destinoCountry.name, costo: travelCost, multiplicador: destinoCountry.jobMultiplier }
+      });
       
       const embed = new EmbedBuilder()
         .setColor('#00FF00')

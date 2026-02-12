@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { getUserEconomy, saveUserEconomy } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -42,6 +43,18 @@ export default {
       )
       .setImage('https://media.tenor.com/MbdLmMq8r8wAAAAC/anime-sad.gif')
       .setFooter({ text: 'Esta acción no se puede deshacer' });
+
+    logActivity({
+      type: LOG_TYPES.DIVORCE,
+      userId: interaction.user.id,
+      username: interaction.user.username,
+      guildId: interaction.guildId,
+      guildName: interaction.guild?.name,
+      command: 'divorce',
+      importance: 'medium',
+      result: 'success',
+      details: { pareja: partnerId, estado: 'solicitud' }
+    });
 
     return interaction.reply({ embeds: [embed], components: [row] });
   }

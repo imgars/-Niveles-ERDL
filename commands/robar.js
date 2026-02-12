@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import { robUser } from '../utils/economyDB.js';
+import { logActivity, LOG_TYPES } from '../utils/activityLogger.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -40,6 +41,21 @@ export default {
           await sendEconomyLog(interaction.client, interaction, 'Robo Exitoso', result.stolen, `Le robó a <@${victim.id}>\nVíctima: ${victim.tag}`);
         } catch (e) {}
 
+        logActivity({
+          type: LOG_TYPES.THEFT_SUCCESS,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'robar',
+          commandOptions: { victima: victim.id },
+          amount: result.stolen,
+          balanceAfter: result.newBalance,
+          importance: result.stolen > 5000 ? 'high' : 'medium',
+          result: 'success',
+          details: { victima: victim.username, robado: result.stolen }
+        });
+
         const embed = new EmbedBuilder()
           .setColor('#00FF00')
           .setTitle('🦹 ¡Robo Exitoso!')
@@ -57,6 +73,20 @@ export default {
           const { sendEconomyLog } = await import('../index.js');
           await sendEconomyLog(interaction.client, interaction, 'Robo Fallido (Multa)', -result.fine, `Intentó robar a <@${victim.id}> y fue atrapado.`);
         } catch (e) {}
+
+        logActivity({
+          type: LOG_TYPES.THEFT_FAIL,
+          userId: interaction.user.id,
+          username: interaction.user.username,
+          guildId: interaction.guildId,
+          guildName: interaction.guild?.name,
+          command: 'robar',
+          commandOptions: { victima: victim.id },
+          amount: -result.fine,
+          importance: 'medium',
+          result: 'failure',
+          details: { victima: victim.username, multa: result.fine }
+        });
 
         const embed = new EmbedBuilder()
           .setColor('#FF0000')

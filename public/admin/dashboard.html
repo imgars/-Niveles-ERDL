@@ -805,6 +805,7 @@
                             <div class="logs-filters">
                                 <select id="logTypeFilter">
                                     <option value="">Todos los tipos</option>
+                                    <option value="command_use">Comando Usado</option>
                                     <option value="xp_gain">XP Ganado</option>
                                     <option value="xp_loss">XP Perdido</option>
                                     <option value="level_up">Subida de Nivel</option>
@@ -816,18 +817,73 @@
                                     <option value="casino_loss">Casino Perdido</option>
                                     <option value="theft_success">Robo Exitoso</option>
                                     <option value="theft_fail">Robo Fallido</option>
-                                    <option value="mission_complete">Mision Completada</option>
-                                    <option value="item_gain">Item Obtenido</option>
+                                    <option value="gift_sent">Regalo Enviado</option>
+                                    <option value="gift_received">Regalo Recibido</option>
+                                    <option value="daily_reward">Recompensa Diaria</option>
+                                    <option value="bank_deposit">Deposito</option>
+                                    <option value="bank_withdraw">Retiro</option>
+                                    <option value="shop_purchase">Compra Tienda</option>
+                                    <option value="powerup_activate">Power-Up</option>
+                                    <option value="insurance_buy">Seguro</option>
+                                    <option value="marriage">Matrimonio</option>
+                                    <option value="divorce">Divorcio</option>
+                                    <option value="bank_heist">Atraco</option>
+                                    <option value="trade">Intercambio</option>
+                                    <option value="auction_create">Subasta</option>
+                                    <option value="mission_complete">Mision</option>
                                     <option value="admin_action">Accion Admin</option>
                                 </select>
+                                <select id="logSystemFilter">
+                                    <option value="">Todos los sistemas</option>
+                                    <option value="economia">Economia</option>
+                                    <option value="casino">Casino</option>
+                                    <option value="niveles">Niveles</option>
+                                    <option value="robos">Robos</option>
+                                    <option value="social">Social</option>
+                                    <option value="tienda">Tienda</option>
+                                    <option value="misiones">Misiones</option>
+                                    <option value="minijuegos">Minijuegos</option>
+                                    <option value="powerups">Power-Ups</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="seguridad">Seguridad</option>
+                                    <option value="nacionalidades">Nacionalidades</option>
+                                </select>
+                                <select id="logImportanceFilter">
+                                    <option value="">Toda importancia</option>
+                                    <option value="critical">Critica</option>
+                                    <option value="high">Alta</option>
+                                    <option value="medium">Media</option>
+                                    <option value="low">Baja</option>
+                                </select>
+                                <select id="logPeriodFilter">
+                                    <option value="all">Todo el tiempo</option>
+                                    <option value="hour">Ultima hora</option>
+                                    <option value="day">Ultimo dia</option>
+                                    <option value="week">Ultima semana</option>
+                                </select>
+                            </div>
+                            <div class="logs-actions">
                                 <button id="refreshLogs" class="btn-primary">Actualizar</button>
-                                <label style="color: #fff; margin-left: 15px;">
-                                    <input type="checkbox" id="autoRefreshLogs" checked> Auto-refresh
+                                <button id="exportLogsCSV" class="btn-secondary">Exportar CSV</button>
+                                <label style="color: #fff; margin-left: 10px;">
+                                    <input type="checkbox" id="autoRefreshLogs" checked> Auto
                                 </label>
                             </div>
                         </div>
+                        
+                        <div id="alertsContainer" class="alerts-container" style="display: none;">
+                            <h4 style="color: #ff6b6b; margin-bottom: 8px;">Alertas de Actividad Sospechosa</h4>
+                            <div id="alertsList"></div>
+                        </div>
+                        
                         <div class="logs-container" id="logsContainer">
                             <p class="loading-text">Cargando logs...</p>
+                        </div>
+                        
+                        <div class="logs-pagination" id="logsPagination" style="display: none;">
+                            <button id="logsPrevPage" class="btn-secondary">Anterior</button>
+                            <span id="logsPageInfo" style="color: #fff; margin: 0 15px;">Pagina 1</span>
+                            <button id="logsNextPage" class="btn-secondary">Siguiente</button>
                         </div>
                     </div>
                 </div>
