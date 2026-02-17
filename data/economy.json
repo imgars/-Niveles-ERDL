@@ -1,0 +1,89 @@
+{
+  "1212886282645147768-1032482231677108224": {
+    "guildId": "1212886282645147768",
+    "userId": "1032482231677108224",
+    "lagcoins": 2326,
+    "bankBalance": 500,
+    "lastWorkTime": "2025-12-03T02:58:58.193Z",
+    "lastRobTime": null,
+    "transactions": [
+      {
+        "type": "work_basico",
+        "amount": 93,
+        "date": "2025-12-02T06:33:28.202Z"
+      },
+      {
+        "type": "work_basico",
+        "amount": 70,
+        "date": "2025-12-02T06:38:01.762Z"
+      },
+      {
+        "type": "work_pescar",
+        "amount": 171,
+        "date": "2025-12-02T06:40:38.412Z"
+      },
+      {
+        "type": "shop",
+        "amount": -800,
+        "date": "2025-12-02T06:42:32.906Z"
+      },
+      {
+        "type": "trivia_levels",
+        "amount": 400,
+        "date": "2025-12-02T06:43:59.225Z"
+      },
+      {
+        "type": "work",
+        "amount": 91,
+        "description": "Trabajo: Trabajo Básico",
+        "date": "2025-12-03T02:58:58.193Z"
+      },
+      {
+        "type": "dados_ext_win",
+        "amount": 200,
+        "description": "Dados: Ganaste 200 Lagcoins",
+        "date": "2025-12-03T21:27:43.370Z"
+      },
+      {
+        "type": "Regalo del Staff",
+        "amount": 1000,
+        "description": "Staff añadió 1000 Lagcoins",
+        "date": "2025-12-03T21:40:48.476Z"
+      }
+    ],
+    "createdAt": "2025-12-02T06:32:20.604Z",
+    "casinoStats": {
+      "plays": 12,
+      "wins": 9,
+      "totalWon": 739
+    },
+    "lastDailyReward": "Tue Dec 02 2025",
+    "items": [
+      "cana_pesca"
+    ],
+    "totalEarned": 1091,
+    "jobStats": {
+      "totalJobs": 1,
+      "favoriteJob": "basico"
+    },
+    "inventory": [],
+    "totalSpent": 0
+  },
+  "1212886282645147768-1234592789430272030": {
+    "guildId": "1212886282645147768",
+    "userId": "1234592789430272030",
+    "lagcoins": 191,
+    "bankBalance": 0,
+    "lastWorkTime": "2025-12-02T06:55:44.299Z",
+    "lastRobTime": null,
+    "transactions": [
+      {
+        "type": "work_basico",
+        "amount": 91,
+        "date": "2025-12-02T06:55:44.299Z"
+      }
+    ],
+    "createdAt": "2025-12-02T06:55:44.298Z",
+    "items": []
+  }
+}

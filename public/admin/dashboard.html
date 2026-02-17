@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Panel Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Panel Admin</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="#xp" class="nav-link" data-page="xp">
+                    <span>⭐</span> Sistema XP
+                </a>
+                <a href="#niveles" class="nav-link" data-page="niveles">
+                    <span>🏆</span> Niveles
+                </a>
+                <a href="#roles" class="nav-link" data-page="roles">
+                    <span>🎭</span> Roles por Nivel
+                </a>
+                <a href="#misiones" class="nav-link" data-page="misiones">
+                    <span>🎯</span> Misiones
+                </a>
+                <a href="#powerups" class="nav-link" data-page="powerups">
+                    <span>⚡</span> Power-ups
+                </a>
+                <a href="#estadisticas" class="nav-link" data-page="estadisticas">
+                    <span>📈</span> Estadisticas
+                </a>
+                <a href="#logs" class="nav-link" data-page="logs">
+                    <span>📋</span> Logs en Vivo
+                </a>
+                <a href="#usuarios" class="nav-link" data-page="usuarios">
+                    <span>👥</span> Gestion Usuarios
+                </a>
+                <a href="#configuracion" class="nav-link" data-page="configuracion">
+                    <span>⚙️</span> Configuracion
+                </a>
+                <a href="#personalizacion" class="nav-link" data-page="personalizacion">
+                    <span>🎨</span> Personalizar
+                </a>
+            </nav>
+            
+        </aside>
+        
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 id="pageTitle">Dashboard Principal</h1>
+                <div class="header-right">
+                    <div class="quick-customize">
+                        <button class="customize-btn" id="quickCustomizeBtn" title="Personalizar">
+                            🎨
+                        </button>
+                        <div class="customize-dropdown" id="customizeDropdown">
+                            <div class="dropdown-section">
+                                <h5>Tema Sidebar</h5>
+                                <div class="mini-themes">
+                                    <div class="mini-theme" data-theme="default" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Morado"></div>
+                                    <div class="mini-theme" data-theme="ocean" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);" title="Oceano"></div>
+                                    <div class="mini-theme" data-theme="sunset" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" title="Atardecer"></div>
+                                    <div class="mini-theme" data-theme="forest" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);" title="Bosque"></div>
+                                    <div class="mini-theme" data-theme="dark" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);" title="Oscuro"></div>
+                                    <div class="mini-theme" data-theme="fire" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);" title="Fuego"></div>
+                                </div>
+                            </div>
+                            <div class="dropdown-section">
+                                <h5>Fondo</h5>
+                                <div class="mini-backgrounds">
+                                    <div class="mini-bg" data-bg="light" style="background: #f5f7fa;" title="Claro"></div>
+                                    <div class="mini-bg" data-bg="dark" style="background: #1a1a2e;" title="Oscuro"></div>
+                                    <div class="mini-bg" data-bg="cream" style="background: #faf8f5;" title="Crema"></div>
+                                    <div class="mini-bg" data-bg="blue" style="background: #e8f4fc;" title="Azul Claro"></div>
+                                    <div class="mini-bg" data-bg="green" style="background: #e8f5e9;" title="Verde Claro"></div>
+                                    <div class="mini-bg" data-bg="purple" style="background: #f3e5f5;" title="Lila"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="admin-dropdown-wrapper">
+                        <div class="admin-info" id="adminInfoBtn">
+                            <span id="adminName"></span>
+                            <span class="admin-arrow">▼</span>
+                        </div>
+                        <div class="admin-dropdown" id="adminDropdown">
+                            <div class="admin-dropdown-item" id="sessionTimeItem">
+                                <span>⏱️</span>
+                                <span id="sessionTime">Sesion activa</span>
+                            </div>
+                            <div class="admin-dropdown-divider"></div>
+                            <div class="admin-dropdown-item logout-item" id="headerLogoutBtn">
+                                <span>🚪</span>
+                                <span>Cerrar sesion</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <div id="dashboard-page" class="page active">
+                    <div class="dashboard-grid">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🤖</div>
+                                <div class="stat-content">
+                                    <h3>Estado del Bot</h3>
+                                    <p class="stat-value" id="botStatus">Conectando...</p>
+                                    <p class="stat-label">Online</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">⏱️</div>
+                                <div class="stat-content">
+                                    <h3>Uptime</h3>
+                                    <p class="stat-value" id="uptime">Cargando...</p>
+                                    <p class="stat-label">Tiempo activo</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">🌐</div>
+                                <div class="stat-content">
+                                    <h3>Servidores</h3>
+                                    <p class="stat-value" id="guildCount">0</p>
+                                    <p class="stat-label">Conectados</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-content">
+                                    <h3>Usuarios</h3>
+                                    <p class="stat-value" id="userCount">0</p>
+                                    <p class="stat-label">Registrados</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="events-section">
+                            <h2>Eventos Hoy</h2>
+                            <div class="events-container">
+                                <div class="event-item">
+                                    <span class="event-icon">⭐</span>
+                                    <div class="event-content">
+                                        <p class="event-label">XP Generado</p>
+                                        <p class="event-value" id="xpToday">0</p>
+                                    </div>
+                                </div>
+                                <div class="event-item">
+                                    <span class="event-icon">🏆</span>
+                                    <div class="event-content">
+                                        <p class="event-label">Niveles Subidos</p>
+                                        <p class="event-value" id="levelsToday">0</p>
+                                    </div>
+                                </div>
+                                <div class="event-item">
+                                    <span class="event-icon">✅</span>
+                                    <div class="event-content">
+                                        <p class="event-label">Misiones Completadas</p>
+                                        <p class="event-value" id="missionsToday">0</p>
+                                    </div>
+                                </div>
+                                <div class="event-item">
+                                    <span class="event-icon">⚠️</span>
+                                    <div class="event-content">
+                                        <p class="event-label">Errores</p>
+                                        <p class="event-value" id="errorsToday">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <div class="info-card">
+                                <h3>Informacion del Sistema</h3>
+                                <div class="info-grid">
+                                    <div class="info-row">
+                                        <span class="info-label">Version del Bot:</span>
+                                        <span class="info-value" id="botVersion">1.0.0</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Ultima sincronizacion:</span>
+                                        <span class="info-value" id="lastSync">Hace unos momentos</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">BD MongoDB:</span>
+                                        <span class="info-value" id="mongoStatus">Conectando...</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Node.js:</span>
+                                        <span class="info-value" id="nodeVersion">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-section">
+                            <h2>Actividad Ultimas Horas</h2>
+                            <div class="activity-chart">
+                                <div class="simple-bar-chart" id="activityChartContainer">
+                                    <p style="color: #999;">Cargando datos...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="xp-page" class="page">
+                    <div class="section-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">⭐</div>
+                                <div class="stat-content">
+                                    <h3>XP Total</h3>
+                                    <p class="stat-value" id="totalXp">0</p>
+                                    <p class="stat-label">Puntos acumulados</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-content">
+                                    <h3>XP Promedio</h3>
+                                    <p class="stat-value" id="avgXp">0</p>
+                                    <p class="stat-label">Por usuario</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🔥</div>
+                                <div class="stat-content">
+                                    <h3>XP Maximo</h3>
+                                    <p class="stat-value" id="maxXp">0</p>
+                                    <p class="stat-label">Usuario mas alto</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-content">
+                                    <h3>Usuarios Activos</h3>
+                                    <p class="stat-value" id="activeUsersXp">0</p>
+                                    <p class="stat-label">Con XP > 0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="config-section">
+                            <h3>Configuracion XP</h3>
+                            <div class="config-grid">
+                                <div class="config-item">
+                                    <span class="config-label">Cooldown</span>
+                                    <span class="config-value" id="xpCooldown">10s</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">XP Base</span>
+                                    <span class="config-value" id="xpBase">15-25</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Multiplicador Booster</span>
+                                    <span class="config-value" id="boosterMult">2.0x</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Multiplicador Nocturno</span>
+                                    <span class="config-value" id="nightMult">0.25x</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="top-section">
+                            <h3>Top 10 Usuarios por XP</h3>
+                            <div class="top-list" id="topXpUsers">
+                                <p class="loading-text">Cargando...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="niveles-page" class="page">
+                    <div class="section-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🏆</div>
+                                <div class="stat-content">
+                                    <h3>Nivel Maximo</h3>
+                                    <p class="stat-value" id="maxLevel">0</p>
+                                    <p class="stat-label">Alcanzado</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-content">
+                                    <h3>Nivel Promedio</h3>
+                                    <p class="stat-value" id="avgLevel">0</p>
+                                    <p class="stat-label">Entre usuarios</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💯</div>
+                                <div class="stat-content">
+                                    <h3>Nivel 100+</h3>
+                                    <p class="stat-value" id="level100Count">0</p>
+                                    <p class="stat-label">Usuarios elite</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="distribution-section">
+                            <h3>Distribucion por Nivel</h3>
+                            <div class="distribution-chart" id="levelDistribution">
+                                <p class="loading-text">Cargando...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="top-section">
+                            <h3>Top 10 Usuarios por Nivel</h3>
+                            <div class="top-list" id="topLevelUsers">
+                                <p class="loading-text">Cargando...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="roles-page" class="page">
+                    <div class="section-content">
+                        <h3>Roles por Nivel</h3>
+                        <p class="section-desc">Roles que se asignan automaticamente al alcanzar ciertos niveles</p>
+                        
+                        <div class="roles-grid" id="levelRolesGrid">
+                            <p class="loading-text">Cargando...</p>
+                        </div>
+                        
+                        <h3 style="margin-top: 30px;">Roles Especiales</h3>
+                        <div class="special-roles-grid" id="specialRolesGrid">
+                            <p class="loading-text">Cargando...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="misiones-page" class="page">
+                    <div class="section-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🎯</div>
+                                <div class="stat-content">
+                                    <h3>Semana</h3>
+                                    <p class="stat-value" id="weekNumber">0</p>
+                                    <p class="stat-label" id="missionYear">2024</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📋</div>
+                                <div class="stat-content">
+                                    <h3>Misiones Totales</h3>
+                                    <p class="stat-value" id="totalMissions">0</p>
+                                    <p class="stat-label">Esta semana</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-content">
+                                    <h3>Completadas</h3>
+                                    <p class="stat-value" id="completedMissions">0</p>
+                                    <p class="stat-label">Misiones</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📈</div>
+                                <div class="stat-content">
+                                    <h3>Tasa Completado</h3>
+                                    <p class="stat-value" id="completionRate">0%</p>
+                                    <p class="stat-label">De misiones</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section" style="margin-top: 20px;">
+                            <div class="info-card">
+                                <h3>Configuracion de Misiones</h3>
+                                <div class="info-grid">
+                                    <div class="info-row">
+                                        <span class="info-label">Canal de notificaciones:</span>
+                                        <span class="info-value" id="missionChannel">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="powerups-page" class="page">
+                    <div class="section-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">🌍</div>
+                                <div class="stat-content">
+                                    <h3>Boosts Globales</h3>
+                                    <p class="stat-value" id="globalBoostsCount">0</p>
+                                    <p class="stat-label">Activos</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">👤</div>
+                                <div class="stat-content">
+                                    <h3>Boosts Usuario</h3>
+                                    <p class="stat-value" id="userBoostsCount">0</p>
+                                    <p class="stat-label">Activos</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📺</div>
+                                <div class="stat-content">
+                                    <h3>Boosts Canal</h3>
+                                    <p class="stat-value" id="channelBoostsCount">0</p>
+                                    <p class="stat-label">Activos</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⚡</div>
+                                <div class="stat-content">
+                                    <h3>Total Activos</h3>
+                                    <p class="stat-value" id="totalBoostsActive">0</p>
+                                    <p class="stat-label">Power-ups</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="boosts-list-section">
+                            <h3>Boosts Globales Activos</h3>
+                            <div class="boosts-list" id="globalBoostsList">
+                                <p class="empty-text">No hay boosts globales activos</p>
+                            </div>
+                        </div>
+                        
+                        <div class="config-section">
+                            <h3>Multiplicadores Base</h3>
+                            <div class="config-grid">
+                                <div class="config-item">
+                                    <span class="config-label">Booster/VIP</span>
+                                    <span class="config-value" id="boosterVipMult">2.0x</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Nocturno</span>
+                                    <span class="config-value" id="nightBoostMult">+0.25x</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="estadisticas-page" class="page">
+                    <div class="section-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-content">
+                                    <h3>Usuarios Totales</h3>
+                                    <p class="stat-value" id="statsTotalUsers">0</p>
+                                    <p class="stat-label">Registrados</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🔥</div>
+                                <div class="stat-content">
+                                    <h3>Usuarios Activos</h3>
+                                    <p class="stat-value" id="statsActiveUsers">0</p>
+                                    <p class="stat-label">Con XP > 0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📅</div>
+                                <div class="stat-content">
+                                    <h3>Activos Hoy</h3>
+                                    <p class="stat-value" id="statsActiveToday">0</p>
+                                    <p class="stat-label">Usuarios</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📆</div>
+                                <div class="stat-content">
+                                    <h3>Activos Semana</h3>
+                                    <p class="stat-value" id="statsActiveWeek">0</p>
+                                    <p class="stat-label">Usuarios</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-grid" style="margin-top: 20px;">
+                            <div class="stat-card">
+                                <div class="stat-icon">⭐</div>
+                                <div class="stat-content">
+                                    <h3>XP Total</h3>
+                                    <p class="stat-value" id="statsTotalXp">0</p>
+                                    <p class="stat-label">Acumulado</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-content">
+                                    <h3>XP Promedio</h3>
+                                    <p class="stat-value" id="statsAvgXp">0</p>
+                                    <p class="stat-label">Por usuario</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🏆</div>
+                                <div class="stat-content">
+                                    <h3>Nivel Promedio</h3>
+                                    <p class="stat-value" id="statsAvgLevel">0</p>
+                                    <p class="stat-label">Por usuario</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="distribution-section">
+                            <h3>Distribucion por Rango de Nivel</h3>
+                            <div class="distribution-chart" id="statsLevelBrackets">
+                                <p class="loading-text">Cargando...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="system-stats">
+                            <h3>Sistema</h3>
+                            <div class="config-grid">
+                                <div class="config-item">
+                                    <span class="config-label">MongoDB</span>
+                                    <span class="config-value" id="statsMongoStatus">-</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Memoria</span>
+                                    <span class="config-value" id="statsMemory">-</span>
+                                </div>
+                                <div class="config-item">
+                                    <span class="config-label">Uptime</span>
+                                    <span class="config-value" id="statsUptime">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="configuracion-page" class="page">
+                    <div class="section-content">
+                        <div class="config-warning">
+                            <span>Los cambios en la configuracion afectan el funcionamiento del bot. Cada cambio requiere confirmacion.</span>
+                        </div>
+                        
+                        <h3>Sistema de XP</h3>
+                        <div class="config-grid">
+                            <div class="config-item editable" data-field="cooldown" data-category="xpSystem">
+                                <span class="config-label">Cooldown (segundos)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgCooldown" min="1" max="300">
+                                    <button class="config-save-btn" data-field="cooldown">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item editable" data-field="baseMin" data-category="xpSystem">
+                                <span class="config-label">XP Minimo</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgXpMin" min="1" max="100">
+                                    <button class="config-save-btn" data-field="baseMin">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item editable" data-field="baseMax" data-category="xpSystem">
+                                <span class="config-label">XP Maximo</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgXpMax" min="1" max="200">
+                                    <button class="config-save-btn" data-field="baseMax">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item editable" data-field="boosterMultiplier" data-category="xpSystem">
+                                <span class="config-label">Mult. Booster</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgBoosterMult" min="1" max="10" step="0.1">
+                                    <button class="config-save-btn" data-field="boosterMultiplier">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item editable" data-field="nightMultiplier" data-category="xpSystem">
+                                <span class="config-label">Mult. Nocturno</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="number" class="config-input" id="cfgNightMult" min="0" max="5" step="0.1">
+                                    <button class="config-save-btn" data-field="nightMultiplier">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 30px;">Canales</h3>
+                        <div class="config-grid">
+                            <div class="config-item wide editable" data-field="levelUp" data-category="channels">
+                                <span class="config-label">Canal Level Up (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgLevelUpChannel" placeholder="ID del canal">
+                                    <button class="config-save-btn" data-field="levelUp">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item wide editable" data-field="missionComplete" data-category="channels">
+                                <span class="config-label">Canal Misiones (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgMissionChannel" placeholder="ID del canal">
+                                    <button class="config-save-btn" data-field="missionComplete">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 30px;">Canales sin XP</h3>
+                        <div class="no-xp-channels-wrapper">
+                            <div class="no-xp-channels" id="cfgNoXpChannels">
+                                <p class="loading-text">Cargando...</p>
+                            </div>
+                            <div class="no-xp-add">
+                                <input type="text" id="newNoXpChannel" placeholder="ID del canal a agregar">
+                                <button class="btn-add-channel" id="addNoXpChannel">Agregar</button>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 30px;">Roles Especiales</h3>
+                        <div class="config-grid">
+                            <div class="config-item editable" data-field="staff" data-category="roles">
+                                <span class="config-label">Staff (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgStaffRole" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="staff">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item editable" data-field="booster" data-category="roles">
+                                <span class="config-label">Booster (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgBoosterRole" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="booster">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item editable" data-field="vip" data-category="roles">
+                                <span class="config-label">VIP (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgVipRole" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="vip">Guardar</button>
+                                </div>
+                            </div>
+                            <div class="config-item editable" data-field="level100" data-category="roles">
+                                <span class="config-label">Nivel 100 (ID)</span>
+                                <div class="config-edit-wrapper">
+                                    <input type="text" class="config-input" id="cfgLevel100Role" placeholder="ID del rol">
+                                    <button class="config-save-btn" data-field="level100">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin-top: 30px;">Modo Mantenimiento</h3>
+                        <div class="maintenance-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="maintenanceToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span id="maintenanceStatus">Desactivado</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="confirmModal" class="modal-overlay" style="display: none;">
+                    <div class="modal-content confirm-modal">
+                        <h3>Confirmar Cambio</h3>
+                        <p id="confirmMessage">¿Estas seguro de que deseas cambiar esta configuracion?</p>
+                        <div class="confirm-details" id="confirmDetails"></div>
+                        <div class="modal-actions">
+                            <button class="btn-cancel" id="confirmCancel">Cancelar</button>
+                            <button class="btn-confirm" id="confirmAccept">Confirmar Cambio</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="personalizacion-page" class="page">
+                    <div class="section-content">
+                        <h3>Personalizar Panel</h3>
+                        <p style="color: #666; margin-bottom: 20px;">Ajusta la apariencia del panel a tu gusto. Los cambios se guardan automaticamente. Tambien puedes usar el boton 🎨 en la barra superior para acceso rapido.</p>
+                        
+                        <div class="customization-section">
+                            <h4>Tema de Sidebar</h4>
+                            <div class="theme-options">
+                                <div class="theme-option" data-theme="default">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                                    <span>Morado (Default)</span>
+                                </div>
+                                <div class="theme-option" data-theme="ocean">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);"></div>
+                                    <span>Oceano</span>
+                                </div>
+                                <div class="theme-option" data-theme="sunset">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                                    <span>Atardecer</span>
+                                </div>
+                                <div class="theme-option" data-theme="forest">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);"></div>
+                                    <span>Bosque</span>
+                                </div>
+                                <div class="theme-option" data-theme="dark">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);"></div>
+                                    <span>Oscuro</span>
+                                </div>
+                                <div class="theme-option" data-theme="fire">
+                                    <div class="theme-preview" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);"></div>
+                                    <span>Fuego</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-section">
+                            <h4>Color de Fondo</h4>
+                            <div class="bg-options">
+                                <div class="bg-option" data-bg="light">
+                                    <div class="bg-preview" style="background: #f5f7fa;"></div>
+                                    <span>Claro (Default)</span>
+                                </div>
+                                <div class="bg-option" data-bg="dark">
+                                    <div class="bg-preview" style="background: #1a1a2e;"></div>
+                                    <span>Oscuro</span>
+                                </div>
+                                <div class="bg-option" data-bg="cream">
+                                    <div class="bg-preview" style="background: #faf8f5;"></div>
+                                    <span>Crema</span>
+                                </div>
+                                <div class="bg-option" data-bg="blue">
+                                    <div class="bg-preview" style="background: #e8f4fc;"></div>
+                                    <span>Azul Claro</span>
+                                </div>
+                                <div class="bg-option" data-bg="green">
+                                    <div class="bg-preview" style="background: #e8f5e9;"></div>
+                                    <span>Verde Claro</span>
+                                </div>
+                                <div class="bg-option" data-bg="purple">
+                                    <div class="bg-preview" style="background: #f3e5f5;"></div>
+                                    <span>Lila</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-section">
+                            <h4>Fuente de Letra</h4>
+                            <div class="font-options">
+                                <div class="font-option" data-font="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">
+                                    <span style="font-family: 'Segoe UI', sans-serif;">Segoe UI (Default)</span>
+                                </div>
+                                <div class="font-option" data-font="'Arial', Helvetica, sans-serif">
+                                    <span style="font-family: Arial, sans-serif;">Arial</span>
+                                </div>
+                                <div class="font-option" data-font="'Roboto', sans-serif">
+                                    <span style="font-family: Roboto, sans-serif;">Roboto</span>
+                                </div>
+                                <div class="font-option" data-font="'Open Sans', sans-serif">
+                                    <span style="font-family: 'Open Sans', sans-serif;">Open Sans</span>
+                                </div>
+                                <div class="font-option" data-font="'Poppins', sans-serif">
+                                    <span style="font-family: Poppins, sans-serif;">Poppins</span>
+                                </div>
+                                <div class="font-option" data-font="'Courier New', monospace">
+                                    <span style="font-family: 'Courier New', monospace;">Courier (Monospace)</span>
+                                </div>
+                                <div class="font-option" data-font="'Comic Sans MS', cursive">
+                                    <span style="font-family: 'Comic Sans MS', cursive;">Comic Sans</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-section">
+                            <h4>Vista Previa</h4>
+                            <div class="preview-box" id="previewBox">
+                                <div class="preview-sidebar"></div>
+                                <div class="preview-content">
+                                    <p>Asi se vera tu panel con los ajustes actuales.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="customization-actions">
+                            <button class="btn-reset-theme" id="resetCustomization">Restaurar Default</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="logs-page" class="page">
+                    <div class="section-content">
+                        <div class="logs-header">
+                            <div class="logs-stats">
+                                <div class="log-stat">
+                                    <span class="log-stat-value" id="logsTotal">0</span>
+                                    <span class="log-stat-label">Total</span>
+                                </div>
+                                <div class="log-stat">
+                                    <span class="log-stat-value" id="logsLastHour">0</span>
+                                    <span class="log-stat-label">Ultima hora</span>
+                                </div>
+                                <div class="log-stat">
+                                    <span class="log-stat-value" id="logsLastDay">0</span>
+                                    <span class="log-stat-label">Ultimo dia</span>
+                                </div>
+                            </div>
+                            <div class="logs-filters">
+                                <select id="logTypeFilter">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="command_use">Comando Usado</option>
+                                    <option value="xp_gain">XP Ganado</option>
+                                    <option value="xp_loss">XP Perdido</option>
+                                    <option value="level_up">Subida de Nivel</option>
+                                    <option value="level_down">Bajada de Nivel</option>
+                                    <option value="coins_gain">Lagcoins Ganados</option>
+                                    <option value="coins_loss">Lagcoins Perdidos</option>
+                                    <option value="work">Trabajo</option>
+                                    <option value="casino_win">Casino Ganado</option>
+                                    <option value="casino_loss">Casino Perdido</option>
+                                    <option value="theft_success">Robo Exitoso</option>
+                                    <option value="theft_fail">Robo Fallido</option>
+                                    <option value="gift_sent">Regalo Enviado</option>
+                                    <option value="gift_received">Regalo Recibido</option>
+                                    <option value="daily_reward">Recompensa Diaria</option>
+                                    <option value="bank_deposit">Deposito</option>
+                                    <option value="bank_withdraw">Retiro</option>
+                                    <option value="shop_purchase">Compra Tienda</option>
+                                    <option value="powerup_activate">Power-Up</option>
+                                    <option value="insurance_buy">Seguro</option>
+                                    <option value="marriage">Matrimonio</option>
+                                    <option value="divorce">Divorcio</option>
+                                    <option value="bank_heist">Atraco</option>
+                                    <option value="trade">Intercambio</option>
+                                    <option value="auction_create">Subasta</option>
+                                    <option value="mission_complete">Mision</option>
+                                    <option value="admin_action">Accion Admin</option>
+                                </select>
+                                <select id="logSystemFilter">
+                                    <option value="">Todos los sistemas</option>
+                                    <option value="economia">Economia</option>
+                                    <option value="casino">Casino</option>
+                                    <option value="niveles">Niveles</option>
+                                    <option value="robos">Robos</option>
+                                    <option value="social">Social</option>
+                                    <option value="tienda">Tienda</option>
+                                    <option value="misiones">Misiones</option>
+                                    <option value="minijuegos">Minijuegos</option>
+                                    <option value="powerups">Power-Ups</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="seguridad">Seguridad</option>
+                                    <option value="nacionalidades">Nacionalidades</option>
+                                </select>
+                                <select id="logImportanceFilter">
+                                    <option value="">Toda importancia</option>
+                                    <option value="critical">Critica</option>
+                                    <option value="high">Alta</option>
+                                    <option value="medium">Media</option>
+                                    <option value="low">Baja</option>
+                                </select>
+                                <select id="logPeriodFilter">
+                                    <option value="all">Todo el tiempo</option>
+                                    <option value="hour">Ultima hora</option>
+                                    <option value="day">Ultimo dia</option>
+                                    <option value="week">Ultima semana</option>
+                                </select>
+                            </div>
+                            <div class="logs-actions">
+                                <button id="refreshLogs" class="btn-primary">Actualizar</button>
+                                <button id="exportLogsCSV" class="btn-secondary">Exportar CSV</button>
+                                <label style="color: #fff; margin-left: 10px;">
+                                    <input type="checkbox" id="autoRefreshLogs" checked> Auto
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="alertsContainer" class="alerts-container" style="display: none;">
+                            <h4 style="color: #ff6b6b; margin-bottom: 8px;">Alertas de Actividad Sospechosa</h4>
+                            <div id="alertsList"></div>
+                        </div>
+                        
+                        <div class="logs-container" id="logsContainer">
+                            <p class="loading-text">Cargando logs...</p>
+                        </div>
+                        
+                        <div class="logs-pagination" id="logsPagination" style="display: none;">
+                            <button id="logsPrevPage" class="btn-secondary">Anterior</button>
+                            <span id="logsPageInfo" style="color: #fff; margin: 0 15px;">Pagina 1</span>
+                            <button id="logsNextPage" class="btn-secondary">Siguiente</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="usuarios-page" class="page">
+                    <div class="section-content">
+                        <div class="user-search-section">
+                            <h3>Buscar Usuario</h3>
+                            <div class="search-box">
+                                <input type="text" id="userSearchInput" placeholder="Nombre, apodo en el servidor o ID">
+                                <button id="userSearchBtn" class="btn-primary">Buscar</button>
+                            </div>
+                            <div id="searchResults" class="search-results"></div>
+                        </div>
+                        
+                        <div id="userDetailsSection" class="user-details-section" style="display: none;">
+                            <div class="user-header">
+                                <img id="userAvatar" src="" alt="Avatar" class="user-avatar">
+                                <div class="user-info-header">
+                                    <h2 id="userDisplayName">Usuario</h2>
+                                    <p id="userUsername">@username</p>
+                                    <p id="userGuild">Servidor</p>
+                                </div>
+                            </div>
+                            
+                            <div class="user-stats-grid">
+                                <div class="user-stat-card">
+                                    <h4>XP Total</h4>
+                                    <span id="userTotalXp" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('totalXp', 'add')">+</button>
+                                        <button onclick="modifyUser('totalXp', 'remove')">-</button>
+                                        <button onclick="modifyUser('totalXp', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('totalXp', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="user-stat-card">
+                                    <h4>Nivel</h4>
+                                    <span id="userLevel" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('level', 'add')">+</button>
+                                        <button onclick="modifyUser('level', 'remove')">-</button>
+                                        <button onclick="modifyUser('level', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('level', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="user-stat-card">
+                                    <h4>Lagcoins (Cartera)</h4>
+                                    <span id="userLagcoins" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('lagcoins', 'add')">+</button>
+                                        <button onclick="modifyUser('lagcoins', 'remove')">-</button>
+                                        <button onclick="modifyUser('lagcoins', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('lagcoins', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                                <div class="user-stat-card">
+                                    <h4>Lagcoins (Banco)</h4>
+                                    <span id="userBank" class="user-stat-value">0</span>
+                                    <div class="user-stat-actions">
+                                        <button onclick="modifyUser('bank', 'add')">+</button>
+                                        <button onclick="modifyUser('bank', 'remove')">-</button>
+                                        <button onclick="modifyUser('bank', 'set')">Establecer</button>
+                                        <button onclick="modifyUser('bank', 'reset')">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="user-extra-info">
+                                <div class="user-info-card">
+                                    <h4>Roles del Usuario</h4>
+                                    <div id="userRoles" class="user-roles-list"></div>
+                                </div>
+                                <div class="user-info-card">
+                                    <h4>Historial de Actividad</h4>
+                                    <div id="userActivityLogs" class="user-activity-logs"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/admin/js/admin.js"></script>
+</body>
+</html>

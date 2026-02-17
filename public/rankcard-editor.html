@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Rankcard - Niveles</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    .rankcard-editor { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .rankcard-editor h1 { text-align: center; color: var(--primary, #FFD700); margin-bottom: 20px; font-size: 14px; }
+    .editor-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+    @media (max-width: 768px) { .editor-layout { grid-template-columns: 1fr; } }
+    .preview-panel { background: rgba(0,0,0,0.4); border: 2px solid var(--accent, #5865F2); padding: 16px; border-radius: 8px; }
+    .preview-panel img { width: 100%; max-width: 800px; height: auto; display: block; margin: 0 auto; image-rendering: pixelated; }
+    .preview-placeholder { min-height: 250px; display: flex; align-items: center; justify-content: center; color: #888; border: 2px dashed #444; }
+    .controls-panel { background: rgba(0,0,0,0.4); border: 2px solid var(--accent); padding: 16px; border-radius: 8px; height: fit-content; }
+    .control-group { margin-bottom: 16px; }
+    .control-group label { display: block; font-size: 10px; color: var(--accent); margin-bottom: 6px; }
+    .color-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .color-swatch { width: 32px; height: 32px; border: 2px solid #fff; cursor: pointer; border-radius: 4px; }
+    .color-input { width: 100px; padding: 6px; background: #2a2d31; border: 1px solid #444; color: #fff; font-size: 11px; }
+    .cost-display { background: rgba(255,215,0,0.2); border: 2px solid #FFD700; padding: 12px; margin: 16px 0; text-align: center; }
+    .cost-display .total { font-size: 18px; color: #FFD700; font-weight: bold; }
+    .cost-display .balance { font-size: 11px; color: #888; margin-top: 4px; }
+    .btn-purchase { width: 100%; padding: 12px; background: #00AA00; color: #fff; border: 2px solid #00FF00; font-weight: bold; cursor: pointer; font-size: 12px; }
+    .btn-purchase:hover { background: #00CC00; }
+    .btn-purchase:disabled { background: #444; border-color: #666; cursor: not-allowed; }
+    .btn-preview { padding: 8px 16px; background: #5865F2; color: #fff; border: none; cursor: pointer; margin-top: 8px; font-size: 11px; }
+    .error-msg { color: #ff4444; font-size: 11px; margin: 8px 0; }
+    .vip-badge { background: linear-gradient(90deg,#FF00FF,#00FFFF); color: #000; padding: 2px 8px; font-size: 9px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="pixel-bg"></div>
+
+  <div class="rankcard-editor">
+    <h1>🎨 EDITOR DE RANKCARD PERSONALIZADA</h1>
+
+    <div id="loading" style="text-align:center;padding:40px;">
+      <p>Verificando token...</p>
+    </div>
+
+    <div id="error-screen" style="display:none;text-align:center;padding:40px;color:#ff4444;">
+      <h2>Token inválido o expirado</h2>
+      <p>Usa <code>/rankcard link</code> en Discord para obtener un enlace nuevo (válido 15 min)</p>
+    </div>
+
+    <div id="editor-screen" style="display:none;">
+      <div class="editor-layout">
+        <div class="preview-panel">
+          <h3 style="font-size:11px;color:var(--accent);margin-bottom:12px;">Previsualización</h3>
+          <div id="preview-container">
+            <div class="preview-placeholder" id="preview-placeholder">Haz clic en "Actualizar Vista Previa"</div>
+            <img id="preview-img" src="" alt="Preview" style="display:none;">
+          </div>
+          <button type="button" class="btn-preview" id="btn-preview">Actualizar Vista Previa</button>
+        </div>
+
+        <div class="controls-panel">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <img id="user-avatar" src="" alt="" style="width:48px;height:48px;border-radius:50%;">
+            <div>
+              <strong id="user-name"></strong>
+              <span id="vip-badge" class="vip-badge" style="display:none;">VIP/BOOSTER</span>
+              <div class="cost-display">
+                <div>💰 <span id="user-lagcoins">0</span> Lagcoins</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Color de fondo</label>
+            <div class="color-row">
+              <input type="color" id="color-bg" value="#36393F" class="color-swatch">
+              <input type="text" id="color-bg-hex" value="#36393F" class="color-input" maxlength="7">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Color de acento</label>
+            <div class="color-row">
+              <input type="color" id="color-accent" value="#5865F2" class="color-swatch">
+              <input type="text" id="color-accent-hex" value="#5865F2" class="color-input" maxlength="7">
+            </div>
+            <div id="neon-palette" style="display:none;margin-top:8px;">
+              <label style="font-size:9px;">Paleta Neón (VIP/Booster):</label>
+              <div class="color-row" id="neon-colors"></div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Color de texto</label>
+            <div class="color-row">
+              <input type="color" id="color-text" value="#FFFFFF" class="color-swatch">
+              <input type="text" id="color-text-hex" value="#FFFFFF" class="color-input" maxlength="7">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Color de barra XP</label>
+            <div class="color-row">
+              <input type="color" id="color-bar" value="#5865F2" class="color-swatch">
+              <input type="text" id="color-bar-hex" value="#5865F2" class="color-input" maxlength="7">
+            </div>
+          </div>
+
+          <div class="control-group" id="neon-toggle-wrap" style="display:none;">
+            <label><input type="checkbox" id="use-neon"> Usar efecto Neón</label>
+          </div>
+
+          <div class="control-group">
+            <label>Tipografía</label>
+            <select id="font-select" style="width:100%;padding:8px;background:#2a2d31;border:1px solid #444;color:#fff;font-size:11px;">
+              <option value="arial">Arial</option>
+              <option value="sans-serif">Sans Serif</option>
+              <option value="press-start" disabled>Press Start 2P (VIP)</option>
+              <option value="monospace" disabled>Monospace Pixel (VIP)</option>
+              <option value="impact" disabled>Impact (VIP)</option>
+            </select>
+          </div>
+
+          <div class="control-group" id="logos-section">
+            <label>URLs de logos (Discord CDN) - Max <span id="max-logos">1</span></label>
+            <div id="logo-inputs"></div>
+          </div>
+
+          <div class="cost-display">
+            <div class="total">Total: <span id="cost-total">7500</span> Lagcoins</div>
+            <div class="balance" id="cost-breakdown">Base: 7500</div>
+          </div>
+
+          <p id="purchase-error" class="error-msg" style="display:none;"></p>
+          <button type="button" class="btn-purchase" id="btn-purchase">Confirmar y Pagar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let token = null;
+    let userData = null;
+
+    function getToken() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('token');
+    }
+
+    function syncColorInputs(id) {
+      const colorEl = document.getElementById(`color-${id}`);
+      const hexEl = document.getElementById(`color-${id}-hex`);
+      if (!colorEl || !hexEl) return;
+      colorEl.addEventListener('input', () => hexEl.value = colorEl.value);
+      hexEl.addEventListener('input', (e) => {
+        if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) colorEl.value = e.target.value;
+      });
+    }
+
+    function getConfig() {
+      return {
+        backgroundColor: document.getElementById('color-bg').value,
+        accentColor: document.getElementById('color-accent').value,
+        textColor: document.getElementById('color-text').value,
+        barColor: document.getElementById('color-bar').value,
+        useNeonPalette: document.getElementById('use-neon')?.checked || false,
+        fontId: document.getElementById('font-select').value,
+        baseImages: [],
+        logos: []
+      };
+    }
+
+    function getLogosFromInputs() {
+      const max = userData?.options?.maxImages || 1;
+      const logos = [];
+      for (let i = 0; i < max; i++) {
+        const input = document.getElementById(`logo-url-${i}`);
+        if (input?.value?.trim()) {
+          logos.push({ url: input.value.trim(), x: 650 + i * 50, y: 80, width: 60, height: 60 });
+        }
+      }
+      return logos;
+    }
+
+    async function loadUser() {
+      token = getToken();
+      if (!token) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-screen').style.display = 'block';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/rankcard/verify?token=${encodeURIComponent(token)}`);
+        if (!res.ok) {
+          throw new Error('Token inválido');
+        }
+        userData = await res.json();
+        initEditor();
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-screen').style.display = 'block';
+      }
+    }
+
+    function initEditor() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('editor-screen').style.display = 'block';
+
+      document.getElementById('user-avatar').src = userData.avatar || '';
+      document.getElementById('user-name').textContent = userData.username || 'Usuario';
+      document.getElementById('user-lagcoins').textContent = (userData.lagcoins || 0).toLocaleString();
+
+      if (userData.hasVIPBenefits) {
+        document.getElementById('vip-badge').style.display = 'inline-block';
+        document.getElementById('neon-palette').style.display = 'block';
+        document.getElementById('neon-toggle-wrap').style.display = 'block';
+
+        const neonDiv = document.getElementById('neon-colors');
+        (userData.options?.neonColors || []).forEach(c => {
+          const sw = document.createElement('div');
+          sw.className = 'color-swatch';
+          sw.style.backgroundColor = c;
+          sw.style.cursor = 'pointer';
+          sw.title = c;
+          sw.addEventListener('click', () => {
+            document.getElementById('color-accent').value = c;
+            document.getElementById('color-accent-hex').value = c;
+          });
+          neonDiv.appendChild(sw);
+        });
+
+        ['press-start', 'monospace', 'impact'].forEach(v => {
+          const opt = document.querySelector(`#font-select option[value="${v}"]`);
+          if (opt) opt.disabled = false;
+        });
+      }
+
+      const maxLogos = userData.options?.maxImages || 1;
+      document.getElementById('max-logos').textContent = maxLogos;
+
+      const logoContainer = document.getElementById('logo-inputs');
+      logoContainer.innerHTML = '';
+      for (let i = 0; i < maxLogos; i++) {
+        const wrap = document.createElement('div');
+        wrap.style.marginTop = '4px';
+        wrap.innerHTML = `<input type="text" id="logo-url-${i}" placeholder="URL logo ${i + 1} (Discord CDN)" class="color-input" style="width:100%;">`;
+        logoContainer.appendChild(wrap);
+      }
+
+      if (userData.rankcard_custom) {
+        const c = userData.rankcard_custom;
+        if (c.backgroundColor) { document.getElementById('color-bg').value = c.backgroundColor; document.getElementById('color-bg-hex').value = c.backgroundColor; }
+        if (c.accentColor) { document.getElementById('color-accent').value = c.accentColor; document.getElementById('color-accent-hex').value = c.accentColor; }
+        if (c.textColor) { document.getElementById('color-text').value = c.textColor; document.getElementById('color-text-hex').value = c.textColor; }
+        if (c.barColor) { document.getElementById('color-bar').value = c.barColor; document.getElementById('color-bar-hex').value = c.barColor; }
+        if (c.fontId) document.getElementById('font-select').value = c.fontId;
+        if (c.useNeonPalette) document.getElementById('use-neon').checked = true;
+        if (c.logos?.length) {
+          c.logos.forEach((logo, i) => {
+            const inp = document.getElementById(`logo-url-${i}`);
+            if (inp) inp.value = logo.url || '';
+          });
+        }
+      }
+
+      ['bg', 'accent', 'text', 'bar'].forEach(syncColorInputs);
+
+      document.getElementById('btn-preview').addEventListener('click', updatePreview);
+      document.getElementById('btn-purchase').addEventListener('click', doPurchase);
+
+      updateCost();
+      document.querySelectorAll('#color-bg, #color-accent, #color-text, #color-bar, #font-select, #use-neon').forEach(el => {
+        el.addEventListener('change', updateCost);
+      });
+      document.getElementById('logos-section').addEventListener('input', updateCost);
+    }
+
+    async function updateCost() {
+      const config = { ...getConfig(), logos: getLogosFromInputs() };
+      try {
+        const res = await fetch('/api/rankcard/calculate-cost', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, config })
+        });
+        const data = await res.json();
+        if (data.total !== undefined) {
+          document.getElementById('cost-total').textContent = data.total.toLocaleString();
+          document.getElementById('cost-breakdown').textContent = `Base: 7500${data.breakdown?.extras > 0 ? ' + ' + data.breakdown.extras + ' extras' : ''}`;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function updatePreview() {
+      const config = { ...getConfig(), logos: getLogosFromInputs() };
+      try {
+        const res = await fetch('/api/rankcard/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, config })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        document.getElementById('preview-placeholder').style.display = 'none';
+        const img = document.getElementById('preview-img');
+        img.src = url;
+        img.style.display = 'block';
+      } catch (e) {
+        document.getElementById('preview-placeholder').textContent = 'Error al generar vista previa';
+        document.getElementById('preview-placeholder').style.display = 'flex';
+        document.getElementById('preview-img').style.display = 'none';
+      }
+    }
+
+    async function doPurchase() {
+      const config = { ...getConfig(), logos: getLogosFromInputs() };
+      const errEl = document.getElementById('purchase-error');
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/rankcard/purchase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, config })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Error al procesar';
+          if (data.balance !== undefined) errEl.textContent += ` (Tienes: ${data.balance} LC)`;
+          errEl.style.display = 'block';
+          return;
+        }
+
+        alert('¡Rankcard guardada! Usa /level en Discord para verla.');
+        document.getElementById('user-lagcoins').textContent = (data.newBalance || 0).toLocaleString();
+        userData.lagcoins = data.newBalance;
+      } catch (e) {
+        errEl.textContent = 'Error de conexión';
+        errEl.style.display = 'block';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUser);
+  </script>
+</body>
+</html>

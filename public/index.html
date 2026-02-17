@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot de Niveles - Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="pixel-bg"></div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">&#9733;</span>
+                <h1>- Niveles</h1>
+            </div>
+            <nav class="nav">
+                <a href="#inicio" class="nav-link active" data-section="inicio">Inicio</a>
+                <a href="#caracteristicas" class="nav-link" data-section="caracteristicas">Caracteristicas</a>
+                <a href="#comandos" class="nav-link" data-section="comandos">Comandos</a>
+                <a href="#economia" class="nav-link" data-section="economia">Economia</a>
+                <a href="#minijuegos" class="nav-link" data-section="minijuegos">Minijuegos</a>
+                <a href="#misiones" class="nav-link" data-section="misiones">Misiones</a>
+                <a href="#inactividad" class="nav-link" data-section="inactividad">Inactividad</a>
+                <a href="#tarjetas" class="nav-link" data-section="tarjetas">Tarjetas</a>
+                <a href="#preguntas" class="nav-link" data-section="preguntas">Preguntas</a>
+                <a href="#estadisticas" class="nav-link" data-section="estadisticas">Estadisticas</a>
+                <a href="#leaderboard" class="nav-link" data-section="leaderboard">Leaderboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- INICIO -->
+        <section id="inicio" class="section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <div class="pixel-character mario"></div>
+                    <h2 class="hero-title glitch" data-text="- Niveles">- Niveles</h2>
+                    <p class="hero-subtitle">Sistema completo de XP, niveles, minijuegos y tarjetas personalizadas con pixel art</p>
+                    <div class="hero-stats">
+                        <div class="stat-box">
+                            <span class="stat-icon">&#9829;</span>
+                            <span class="stat-value" id="total-users">--</span>
+                            <span class="stat-label">Usuarios</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-icon">&#9733;</span>
+                            <span class="stat-value">100+</span>
+                            <span class="stat-label">Niveles</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-icon">💰</span>
+                            <span class="stat-value">13</span>
+                            <span class="stat-label">Trabajos</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-icon">🎰</span>
+                            <span class="stat-value">5</span>
+                            <span class="stat-label">Casinos</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-icon">🎯</span>
+                            <span class="stat-value">10</span>
+                            <span class="stat-label">Misiones</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-icon">&#9830;</span>
+                            <span class="stat-value">10</span>
+                            <span class="stat-label">Temas</span>
+                        </div>
+                    </div>
+                    <div class="pixel-character zelda"></div>
+                </div>
+            </div>
+
+            <div class="features-preview">
+                <div class="feature-card pokemon-theme">
+                    <div class="card-header">
+                        <span class="pokeball"></span>
+                        <h3>Sistema de XP</h3>
+                    </div>
+                    <p>Gana XP por mensajes, imagenes, videos y reacciones. Formula progresiva que se adapta a tu nivel.</p>
+                </div>
+                <div class="feature-card zelda-theme">
+                    <div class="card-header">
+                        <span class="triforce"></span>
+                        <h3>Boosts</h3>
+                    </div>
+                    <p>Boosts acumulables, boost nocturno automatico y boosts especiales para VIPs y Boosters.</p>
+                </div>
+                <div class="feature-card mario-theme">
+                    <div class="card-header">
+                        <span class="mushroom"></span>
+                        <h3>Recompensas</h3>
+                    </div>
+                    <p>Roles automaticos al alcanzar niveles especificos. 11 roles de recompensa disponibles.</p>
+                </div>
+            </div>
+
+            <div class="active-boosts-section">
+                <h3 class="boosts-title">🚀 Boosts Activos</h3>
+                <div id="active-boosts-container" class="boosts-container">
+                    <p class="loading-boosts">Cargando boosts...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CARACTERISTICAS -->
+        <section id="caracteristicas" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">&#9733;</span>
+                Caracteristicas
+            </h2>
+
+            <div class="features-grid">
+                <div class="feature-box retro-box">
+                    <div class="feature-icon xp-icon"></div>
+                    <h3>Sistema de Niveles y XP</h3>
+                    <ul class="pixel-list">
+                        <li>Formula de XP progresiva (niveles 1-5 muy rapidos, 90+ muy lentos)</li>
+                        <li>Cooldown de 10 segundos entre mensajes</li>
+                        <li>Ganancia de XP por mensajes, imagenes, videos y reacciones</li>
+                        <li>Recompensas automaticas de roles en niveles especificos</li>
+                        <li>Persistencia de datos (sobrevive reinicios)</li>
+                    </ul>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon boost-icon"></div>
+                    <h3>Sistema de Boosts</h3>
+                    <ul class="pixel-list">
+                        <li>Boosts acumulables (se suman entre si)</li>
+                        <li>Boost automatico de 200% para Boosters y VIPs</li>
+                        <li>Boost nocturno de 25% (18:00-06:00 Venezuela)</li>
+                        <li>Boosts personalizados por usuario, canal o globales</li>
+                        <li>Gestion completa via comandos</li>
+                    </ul>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon rewards-icon"></div>
+                    <h3>Roles de Recompensa</h3>
+                    <div class="rewards-table">
+                        <div class="reward-row"><span class="lvl">Nivel 1</span><span class="role">Nuevo Miembro</span></div>
+                        <div class="reward-row"><span class="lvl">Nivel 5</span><span class="role">Iniciado</span></div>
+                        <div class="reward-row"><span class="lvl">Nivel 10</span><span class="role">Regular</span></div>
+                        <div class="reward-row"><span class="lvl">Nivel 20</span><span class="role">Conocido</span></div>
+                        <div class="reward-row highlight"><span class="lvl">Nivel 25</span><span class="role">Miembro Activo</span></div>
+                        <div class="reward-row"><span class="lvl">Nivel 30</span><span class="role">Veterano</span></div>
+                        <div class="reward-row highlight"><span class="lvl">Nivel 35</span><span class="role">Super Activo</span></div>
+                        <div class="reward-row"><span class="lvl">Nivel 40</span><span class="role">Elite</span></div>
+                        <div class="reward-row"><span class="lvl">Nivel 50</span><span class="role">Maestro</span></div>
+                        <div class="reward-row"><span class="lvl">Nivel 75</span><span class="role">Leyenda</span></div>
+                        <div class="reward-row legendary"><span class="lvl">Nivel 100</span><span class="role">Inmortal</span></div>
+                    </div>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon formula-icon"></div>
+                    <h3>Formula de XP</h3>
+                    <div class="xp-formula">
+                        <div class="formula-row fast"><span>Nivel 1-5</span><span>100 XP</span><span class="speed">MUY RAPIDO</span></div>
+                        <div class="formula-row fast"><span>Nivel 6-10</span><span>150 XP</span><span class="speed">Muy rapido</span></div>
+                        <div class="formula-row medium"><span>Nivel 11-15</span><span>250 XP</span><span class="speed">Rapido</span></div>
+                        <div class="formula-row medium"><span>Nivel 16-20</span><span>400 XP</span><span class="speed">Med. rapido</span></div>
+                        <div class="formula-row normal"><span>Nivel 21-35</span><span>600 XP</span><span class="speed">Normal</span></div>
+                        <div class="formula-row slow"><span>Nivel 36-40</span><span>850 XP</span><span class="speed">Med. lento</span></div>
+                        <div class="formula-row slow"><span>Nivel 41-50</span><span>1200 XP</span><span class="speed">Lento</span></div>
+                        <div class="formula-row slow"><span>Nivel 51-75</span><span>1800 XP</span><span class="speed">Med. lento</span></div>
+                        <div class="formula-row very-slow"><span>Nivel 76-90</span><span>2500 XP</span><span class="speed">Lento</span></div>
+                        <div class="formula-row very-slow"><span>Nivel 90+</span><span>3500 XP</span><span class="speed">MUY LENTO</span></div>
+                    </div>
+                    <p class="formula-note">Multiplicador: baseXP * (1 + nivel * 0.1)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMANDOS -->
+        <section id="comandos" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">&#9824;</span>
+                Comandos
+            </h2>
+
+            <div class="commands-container">
+                <div class="command-category">
+                    <h3 class="category-title user-title">
+                        <span class="category-icon">&#9829;</span>
+                        Comandos de Niveles
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card">
+                            <code>/level [usuario]</code>
+                            <p>Muestra el nivel y XP con tarjeta personalizada</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/nivel [usuario]</code>
+                            <p>Alias de /level</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/rank [usuario]</code>
+                            <p>Alias de /level</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/leaderboard</code>
+                            <p>Tabla de clasificacion top 10</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/lb</code>
+                            <p>Alias de /leaderboard</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/rewards list</code>
+                            <p>Muestra las recompensas por nivel</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/boost list</code>
+                            <p>Ver boosts activos</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/help</code>
+                            <p>Muestra todos los comandos</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/afk [motivo]</code>
+                            <p>Establece tu estado como ausente y añade [AFK] a tu nombre</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-category">
+                    <h3 class="category-title economy-title" style="color: #FFD700;">
+                        <span class="category-icon">&#128176;</span>
+                        Comandos de Economia
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card">
+                            <code>/balance [usuario]</code>
+                            <p>Ver tu saldo de Lagcoins</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/perfil [usuario]</code>
+                            <p>Ver tu perfil completo</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/estadisticas [usuario]</code>
+                            <p>Ver estadisticas detalladas de economia</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/daily</code>
+                            <p>Reclamar recompensa diaria (con rachas)</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/trabajar [trabajo]</code>
+                            <p>Trabajar para ganar Lagcoins (13 trabajos)</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/work</code>
+                            <p>Trabajo rapido basico</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/tienda [categoria]</code>
+                            <p>Comprar items y herramientas</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/inventario [usuario]</code>
+                            <p>Ver tu inventario de items</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/depositar &lt;cantidad&gt;</code>
+                            <p>Depositar Lagcoins en el banco</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/retirar &lt;cantidad&gt;</code>
+                            <p>Retirar Lagcoins del banco</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/robar &lt;usuario&gt;</code>
+                            <p>Intentar robar a otro usuario</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/trade &lt;usuario&gt;</code>
+                            <p>Intercambiar Lagcoins con otro usuario</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-category">
+                    <h3 class="category-title casino-title" style="color: #E74C3C;">
+                        <span class="category-icon">&#127920;</span>
+                        Comandos de Casino
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card">
+                            <code>/casino &lt;apuesta&gt;</code>
+                            <p>Ruleta clasica - multiplica hasta x3</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/slots &lt;apuesta&gt;</code>
+                            <p>Tragamonedas - jackpot x10</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/blackjack &lt;apuesta&gt;</code>
+                            <p>Juega al 21 contra el dealer</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/coinflip &lt;apuesta&gt; &lt;cara/cruz&gt;</code>
+                            <p>Lanza una moneda - 50/50</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/dice &lt;apuesta&gt; &lt;prediccion&gt;</code>
+                            <p>Dados - alto/bajo/exacto/dobles</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-category">
+                    <h3 class="category-title minigame-title" style="color: #9B59B6;">
+                        <span class="category-icon">&#127918;</span>
+                        Minijuegos de XP
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card">
+                            <code>/minigame trivia</code>
+                            <p>Jugar trivia - gana XP</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/minigame rps</code>
+                            <p>Piedra, Papel o Tijeras</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/minigame roulette</code>
+                            <p>Ruleta Rusa - apuesta niveles</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/ahorcado solo</code>
+                            <p>Jugar ahorcado en solitario</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/ahorcado multi</code>
+                            <p>Ahorcado multijugador</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-category">
+                    <h3 class="category-title staff-title">
+                        <span class="category-icon">&#9733;</span>
+                        Comandos de Staff - Niveles
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card staff">
+                            <code>/addlevel &lt;usuario&gt; &lt;cantidad&gt;</code>
+                            <p>Anadir niveles a un usuario</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/removelevel &lt;usuario&gt; &lt;cantidad&gt;</code>
+                            <p>Quitar niveles a un usuario</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/setlevel &lt;usuario&gt; &lt;nivel&gt;</code>
+                            <p>Establecer nivel exacto</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/xp add/remove/reset</code>
+                            <p>Gestionar XP de usuarios</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/boost add</code>
+                            <p>Anadir boost a usuario/canal</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/globalboost</code>
+                            <p>Activar boost global</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/removeglobalboost</code>
+                            <p>Quitar boost global</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/banxp user/channel</code>
+                            <p>Banear de ganar XP</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/unbanxp user/channel</code>
+                            <p>Desbanear de XP</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/resettemporada</code>
+                            <p>Resetear toda la XP del servidor</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/clearlevelroles</code>
+                            <p>Quitar todos los roles de nivel</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-category">
+                    <h3 class="category-title staff-title" style="color: #F39C12;">
+                        <span class="category-icon">&#128176;</span>
+                        Comandos de Staff - Economia
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card staff">
+                            <code>/addcoins &lt;usuario&gt; &lt;cantidad&gt;</code>
+                            <p>Anadir Lagcoins a un usuario</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/removecoins &lt;usuario&gt; &lt;cantidad&gt;</code>
+                            <p>Quitar Lagcoins a un usuario</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/setcoins &lt;usuario&gt; &lt;cantidad&gt;</code>
+                            <p>Establecer Lagcoins exactos</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/giveitem &lt;usuario&gt; &lt;item&gt;</code>
+                            <p>Dar un item a un usuario</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/removeitem &lt;usuario&gt; &lt;item&gt;</code>
+                            <p>Quitar un item a un usuario</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/embed</code>
+                            <p>Crear embed personalizado</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/mensaje &lt;texto&gt;</code>
+                            <p>Enviar mensaje plano</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-category">
+                    <h3 class="category-title staff-title" style="color: #E74C3C;">
+                        <span class="category-icon">&#9881;</span>
+                        Comandos de Staff - Sistemas
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card staff">
+                            <code>/sistema toggle &lt;sistema&gt; &lt;estado&gt;</code>
+                            <p>Activar o desactivar sistemas del bot</p>
+                        </div>
+                        <div class="command-card staff">
+                            <code>/sistema status</code>
+                            <p>Ver estado de todos los sistemas</p>
+                        </div>
+                    </div>
+                    <div class="systems-info" style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                        <h4 style="color: #E74C3C; margin-bottom: 10px;">Sistemas Controlables:</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                            <span style="color: #FFD700;">💰 Economia</span>
+                            <span style="color: #FFD700;">🎰 Casino</span>
+                            <span style="color: #FFD700;">💼 Trabajos</span>
+                            <span style="color: #FFD700;">🎮 Minijuegos</span>
+                            <span style="color: #FFD700;">🛡️ Seguros</span>
+                            <span style="color: #FFD700;">🔫 Robos</span>
+                            <span style="color: #FFD700;">🎯 Misiones</span>
+                            <span style="color: #FFD700;">⚡ Power-ups</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-category">
+                    <h3 class="category-title" style="color: #3498DB;">
+                        <span class="category-icon">ℹ️</span>
+                        Comandos de Informacion
+                    </h3>
+                    <div class="commands-grid">
+                        <div class="command-card">
+                            <code>/info</code>
+                            <p>Ver informacion general del bot</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/help [categoria]</code>
+                            <p>Ver todos los comandos disponibles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ECONOMIA -->
+        <section id="economia" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">💰</span>
+                Sistema de Economía - Lagcoins
+            </h2>
+
+            <p class="section-intro">Gana, ahorra y gasta Lagcoins en un completo sistema de economía con trabajos, casino, tienda y más.</p>
+
+            <div class="features-grid">
+                <div class="feature-box retro-box">
+                    <div class="feature-icon xp-icon"></div>
+                    <h3>Trabajos</h3>
+                    <ul class="pixel-list">
+                        <li>13 trabajos diferentes con ganancias únicas</li>
+                        <li>Sistema de herramientas: Mejora tus ganancias</li>
+                        <li>Cooldowns variables por trabajo (30s - 90s)</li>
+                        <li>Estadísticas de trabajos realizados</li>
+                        <li>Comando rápido /work para trabajo básico</li>
+                    </ul>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon boost-icon"></div>
+                    <h3>Casino (5 Juegos)</h3>
+                    <ul class="pixel-list">
+                        <li>🎰 Ruleta Clásica - Multiplica hasta x3</li>
+                        <li>🎰 Slots - Jackpot x10</li>
+                        <li>🃏 Blackjack - Juega contra el dealer</li>
+                        <li>🪙 Coinflip - 50/50 cara o cruz</li>
+                        <li>🎲 Dados - Alto/Bajo/Exacto/Dobles</li>
+                    </ul>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon rewards-icon"></div>
+                    <h3>Tienda y Items</h3>
+                    <div class="shop-categories">
+                        <div class="category-item">🔧 Herramientas de Trabajo</div>
+                        <div class="category-item">🛡️ Protección Anti-Robo</div>
+                        <div class="category-item">🎁 Cajas de Recompensa</div>
+                        <div class="category-item">⚡ Multiplicadores de XP</div>
+                        <div class="category-item">🎨 Personalizaciones</div>
+                        <div class="category-item">🎮 Items Especiales</div>
+                        <div class="category-item">💎 Items de Prestigio</div>
+                        <div class="category-item">🌟 Boosts Premium</div>
+                        <div class="category-item">🎪 Items de Evento</div>
+                        <div class="category-item">🏆 Coleccionables</div>
+                    </div>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon formula-icon"></div>
+                    <h3>Características Adicionales</h3>
+                    <ul class="pixel-list">
+                        <li>🏦 Sistema de Banco - Deposita/Retira con límites</li>
+                        <li>💰 Daily - Recompensa diaria con rachas</li>
+                        <li>🔫 Robo - Roba a otros usuarios (con riesgo)</li>
+                        <li>🤝 Trade - Intercambia Lagcoins</li>
+                        <li>📊 Estadísticas detalladas de economía</li>
+                        <li>💼 Inventario visual de items</li>
+                        <li>🎯 Perfil completo de usuario</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="economy-stats">
+                <h3 style="text-align: center; color: var(--primary); margin: 40px 0 20px;">Trabajos Disponibles</h3>
+                <div class="jobs-grid">
+                    <div class="job-card"><span class="job-name">👨‍💼 Oficinista</span><span class="job-pay">100-300 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🍔 Mesero</span><span class="job-pay">120-280 🪙</span></div>
+                    <div class="job-card"><span class="job-name">👨‍💻 Programador</span><span class="job-pay">200-600 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🎨 Diseñador</span><span class="job-pay">180-450 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🎬 Streamer</span><span class="job-pay">150-500 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🎵 Músico</span><span class="job-pay">160-400 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🏗️ Constructor</span><span class="job-pay">220-550 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🔬 Científico</span><span class="job-pay">250-700 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🎓 Profesor</span><span class="job-pay">190-480 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🎨 Artista</span><span class="job-pay">170-450 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🏹 Cazador</span><span class="job-pay">180-500 🪙</span></div>
+                    <div class="job-card"><span class="job-name">🌾 Granjero</span><span class="job-pay">130-350 🪙</span></div>
+                    <div class="job-card"><span class="job-name">⚡ Básico</span><span class="job-pay">50-150 🪙</span></div>
+                </div>
+            </div>
+
+            <div class="nationalities-section">
+                <h3 style="text-align: center; color: var(--primary); margin: 40px 0 20px;">🌍 Nacionalidades</h3>
+                <p style="text-align: center; color: #B5BAC1; margin-bottom: 20px;">Tu nacionalidad afecta el multiplicador de ganancias en trabajos. Se asigna aleatoriamente al unirte.</p>
+                
+                <div class="nationalities-grid">
+                    <div class="nationality-category">
+                        <h4 style="color: #FFD700; margin-bottom: 15px; text-align: center;">Latinoamérica</h4>
+                        <div class="nationality-list">
+                            <div class="nationality-card"><span class="flag">🇻🇪</span><span class="country-name">Venezuela</span><span class="multiplier">x0.6</span></div>
+                            <div class="nationality-card"><span class="flag">🇲🇽</span><span class="country-name">México</span><span class="multiplier">x0.8</span></div>
+                            <div class="nationality-card"><span class="flag">🇦🇷</span><span class="country-name">Argentina</span><span class="multiplier">x0.7</span></div>
+                            <div class="nationality-card"><span class="flag">🇨🇴</span><span class="country-name">Colombia</span><span class="multiplier">x0.75</span></div>
+                            <div class="nationality-card"><span class="flag">🇧🇷</span><span class="country-name">Brasil</span><span class="multiplier">x0.9</span></div>
+                            <div class="nationality-card"><span class="flag">🇪🇨</span><span class="country-name">Ecuador</span><span class="multiplier">x0.7</span></div>
+                            <div class="nationality-card"><span class="flag">🇵🇪</span><span class="country-name">Perú</span><span class="multiplier">x0.72</span></div>
+                            <div class="nationality-card"><span class="flag">🇨🇱</span><span class="country-name">Chile</span><span class="multiplier">x0.95</span></div>
+                            <div class="nationality-card"><span class="flag">🇺🇾</span><span class="country-name">Uruguay</span><span class="multiplier">x0.85</span></div>
+                            <div class="nationality-card"><span class="flag">🇸🇻</span><span class="country-name">El Salvador</span><span class="multiplier">x0.65</span></div>
+                            <div class="nationality-card"><span class="flag">🇵🇦</span><span class="country-name">Panamá</span><span class="multiplier">x0.9</span></div>
+                            <div class="nationality-card"><span class="flag">🇨🇷</span><span class="country-name">Costa Rica</span><span class="multiplier">x0.82</span></div>
+                            <div class="nationality-card"><span class="flag">🇩🇴</span><span class="country-name">Rep. Dominicana</span><span class="multiplier">x0.7</span></div>
+                            <div class="nationality-card"><span class="flag">🇬🇹</span><span class="country-name">Guatemala</span><span class="multiplier">x0.65</span></div>
+                            <div class="nationality-card"><span class="flag">🇭🇳</span><span class="country-name">Honduras</span><span class="multiplier">x0.6</span></div>
+                            <div class="nationality-card"><span class="flag">🇧🇴</span><span class="country-name">Bolivia</span><span class="multiplier">x0.62</span></div>
+                            <div class="nationality-card"><span class="flag">🇵🇾</span><span class="country-name">Paraguay</span><span class="multiplier">x0.68</span></div>
+                            <div class="nationality-card"><span class="flag">🇳🇮</span><span class="country-name">Nicaragua</span><span class="multiplier">x0.58</span></div>
+                            <div class="nationality-card"><span class="flag">🇨🇺</span><span class="country-name">Cuba</span><span class="multiplier">x0.5</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="nationality-category">
+                        <h4 style="color: #5865F2; margin-bottom: 15px; text-align: center;">Primer Mundo (Raros)</h4>
+                        <div class="nationality-list rare">
+                            <div class="nationality-card rare"><span class="flag">🇪🇸</span><span class="country-name">España</span><span class="multiplier">x1.3</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇺🇸</span><span class="country-name">Estados Unidos</span><span class="multiplier legendary">x2.0</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇨🇦</span><span class="country-name">Canadá</span><span class="multiplier">x1.8</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇬🇧</span><span class="country-name">Reino Unido</span><span class="multiplier">x1.7</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇯🇵</span><span class="country-name">Japón</span><span class="multiplier">x1.6</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇩🇪</span><span class="country-name">Alemania</span><span class="multiplier">x1.7</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇫🇷</span><span class="country-name">Francia</span><span class="multiplier">x1.5</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇮🇹</span><span class="country-name">Italia</span><span class="multiplier">x1.4</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇵🇹</span><span class="country-name">Portugal</span><span class="multiplier">x1.2</span></div>
+                            <div class="nationality-card rare"><span class="flag">🇦🇺</span><span class="country-name">Australia</span><span class="multiplier">x1.9</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="text-align: center; color: #888; margin-top: 20px; font-size: 0.85em;">Usa <code>/nacionalidad</code> para ver tu país actual y <code>/viajar</code> para cambiar temporalmente.</p>
+            </div>
+        </section>
+
+        <!-- MINIJUEGOS -->
+        <section id="minijuegos" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">&#9830;</span>
+                Minijuegos
+            </h2>
+
+            <div class="minigames-grid">
+                <div class="minigame-card gd-game-card">
+                    <div class="minigame-header">
+                        <div class="minigame-icon gd-game-icon">
+                            <svg viewBox="0 0 100 100" width="60" height="60">
+                                <!-- Cabeza -->
+                                <rect x="20" y="20" width="60" height="50" fill="#FF10F0" stroke="#000" stroke-width="2"/>
+                                <!-- Ojo izquierdo (gafas) -->
+                                <rect x="30" y="35" width="18" height="18" fill="#00FFFF" stroke="#000" stroke-width="2"/>
+                                <!-- Ojo derecho (gafas) -->
+                                <rect x="52" y="35" width="18" height="18" fill="#00FFFF" stroke="#000" stroke-width="2"/>
+                                <!-- Puente de gafas -->
+                                <line x1="48" y1="43" x2="52" y2="43" stroke="#000" stroke-width="2"/>
+                                <!-- Brazos arriba -->
+                                <line x1="20" y1="35" x2="5" y2="25" stroke="#000" stroke-width="3"/>
+                                <line x1="80" y1="35" x2="95" y2="25" stroke="#000" stroke-width="3"/>
+                            </svg>
+                        </div>
+                        <h3>Geometry Dash</h3>
+                    </div>
+                    <div class="minigame-content">
+                        <p class="minigame-desc">Salta y esquiva obstáculos en este juego estilo infinite runner</p>
+                        <button class="play-btn" onclick="document.getElementById('gd-modal').style.display='flex'">Click aquí para Jugar</button>
+                        <div class="minigame-details">
+                            <div class="detail"><span class="label">Tipo:</span><span class="value">Infinite Runner</span></div>
+                            <div class="detail"><span class="label">Dificultad:</span><span class="value">Aumenta progresivamente</span></div>
+                            <div class="detail"><span class="label">Controles:</span><span class="value">Click o Espacio para saltar</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="minigame-card trivia-card">
+                    <div class="minigame-header">
+                        <div class="minigame-icon trivia-icon">?</div>
+                        <h3>Trivia</h3>
+                    </div>
+                    <div class="minigame-content">
+                        <p class="minigame-desc">Responde 5 preguntas de conocimiento general</p>
+                        <div class="minigame-details">
+                            <div class="detail"><span class="label">Preguntas:</span><span class="value">5</span></div>
+                            <div class="detail"><span class="label">Recompensa:</span><span class="value">20% boost x12h o 1.5 niveles</span></div>
+                            <div class="detail"><span class="label">Comando:</span><code>/minigame trivia</code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="minigame-card rps-card">
+                    <div class="minigame-header">
+                        <div class="minigame-icon rps-icon">&#9994;</div>
+                        <h3>Piedra, Papel o Tijeras</h3>
+                    </div>
+                    <div class="minigame-content">
+                        <p class="minigame-desc">Juega contra otro usuario al mejor de 3</p>
+                        <div class="minigame-details">
+                            <div class="detail"><span class="label">Formato:</span><span class="value">Mejor de 3</span></div>
+                            <div class="detail"><span class="label">Recompensa:</span><span class="value">30% boost x2h</span></div>
+                            <div class="detail"><span class="label">Comando:</span><code>/minigame rps @oponente</code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="minigame-card roulette-card">
+                    <div class="minigame-header">
+                        <div class="minigame-icon roulette-icon">&#9760;</div>
+                        <h3>Ruleta Rusa</h3>
+                    </div>
+                    <div class="minigame-content">
+                        <p class="minigame-desc">Alto riesgo, alta recompensa. Apuesta tus niveles!</p>
+                        <div class="minigame-details">
+                            <div class="detail warning"><span class="label">Ganador:</span><span class="value">+2.5 niveles</span></div>
+                            <div class="detail danger"><span class="label">Perdedor:</span><span class="value">-3 niveles</span></div>
+                            <div class="detail"><span class="label">Comando:</span><code>/minigame roulette @oponente</code></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="minigame-card hangman-card">
+                    <div class="minigame-header">
+                        <div class="minigame-icon hangman-icon">&#9786;</div>
+                        <h3>Ahorcado</h3>
+                    </div>
+                    <div class="minigame-content">
+                        <p class="minigame-desc">Adivina la palabra letra por letra</p>
+                        <div class="hangman-modes">
+                            <div class="mode-box">
+                                <h4>Modo Solitario</h4>
+                                <ul>
+                                    <li>3 rondas consecutivas</li>
+                                    <li>Ganar 2/3: 25% boost x24h o 1 nivel</li>
+                                    <li>Cooldown: 48 horas</li>
+                                    <li>Comando: <code>/ahorcado solo</code></li>
+                                </ul>
+                            </div>
+                            <div class="mode-box">
+                                <h4>Modo Multijugador</h4>
+                                <ul>
+                                    <li>Host crea palabra personalizada</li>
+                                    <li>Recompensa: +0.5 niveles</li>
+                                    <li>Cooldown: 30 minutos</li>
+                                    <li>Comando: <code>/ahorcado multi</code></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MISIONES -->
+        <section id="misiones" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">🎯</span>
+                Primera semana de misiones
+            </h2>
+
+            <p class="section-intro">Completa misiones semanales para ganar XP, multiplicadores y niveles adicionales. Idea contribuida por <strong style="color: #FF10F0;">Elpelotocino0341 ❤️</strong></p>
+
+            <div class="features-grid">
+                <div class="feature-box retro-box">
+                    <div class="feature-icon mission-icon"></div>
+                    <h3>Sistema de Misiones</h3>
+                    <ul class="pixel-list">
+                        <li>10 misiones únicas cada semana</li>
+                        <li>Reinicio automático semanal</li>
+                        <li>Recompensas progresivas de XP, boosts y niveles</li>
+                        <li>3 niveles de dificultad (⭐, ⭐⭐, ⭐⭐⭐)</li>
+                        <li>Misión meta: Completa 9 misiones para desbloquear la 10ª</li>
+                    </ul>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon rewards-icon"></div>
+                    <h3>Primera semana de misiones</h3>
+                    <div class="missions-table">
+                        <div class="mission-row easy"><span class="mission-name">Saludador ⭐</span><span class="mission-desc">Di hola a 5 personas</span></div>
+                        <div class="mission-row easy"><span class="mission-name">Preguntón ⭐</span><span class="mission-desc">Pregunta cómo están a 3 personas</span></div>
+                        <div class="mission-row medium"><span class="mission-name">Socializador ⭐⭐</span><span class="mission-desc">Participa en 10 conversaciones</span></div>
+                        <div class="mission-row medium"><span class="mission-name">Ayudante ⭐⭐</span><span class="mission-desc">Ofrece ayuda a 4 personas</span></div>
+                        <div class="mission-row easy"><span class="mission-name">Visitante ⭐</span><span class="mission-desc">Envía mensajes en 6 canales</span></div>
+                        <div class="mission-row medium"><span class="mission-name">Amigable ⭐⭐</span><span class="mission-desc">Interactúa con 8 usuarios nuevos</span></div>
+                        <div class="mission-row medium"><span class="mission-name">Comunicador ⭐⭐</span><span class="mission-desc">Envía 50 mensajes</span></div>
+                        <div class="mission-row easy"><span class="mission-name">Entusiasta ⭐</span><span class="mission-desc">Reacciona a 20 mensajes</span></div>
+                        <div class="mission-row hard"><span class="mission-name">Comentarista ⭐⭐⭐</span><span class="mission-desc">Responde a 7 preguntas</span></div>
+                        <div class="mission-row legendary"><span class="mission-name">Leyenda ⭐⭐⭐</span><span class="mission-desc">Completa 9 misiones (Meta)</span></div>
+                    </div>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon formula-icon"></div>
+                    <h3>Recompensas</h3>
+                    <div class="missions-rewards">
+                        <div class="reward-item"><span class="icon">💎</span><span>100-500 XP por misión</span></div>
+                        <div class="reward-item"><span class="icon">⚡</span><span>10%-50% multiplicadores de XP</span></div>
+                        <div class="reward-item"><span class="icon">🎖️</span><span>1-3 niveles adicionales</span></div>
+                        <div class="reward-item special"><span class="icon">🏆</span><span>Misión Leyenda: 500 XP + 50% boost + 3 niveles</span></div>
+                    </div>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <div class="feature-icon boost-icon"></div>
+                    <h3>Comandos de Misiones</h3>
+                    <div class="commands-grid" style="grid-template-columns: 1fr;">
+                        <div class="command-card">
+                            <code>/mision empezar</code>
+                            <p>Inicia tus misiones de la semana</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/mision listar</code>
+                            <p>Ve todas tus misiones activas</p>
+                        </div>
+                        <div class="command-card">
+                            <code>/mision progreso</code>
+                            <p>Revisa tu progreso y estadísticas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INACTIVIDAD -->
+        <section id="inactividad" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">⚠️</span>
+                Sistema de Inactividad
+            </h2>
+
+            <div class="features-grid">
+                <div class="feature-box retro-box">
+                    <div class="inactivity-icon" style="font-size: 50px; text-align: center; margin-bottom: 20px;">💤</div>
+                    <h3>¿Que es la Inactividad?</h3>
+                    <p class="section-intro">Si pasas más de 7 días sin enviar un mensaje, entrarás en estado de inactividad.</p>
+                    <div class="missions-table">
+                        <div class="mission-row hard">
+                            <span class="mission-name">Penalización</span>
+                            <span class="mission-desc">Ganas XP 2 veces más lento (50% de penalización).</span>
+                        </div>
+                        <div class="mission-row hard">
+                            <span class="mission-name">Cooldown</span>
+                            <span class="mission-desc">El cooldown de XP sube a 30 segundos (normal 10s).</span>
+                        </div>
+                        <div class="mission-row medium">
+                            <span class="mission-name">Restricción</span>
+                            <span class="mission-desc">No puedes participar en minijuegos ni reclamar recompensas.</span>
+                        </div>
+                        <div class="mission-row medium">
+                            <span class="mission-name">Bloqueo</span>
+                            <span class="mission-desc">No puedes hablar en el canal #1400931230266032149.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-box retro-box">
+                    <h3>¿Como recuperar tu estado?</h3>
+                    <p class="section-intro">Para volver a la normalidad, debes demostrar tu actividad de nuevo.</p>
+                    <div class="missions-rewards">
+                        <div class="reward-item">
+                            <span class="icon">💬</span>
+                            <span>Enviar 50 mensajes en el servidor.</span>
+                        </div>
+                        <div class="reward-item special">
+                            <span class="icon">🎁 Recompensa</span>
+                            <span>Al terminar los 50 mensajes, ganas un Boost de 50% XP por 24h.</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; border: 2px dashed var(--primary); font-size: 8px;">
+                        <strong>Nota:</strong> El bot te notificará en el canal de avisos cuando entres en inactividad y cuando te recuperes.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TARJETAS -->
+        <section id="tarjetas" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">&#9827;</span>
+                Temas de Tarjetas
+            </h2>
+
+            <p class="section-intro">Las tarjetas de rango se generan dinamicamente con diferentes temas pixel art segun tu nivel y rol.</p>
+            
+            <div class="card-disclaimer" style="text-align: center; margin-bottom: 30px; padding: 15px; border: 2px dashed var(--accent); background: rgba(0,0,0,0.3); font-size: 9px; color: var(--text-dim);">
+                <p>⚠️ <strong>Nota:</strong> Estas son imágenes de referencia. En el servidor de Discord, las tarjetas aparecerán con tu <strong>foto de perfil actual</strong>, tu <strong>nombre de usuario</strong> y tu <strong>nivel exacto</strong>.</p>
+                <p style="margin-top:10px;">🎨 <strong>Rankcard personalizada:</strong> Usa <code>/rankcard link</code> en Discord para obtener un enlace al editor web (desde 7500 Lagcoins). Colores, tipografía y logos personalizables.</p>
+            </div>
+
+            <div class="themes-grid">
+                <!-- 1. Predeterminada -->
+                <div class="theme-card discord-theme">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/default.png" alt="Default" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Predeterminada</h3>
+                        <p>Estilo clasico</p>
+                        <span class="theme-requirement">Por defecto</span>
+                    </div>
+                </div>
+
+                <!-- 2. Pixel -->
+                <div class="theme-card normal-theme">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/pixel.png" alt="Pixel" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Pixel</h3>
+                        <p>Pixel art cyan</p>
+                        <span class="theme-requirement">Gratuita</span>
+                    </div>
+                </div>
+
+                <!-- 3. Oceano -->
+                <div class="theme-card ocean-theme">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/ocean.png" alt="Ocean" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Oceano</h3>
+                        <p>Tema marino</p>
+                        <span class="theme-requirement">Nivel 25 (Activo)</span>
+                    </div>
+                </div>
+
+                <!-- 4. Zelda -->
+                <div class="theme-card zelda-theme-card">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/zelda.png" alt="Zelda" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Zelda</h3>
+                        <p>Aventura heroica</p>
+                        <span class="theme-requirement">Nivel 35 (Super Activo)</span>
+                    </div>
+                </div>
+
+                <!-- 5. Pokemon -->
+                <div class="theme-card pokemon-theme-card">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/pokemon.png" alt="Pokemon" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Pokemon</h3>
+                        <p>¡Atrapalos ya!</p>
+                        <span class="theme-requirement">Nivel 100</span>
+                    </div>
+                </div>
+
+                <!-- 6. Minecraft -->
+                <div class="theme-card minecraft-theme">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/minecraft.png" alt="Minecraft" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Minecraft</h3>
+                        <p>Cubico y creativo</p>
+                        <span class="theme-requirement">🛒 5000 LagCoins</span>
+                    </div>
+                </div>
+
+                <!-- 7. FNAF -->
+                <div class="theme-card fnaf-theme" style="border-color: #4a0000;">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/fnaf.png" alt="FNAF" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>FNAF</h3>
+                        <p>Terror nocturno</p>
+                        <span class="theme-requirement">🛒 4500 LagCoins</span>
+                    </div>
+                </div>
+
+                <!-- 8. Roblox -->
+                <div class="theme-card roblox-theme">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/roblox.png" alt="Roblox" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Roblox</h3>
+                        <p>Poder de la imaginacion</p>
+                        <span class="theme-requirement">🛒 7500 LagCoins</span>
+                    </div>
+                </div>
+
+                <!-- 9. Noche Estrellada -->
+                <div class="theme-card night-theme">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/night.png" alt="Twitch VIP" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Noche Estrellada</h3>
+                        <p>Elegancia nocturna</p>
+                        <span class="theme-requirement">TikTok & Twitch VIPs</span>
+                    </div>
+                </div>
+
+                <!-- 10. Geometry Dash -->
+                <div class="theme-card gd-theme">
+                    <div class="theme-preview">
+                        <img src="/assets/cards/geometry.png" alt="Geometry Dash" class="card-img-preview">
+                    </div>
+                    <div class="theme-info">
+                        <h3>Geometry Dash</h3>
+                        <p>Ritmo y neon</p>
+                        <span class="theme-requirement">Server Boosters</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PREGUNTAS Y RESPUESTAS -->
+        <section id="preguntas" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">❓</span>
+                Preguntas Frecuentes
+            </h2>
+
+            <div class="faq-container">
+                <div class="faq-form-section">
+                    <h3>Haz una Pregunta</h3>
+                    <form id="question-form" class="pixel-form">
+                        <input 
+                            type="text" 
+                            id="asker-name" 
+                            placeholder="Tu nombre" 
+                            maxlength="50"
+                            required
+                            class="pixel-input">
+                        <textarea 
+                            id="question-text" 
+                            placeholder="Tu pregunta sobre el bot..." 
+                            maxlength="500"
+                            required
+                            class="pixel-textarea"></textarea>
+                        <button type="submit" class="pixel-btn">Enviar Pregunta</button>
+                        <div id="form-message" class="form-message"></div>
+                    </form>
+                </div>
+
+                <div class="faq-list-section">
+                    <h3>Preguntas</h3>
+                    <div id="questions-list" class="questions-grid">
+                        <div class="loading-row">
+                            <div class="loading-spinner"></div>
+                            <span>Cargando preguntas...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODAL DE RESPUESTA -->
+        <div id="answer-modal" class="answer-modal">
+            <div class="answer-modal-content">
+                <span class="answer-modal-close">&times;</span>
+                <h3>Responder Pregunta</h3>
+                <div id="answer-question-preview" class="answer-question-preview"></div>
+                <form id="answer-form" class="pixel-form">
+                    <textarea 
+                        id="answer-text" 
+                        placeholder="Tu respuesta..." 
+                        maxlength="1000"
+                        required
+                        class="pixel-textarea"></textarea>
+                    <input 
+                        type="password" 
+                        id="admin-password" 
+                        placeholder="Contraseña de staff" 
+                        required
+                        class="pixel-input">
+                    <button type="submit" class="pixel-btn">Enviar Respuesta</button>
+                    <div id="answer-message" class="form-message"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DE IMAGEN (FULLSCREEN) -->
+        <!-- Modal de Imagen Fullscreen -->
+        <div id="image-modal" class="image-modal">
+            <div class="image-modal-container">
+                <span class="image-modal-close">&times;</span>
+                <div class="image-modal-layout">
+                    <div class="image-modal-image-side">
+                        <img class="image-modal-content" id="img-full">
+                        <div id="image-modal-caption"></div>
+                    </div>
+                    <div class="image-modal-info-side">
+                        <div class="card-tutorial">
+                            <h3>📖 Cómo obtenerla</h3>
+                            <div id="card-tutorial-content" class="tutorial-content">
+                                <!-- Se llena por JS -->
+                            </div>
+                        </div>
+                        <div class="card-selection-tip">
+                            <p>💡 <strong>Para equipar:</strong> Usa el comando <code>/rankcard select</code> en el bot.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADISTICAS DE USUARIO -->
+        <section id="estadisticas" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">📊</span>
+                Estadísticas de Usuario
+            </h2>
+
+            <div class="stats-search-container">
+                <div class="stats-search-box">
+                    <input type="text" id="stats-username-input" placeholder="Buscar por nombre de usuario..." class="pixel-input">
+                    <button id="stats-search-btn" class="pixel-btn">Buscar</button>
+                </div>
+            </div>
+
+            <div id="stats-container" class="stats-container" style="display: none;">
+                <div class="stats-header">
+                    <div class="stats-user-info">
+                        <img id="stats-avatar" src="" alt="Avatar" class="stats-avatar">
+                        <div class="stats-user-details">
+                            <h3 id="stats-username" class="stats-username"></h3>
+                            <p id="stats-userid" class="stats-userid"></p>
+                        </div>
+                    </div>
+                    <div class="stats-rankcard-container">
+                        <img id="stats-rankcard" src="" alt="Rankcard" class="stats-rankcard">
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <!-- Niveles y XP -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">📈 Niveles y XP</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Nivel Actual:</span>
+                                <span class="stat-value" id="stat-level">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">XP Total:</span>
+                                <span class="stat-value" id="stat-totalxp">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">XP Progreso:</span>
+                                <span class="stat-value" id="stat-xpprogress">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Posición en Leaderboard:</span>
+                                <span class="stat-value" id="stat-leaderboard-pos">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Economía -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">💰 Economía</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Lagcoins:</span>
+                                <span class="stat-value" id="stat-lagcoins">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Lagcoins en Banco:</span>
+                                <span class="stat-value" id="stat-bank">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Estado Civil:</span>
+                                <span class="stat-value" id="stat-married">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Items en Inventario:</span>
+                                <span class="stat-value" id="stat-items-count">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Robos -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🔫 Robos</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Robos Exitosos:</span>
+                                <span class="stat-value" id="stat-robberies">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Veces Robado:</span>
+                                <span class="stat-value" id="stat-robbed">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boosts y Power-ups -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">⚡ Boosts y Power-ups</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Boosts Activos:</span>
+                                <span class="stat-value" id="stat-boosts">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Power-ups Activos:</span>
+                                <span class="stat-value" id="stat-powerups">-</span>
+                            </div>
+                            <div id="stat-boosts-list" class="stat-list"></div>
+                            <div id="stat-powerups-list" class="stat-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Rankcard -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎨 Rankcard</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Tema Actual:</span>
+                                <span class="stat-value" id="stat-card-theme">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Tarjetas Compradas:</span>
+                                <span class="stat-value" id="stat-purchased-cards">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misiones -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎯 Misiones</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Misiones Completadas:</span>
+                                <span class="stat-value" id="stat-missions-completed">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total de Misiones:</span>
+                                <span class="stat-value" id="stat-missions-total">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rachas -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🔥 Rachas</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Rachas Activas:</span>
+                                <span class="stat-value" id="stat-active-streaks">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Rachas Perdidas:</span>
+                                <span class="stat-value" id="stat-broken-streaks">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Racha Más Larga:</span>
+                                <span class="stat-value" id="stat-longest-streak">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Días de Racha:</span>
+                                <span class="stat-value" id="stat-total-streak-days">-</span>
+                            </div>
+                            <div id="stat-streaks-details" class="stat-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Casino y Minijuegos -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎰 Casino y Minijuegos</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Minijuegos Ganados:</span>
+                                <span class="stat-value" id="stat-minigames-won">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Win Rate Minijuegos:</span>
+                                <span class="stat-value" id="stat-minigame-wr">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Partidas de Casino:</span>
+                                <span class="stat-value" id="stat-casino-plays">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Victorias en Casino:</span>
+                                <span class="stat-value" id="stat-casino-wins">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Win Rate Casino:</span>
+                                <span class="stat-value" id="stat-casino-wr">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Ganado Casino:</span>
+                                <span class="stat-value" id="stat-casino-won">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Perdido Casino:</span>
+                                <span class="stat-value" id="stat-casino-lost">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trabajos -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">💼 Trabajos</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">Veces Trabajado:</span>
+                                <span class="stat-value" id="stat-times-worked">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Trabajos Disponibles:</span>
+                                <span class="stat-value" id="stat-available-jobs">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Trabajos:</span>
+                                <span class="stat-value" id="stat-total-jobs">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Trabajo Favorito:</span>
+                                <span class="stat-value" id="stat-favorite-job">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nacionalidad -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🌍 Nacionalidad</h4>
+                        <div class="stats-card-content">
+                            <div class="stat-item">
+                                <span class="stat-label">País:</span>
+                                <span class="stat-value" id="stat-nationality">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">País Actual:</span>
+                                <span class="stat-value" id="stat-current-country">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items -->
+                    <div class="stats-card">
+                        <h4 class="stats-card-title">🎒 Items</h4>
+                        <div class="stats-card-content">
+                            <div id="stat-items-list" class="stat-items-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stats-error" class="stats-error" style="display: none;"></div>
+            <div id="stats-loading" class="stats-loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <span>Cargando estadísticas...</span>
+            </div>
+        </section>
+
+        <!-- LEADERBOARD -->
+        <section id="leaderboard" class="section">
+            <h2 class="section-title">
+                <span class="title-icon">&#9813;</span>
+                Leaderboard Completo
+            </h2>
+
+            <div class="leaderboard-container">
+                <div class="leaderboard-header">
+                    <div class="leaderboard-stats">
+                        <span id="lb-total">Cargando...</span>
+                        <span class="lb-note">(Maximo 500 usuarios)</span>
+                    </div>
+                    <div class="leaderboard-search">
+                        <input type="text" id="search-user" placeholder="Buscar usuario..." class="pixel-input">
+                    </div>
+                </div>
+
+                <div class="leaderboard-table-container">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th class="rank-col">#</th>
+                                <th class="user-col">Usuario</th>
+                                <th class="level-col">Nivel</th>
+                                <th class="xp-col">XP Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <tr>
+                                <td colspan="4" class="loading-row">
+                                    <div class="loading-spinner"></div>
+                                    <span>Cargando leaderboard...</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="leaderboard-footer">
+                    <div class="pagination">
+                        <button id="prev-page" class="pixel-btn" disabled>&lt; Anterior</button>
+                        <span id="page-info">Pagina 1</span>
+                        <button id="next-page" class="pixel-btn">Siguiente &gt;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Desarrollado con &#9829; por Sirgio Team</p>
+            <p class="footer-tech">Node.js | Discord.js v14 | Canvas</p>
+        </div>
+    </footer>
+
+    <!-- Modal para el juego de Geometry Dash -->
+    <div id="gd-modal" class="gd-modal">
+        <div class="gd-modal-content">
+            <span class="gd-close" onclick="document.getElementById('gd-modal').style.display='none'">&times;</span>
+            <canvas id="geometry-dash-game" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/minigame-gd.js"></script>
+</body>
+</html>
