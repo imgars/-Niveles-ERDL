@@ -2,6 +2,7 @@ import { SlashCommandBuilder, EmbedBuilder, StringSelectMenuBuilder, StringSelec
 import db from '../utils/database.js';
 import { getAvailableThemes, getCardTheme, getThemeButtonStyle } from '../utils/cardGenerator.js';
 import { createVerificationToken } from '../utils/rankcardService.js';
+import { isStaff } from '../utils/helpers.js';
 
 const THEME_NAMES = {
   pixel: '🎮 Pixel Art',
@@ -27,7 +28,7 @@ export default {
     .addSubcommand(subcommand =>
       subcommand
         .setName('link')
-        .setDescription('Obtén un enlace para personalizar tu rankcard en la web (7500 Lagcoins base)')
+        .setDescription('Solo staff: genera enlace para el editor web de rankcards (7500 Lagcoins base)')
     ),
 
   async execute(interaction) {
@@ -35,6 +36,13 @@ export default {
       const subcommand = interaction.options.getSubcommand();
 
       if (subcommand === 'link') {
+        const member = await interaction.guild.members.fetch(interaction.user.id).catch(() => null);
+        if (!member || !isStaff(member)) {
+          return interaction.reply({
+            content: '❌ Solo el **staff** puede usar este comando. Pide un enlace a un administrador.',
+            flags: 64
+          });
+        }
         const token = createVerificationToken(interaction.user.id, interaction.guild.id);
         const baseUrl = process.env.WEB_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 5000}`;
         const editorUrl = `${baseUrl}/rankcard-editor.html?token=${token}`;

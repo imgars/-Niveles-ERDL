@@ -17,17 +17,52 @@ export const NEON_COLORS = [
   '#FF1493', '#00CED1', '#7FFF00', '#FFD700', '#FF4500'
 ];
 
+// Colores para dibujo - estándar (todos)
+export const STANDARD_DRAW_COLORS = [
+  '#FFFFFF', '#000000', '#FF0000', '#00FF00', '#0000FF',
+  '#FFFF00', '#FF00FF', '#00FFFF', '#808080', '#C0C0C0'
+];
+
+// Colores de dibujo extra para VIP/Booster (incluye neón y más)
+export const VIP_DRAW_COLORS = [
+  ...STANDARD_DRAW_COLORS,
+  '#FF00FF', '#00FFFF', '#00FF00', '#FF1493', '#FFD700',
+  '#FF4500', '#7FFF00', '#FF69B4', '#00CED1', '#9370DB'
+];
+
+// Pinceles estándar (todos)
+export const STANDARD_BRUSHES = [
+  { id: 'round', name: 'Redondo', premium: false },
+  { id: 'square', name: 'Cuadrado', premium: false },
+  { id: 'thin', name: 'Fino', premium: false },
+  { id: 'medium', name: 'Medio', premium: false }
+];
+
+// Pinceles premium (solo VIP/Booster)
+export const VIP_BRUSHES = [
+  { id: 'spray', name: 'Spray', premium: true },
+  { id: 'neon', name: 'Neón', premium: true },
+  { id: 'marker', name: 'Marcador', premium: true },
+  { id: 'eraser', name: 'Goma', premium: true }
+];
+
 // Tipografías estándar (todos)
 export const STANDARD_FONTS = [
   { id: 'arial', name: 'Arial', premium: false },
-  { id: 'sans-serif', name: 'Sans Serif', premium: false }
+  { id: 'sans-serif', name: 'Sans Serif', premium: false },
+  { id: 'georgia', name: 'Georgia', premium: false },
+  { id: 'times', name: 'Times New Roman', premium: false },
+  { id: 'verdana', name: 'Verdana', premium: false }
 ];
 
 // Tipografías premium (solo VIP/Booster)
 export const PREMIUM_FONTS = [
   { id: 'press-start', name: 'Press Start 2P', premium: true },
   { id: 'monospace', name: 'Monospace Pixel', premium: true },
-  { id: 'impact', name: 'Impact', premium: true }
+  { id: 'impact', name: 'Impact', premium: true },
+  { id: 'comic', name: 'Comic Sans', premium: true },
+  { id: 'fantasy', name: 'Fantasy', premium: true },
+  { id: 'bebas', name: 'Bebas (bold)', premium: true }
 ];
 
 // Máximo de imágenes para usuarios estándar
@@ -79,8 +114,18 @@ export function validateRankcardConfig(config, { isVIP, isBooster }) {
     useNeonPalette: false,
     fontId: 'arial',
     baseImages: [],
-    logos: []
+    logos: [],
+    drawLayer: null
   };
+
+  // Capa de dibujo (imagen PNG base64) - opcional, máx ~300KB
+  const MAX_DRAW_LAYER_BASE64 = 450000; // ~300KB en base64
+  if (config.drawLayer && typeof config.drawLayer === 'string' && config.drawLayer.startsWith('data:image/png;base64,')) {
+    const b64 = config.drawLayer.slice(22);
+    if (b64.length <= MAX_DRAW_LAYER_BASE64) {
+      sanitized.drawLayer = config.drawLayer;
+    }
+  }
 
   // Validar colores - si no es VIP, rechazar paleta Neón
   if (config.useNeonPalette && !hasVIP) {
@@ -166,6 +211,18 @@ export function validateRankcardConfig(config, { isVIP, isBooster }) {
     }));
 
   return { valid: true, sanitized };
+}
+
+/** Colores de pincel permitidos según rol */
+export function getDrawColorsForRole(hasVIP) {
+  return hasVIP ? VIP_DRAW_COLORS : STANDARD_DRAW_COLORS;
+}
+
+/** Pinceles permitidos según rol */
+export function getBrushesForRole(hasVIP) {
+  const list = [...STANDARD_BRUSHES];
+  if (hasVIP) list.push(...VIP_BRUSHES);
+  return list;
 }
 
 /**

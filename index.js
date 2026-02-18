@@ -717,7 +717,7 @@ app.use('/api/rankcard', express.json());
 app.get('/api/rankcard/verify', async (req, res) => {
   try {
     const { token } = req.query;
-    const { verifyToken, checkVIPBoosterRoles, NEON_COLORS, STANDARD_FONTS, PREMIUM_FONTS, RANKCARD_BASE_COST, RANKCARD_IMAGE_EXTRA_COST, RANKCARD_PREMIUM_FONT_COST } = await import('./utils/rankcardService.js');
+    const { verifyToken, checkVIPBoosterRoles, NEON_COLORS, STANDARD_FONTS, PREMIUM_FONTS, RANKCARD_BASE_COST, RANKCARD_IMAGE_EXTRA_COST, RANKCARD_PREMIUM_FONT_COST, getDrawColorsForRole, getBrushesForRole } = await import('./utils/rankcardService.js');
     const { getEconomy } = await import('./utils/mongoSync.js');
 
     const verified = verifyToken(token);
@@ -753,7 +753,9 @@ app.get('/api/rankcard/verify', async (req, res) => {
         neonColors: NEON_COLORS,
         standardFonts: STANDARD_FONTS,
         premiumFonts: roles.isVIP || roles.isBooster ? PREMIUM_FONTS : [],
-        maxImages: (roles.isVIP || roles.isBooster) ? 5 : 1
+        maxImages: (roles.isVIP || roles.isBooster) ? 5 : 1,
+        drawColors: getDrawColorsForRole(roles.isVIP || roles.isBooster),
+        brushes: getBrushesForRole(roles.isVIP || roles.isBooster)
       },
       costs: {
         base: RANKCARD_BASE_COST,

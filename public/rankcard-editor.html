@@ -29,6 +29,15 @@
     .btn-preview { padding: 8px 16px; background: #5865F2; color: #fff; border: none; cursor: pointer; margin-top: 8px; font-size: 11px; }
     .error-msg { color: #ff4444; font-size: 11px; margin: 8px 0; }
     .vip-badge { background: linear-gradient(90deg,#FF00FF,#00FFFF); color: #000; padding: 2px 8px; font-size: 9px; font-weight: bold; }
+    .draw-section { margin-bottom: 20px; }
+    .draw-canvas-wrap { overflow: auto; max-width: 100%; border: 2px solid var(--accent); background: #1a1a1a; }
+    #draw-canvas { display: block; cursor: crosshair; max-width: 100%; height: auto; }
+    .brush-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; align-items: center; }
+    .brush-btn { padding: 6px 10px; font-size: 10px; background: #2a2d31; border: 1px solid #444; color: #fff; cursor: pointer; border-radius: 4px; }
+    .brush-btn.active { border-color: var(--accent); background: #36393F; }
+    .brush-btn.vip { border-color: #FF00FF; }
+    .logo-pos-grid { display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 4px; align-items: center; font-size: 10px; margin-top: 4px; }
+    .logo-pos-grid input[type="number"] { width: 56px; padding: 4px; background: #2a2d31; border: 1px solid #444; color: #fff; }
   </style>
 </head>
 <body>
@@ -44,18 +53,41 @@
 
     <div id="error-screen" style="display:none;text-align:center;padding:40px;color:#ff4444;">
       <h2>Token inválido o expirado</h2>
-      <p>Usa <code>/rankcard link</code> en Discord para obtener un enlace nuevo (válido 15 min)</p>
+      <p>Pide a un <strong>staff</strong> que use <code>/rankcard link</code> en Discord para obtener un enlace (válido 15 min)</p>
     </div>
 
     <div id="editor-screen" style="display:none;">
       <div class="editor-layout">
-        <div class="preview-panel">
+        <div>
+          <div class="draw-section preview-panel">
+            <h3 style="font-size:11px;color:var(--accent);margin-bottom:8px;">✏️ Dibujar en la tarjeta</h3>
+            <div class="control-group">
+              <label>Color del pincel</label>
+              <div class="brush-row" id="draw-colors"></div>
+            </div>
+            <div class="control-group">
+              <label>Pincel</label>
+              <div class="brush-row" id="draw-brushes"></div>
+            </div>
+            <div class="control-group">
+              <label>Tamaño: <span id="brush-size-val">8</span>px</label>
+              <input type="range" id="brush-size" min="2" max="30" value="8" style="width:100%;">
+            </div>
+            <div class="brush-row">
+              <button type="button" class="btn-preview" id="draw-clear">Borrar dibujo</button>
+            </div>
+            <div class="draw-canvas-wrap">
+              <canvas id="draw-canvas" width="800" height="250"></canvas>
+            </div>
+          </div>
+          <div class="preview-panel" style="margin-top:16px;">
           <h3 style="font-size:11px;color:var(--accent);margin-bottom:12px;">Previsualización</h3>
           <div id="preview-container">
             <div class="preview-placeholder" id="preview-placeholder">Haz clic en "Actualizar Vista Previa"</div>
             <img id="preview-img" src="" alt="Preview" style="display:none;">
           </div>
           <button type="button" class="btn-preview" id="btn-preview">Actualizar Vista Previa</button>
+          </div>
         </div>
 
         <div class="controls-panel">
@@ -112,17 +144,11 @@
 
           <div class="control-group">
             <label>Tipografía</label>
-            <select id="font-select" style="width:100%;padding:8px;background:#2a2d31;border:1px solid #444;color:#fff;font-size:11px;">
-              <option value="arial">Arial</option>
-              <option value="sans-serif">Sans Serif</option>
-              <option value="press-start" disabled>Press Start 2P (VIP)</option>
-              <option value="monospace" disabled>Monospace Pixel (VIP)</option>
-              <option value="impact" disabled>Impact (VIP)</option>
-            </select>
+            <select id="font-select" style="width:100%;padding:8px;background:#2a2d31;border:1px solid #444;color:#fff;font-size:11px;"></select>
           </div>
 
           <div class="control-group" id="logos-section">
-            <label>URLs de logos (Discord CDN) - Max <span id="max-logos">1</span></label>
+            <label>Logos e imágenes (Discord CDN) - Max <span id="max-logos">1</span> — Arrastra o indica X, Y, Ancho, Alto</label>
             <div id="logo-inputs"></div>
           </div>
 
@@ -141,6 +167,12 @@
   <script>
     let token = null;
     let userData = null;
+    let drawCtx = null;
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+    let drawColor = '#FFFFFF';
+    let brushId = 'round';
+    let brushSize = 8;
 
     function getToken() {
       const params = new URLSearchParams(window.location.search);
@@ -158,6 +190,12 @@
     }
 
     function getConfig() {
+      const canvas = document.getElementById('draw-canvas');
+      let drawLayer = null;
+      if (canvas && drawCtx) {
+        const d = canvas.toDataURL('image/png');
+        if (d.length > 100) drawLayer = d;
+      }
       return {
         backgroundColor: document.getElementById('color-bg').value,
         accentColor: document.getElementById('color-accent').value,
@@ -166,7 +204,8 @@
         useNeonPalette: document.getElementById('use-neon')?.checked || false,
         fontId: document.getElementById('font-select').value,
         baseImages: [],
-        logos: []
+        logos: [],
+        drawLayer: drawLayer
       };
     }
 
@@ -174,12 +213,97 @@
       const max = userData?.options?.maxImages || 1;
       const logos = [];
       for (let i = 0; i < max; i++) {
-        const input = document.getElementById(`logo-url-${i}`);
-        if (input?.value?.trim()) {
-          logos.push({ url: input.value.trim(), x: 650 + i * 50, y: 80, width: 60, height: 60 });
-        }
+        const urlEl = document.getElementById(`logo-url-${i}`);
+        if (!urlEl?.value?.trim()) continue;
+        const x = Math.max(0, Math.min(800, parseInt(document.getElementById(`logo-x-${i}`)?.value, 10) || 650));
+        const y = Math.max(0, Math.min(250, parseInt(document.getElementById(`logo-y-${i}`)?.value, 10) || 80));
+        const w = Math.max(20, Math.min(150, parseInt(document.getElementById(`logo-w-${i}`)?.value, 10) || 60));
+        const h = Math.max(20, Math.min(150, parseInt(document.getElementById(`logo-h-${i}`)?.value, 10) || 60));
+        logos.push({ url: urlEl.value.trim(), x, y, width: w, height: h });
       }
       return logos;
+    }
+
+    function drawStroke(ctx, x1, y1, x2, y2) {
+      ctx.strokeStyle = brushId === 'eraser' ? 'rgba(0,0,0,0)' : drawColor;
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      if (brushId === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+      } else ctx.globalCompositeOperation = 'source-over';
+      if (brushId === 'square') ctx.lineCap = 'butt';
+      if (brushId === 'spray') {
+        const steps = Math.max(4, Math.floor(Math.sqrt((x2-x1)**2 + (y2-y1)**2) / 2));
+        for (let i = 0; i < steps; i++) {
+          const t = i / steps;
+          const x = x1 + (x2 - x1) * t + (Math.random() - 0.5) * brushSize;
+          const y = y1 + (y2 - y1) * t + (Math.random() - 0.5) * brushSize;
+          ctx.beginPath();
+          ctx.arc(x, y, brushSize / 4, 0, Math.PI * 2);
+          ctx.fillStyle = drawColor;
+          ctx.fill();
+        }
+        return;
+      }
+      if (brushId === 'neon') {
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = drawColor;
+      }
+      if (brushId === 'marker') ctx.globalAlpha = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function initDrawCanvas() {
+      const canvas = document.getElementById('draw-canvas');
+      if (!canvas) return;
+      drawCtx = canvas.getContext('2d');
+      drawCtx.fillStyle = 'rgba(0,0,0,0)';
+      drawCtx.fillRect(0, 0, 800, 250);
+
+      function getXY(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = 800 / rect.width;
+        const scaleY = 250 / rect.height;
+        return {
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top) * scaleY
+        };
+      }
+
+      canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        const { x, y } = getXY(e);
+        lastX = x; lastY = y;
+        if (brushId === 'round' || brushId === 'square') {
+          drawCtx.fillStyle = brushId === 'eraser' ? 'rgba(0,0,0,0.5)' : drawColor;
+          if (brushId === 'eraser') drawCtx.globalCompositeOperation = 'destination-out';
+          const s = brushSize / 2;
+          if (brushId === 'square') drawCtx.fillRect(x - s, y - s, brushSize, brushSize);
+          else drawCtx.beginPath(); drawCtx.arc(x, y, s, 0, Math.PI * 2); drawCtx.fill();
+          drawCtx.globalCompositeOperation = 'source-over';
+        }
+      });
+      canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const { x, y } = getXY(e);
+        drawStroke(drawCtx, lastX, lastY, x, y);
+        lastX = x; lastY = y;
+      });
+      canvas.addEventListener('mouseup', () => { isDrawing = false; });
+      canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+    }
+
+    function clearDrawCanvas() {
+      if (!drawCtx) return;
+      drawCtx.clearRect(0, 0, 800, 250);
     }
 
     async function loadUser() {
@@ -215,7 +339,6 @@
         document.getElementById('vip-badge').style.display = 'inline-block';
         document.getElementById('neon-palette').style.display = 'block';
         document.getElementById('neon-toggle-wrap').style.display = 'block';
-
         const neonDiv = document.getElementById('neon-colors');
         (userData.options?.neonColors || []).forEach(c => {
           const sw = document.createElement('div');
@@ -229,12 +352,53 @@
           });
           neonDiv.appendChild(sw);
         });
-
-        ['press-start', 'monospace', 'impact'].forEach(v => {
-          const opt = document.querySelector(`#font-select option[value="${v}"]`);
-          if (opt) opt.disabled = false;
-        });
       }
+
+      const fontSelect = document.getElementById('font-select');
+      fontSelect.innerHTML = '';
+      (userData.options?.standardFonts || []).forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = f.name;
+        fontSelect.appendChild(opt);
+      });
+      (userData.options?.premiumFonts || []).forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = f.name + ' (VIP)';
+        fontSelect.appendChild(opt);
+      });
+
+      const drawColorsRow = document.getElementById('draw-colors');
+      drawColorsRow.innerHTML = '';
+      (userData.options?.drawColors || ['#FFFFFF','#000000','#FF0000','#00FF00','#0000FF']).forEach(c => {
+        const sw = document.createElement('div');
+        sw.className = 'color-swatch';
+        sw.style.backgroundColor = c;
+        sw.style.cursor = 'pointer';
+        sw.title = c;
+        sw.addEventListener('click', () => { drawColor = c; document.querySelectorAll('#draw-colors .color-swatch').forEach(s => s.style.border = '2px solid #444'); sw.style.border = '2px solid #FFD700'; });
+        drawColorsRow.appendChild(sw);
+      });
+      if (drawColorsRow.firstChild) drawColorsRow.firstChild.style.border = '2px solid #FFD700';
+
+      const brushesRow = document.getElementById('draw-brushes');
+      brushesRow.innerHTML = '';
+      (userData.options?.brushes || []).forEach(b => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'brush-btn' + (b.premium ? ' vip' : '');
+        btn.textContent = b.name;
+        btn.dataset.id = b.id;
+        btn.addEventListener('click', () => { brushId = b.id; document.querySelectorAll('#draw-brushes .brush-btn').forEach(x => x.classList.remove('active')); btn.classList.add('active'); });
+        brushesRow.appendChild(btn);
+      });
+      if (brushesRow.firstChild) brushesRow.firstChild.classList.add('active');
+
+      document.getElementById('brush-size').addEventListener('input', (e) => { brushSize = parseInt(e.target.value, 10); document.getElementById('brush-size-val').textContent = brushSize; });
+      document.getElementById('draw-clear').addEventListener('click', clearDrawCanvas);
+
+      initDrawCanvas();
 
       const maxLogos = userData.options?.maxImages || 1;
       document.getElementById('max-logos').textContent = maxLogos;
@@ -243,8 +407,16 @@
       logoContainer.innerHTML = '';
       for (let i = 0; i < maxLogos; i++) {
         const wrap = document.createElement('div');
-        wrap.style.marginTop = '4px';
-        wrap.innerHTML = `<input type="text" id="logo-url-${i}" placeholder="URL logo ${i + 1} (Discord CDN)" class="color-input" style="width:100%;">`;
+        wrap.style.marginTop = '8px';
+        wrap.innerHTML = `
+          <input type="text" id="logo-url-${i}" placeholder="URL imagen ${i + 1} (Discord CDN)" class="color-input" style="width:100%;">
+          <div class="logo-pos-grid">
+            <span>Posición (0-800, 0-250):</span>
+            <input type="number" id="logo-x-${i}" placeholder="X" min="0" max="800" value="${650 + i * 50}">
+            <input type="number" id="logo-y-${i}" placeholder="Y" min="0" max="250" value="80">
+            <input type="number" id="logo-w-${i}" placeholder="Ancho" min="20" max="150" value="60">
+            <input type="number" id="logo-h-${i}" placeholder="Alto" min="20" max="150" value="60">
+          </div>`;
         logoContainer.appendChild(wrap);
       }
 
@@ -258,9 +430,24 @@
         if (c.useNeonPalette) document.getElementById('use-neon').checked = true;
         if (c.logos?.length) {
           c.logos.forEach((logo, i) => {
-            const inp = document.getElementById(`logo-url-${i}`);
-            if (inp) inp.value = logo.url || '';
+            const urlEl = document.getElementById(`logo-url-${i}`);
+            if (urlEl) urlEl.value = logo.url || '';
+            const xEl = document.getElementById(`logo-x-${i}`);
+            if (xEl) xEl.value = logo.x ?? (650 + i * 50);
+            const yEl = document.getElementById(`logo-y-${i}`);
+            if (yEl) yEl.value = logo.y ?? 80;
+            const wEl = document.getElementById(`logo-w-${i}`);
+            if (wEl) wEl.value = logo.width ?? 60;
+            const hEl = document.getElementById(`logo-h-${i}`);
+            if (hEl) hEl.value = logo.height ?? 60;
           });
+        }
+        if (c.drawLayer && c.drawLayer.startsWith('data:image/png;base64,')) {
+          const img = new Image();
+          img.onload = () => {
+            if (drawCtx) { drawCtx.drawImage(img, 0, 0, 800, 250); }
+          };
+          img.src = c.drawLayer;
         }
       }
 

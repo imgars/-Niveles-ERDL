@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
     useNeonPalette: Boolean,
     fontId: String,
     baseImages: [mongoose.Schema.Types.Mixed],
-    logos: [mongoose.Schema.Types.Mixed]
+    logos: [mongoose.Schema.Types.Mixed],
+    drawLayer: String
   },
   afk: {
     status: { type: Boolean, default: false },

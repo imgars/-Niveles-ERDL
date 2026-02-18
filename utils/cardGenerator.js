@@ -364,9 +364,15 @@ function drawPixelText(ctx, text, x, y, size, color) {
 const FONT_MAP = {
   arial: 'bold 28px Arial, sans-serif',
   'sans-serif': 'bold 28px "Segoe UI", sans-serif',
+  georgia: 'bold 26px Georgia, serif',
+  times: 'bold 26px "Times New Roman", serif',
+  verdana: 'bold 26px Verdana, sans-serif',
   'press-start': 'bold 24px "Press Start 2P", monospace',
   monospace: 'bold 24px "Courier New", monospace',
-  impact: 'bold 26px Impact, sans-serif'
+  impact: 'bold 26px Impact, sans-serif',
+  comic: 'bold 24px "Comic Sans MS", cursive',
+  fantasy: 'bold 24px fantasy, cursive',
+  bebas: 'bold 26px "Bebas Neue", Arial Black, sans-serif'
 };
 
 export async function generateCustomRankCard(member, userData, progress, boostsText = '') {
@@ -406,6 +412,16 @@ export async function generateCustomRankCard(member, userData, progress, boostsT
 
   drawPixelBorder(ctx, 0, 0, CARD_WIDTH, CARD_HEIGHT, colors.border, 6);
   drawPixelBorder(ctx, 8, 8, CARD_WIDTH - 16, CARD_HEIGHT - 16, 'rgba(0,0,0,0.3)', 2);
+
+  // Capa de dibujo del usuario (si existe)
+  if (custom.drawLayer && typeof custom.drawLayer === 'string' && custom.drawLayer.startsWith('data:image/png;base64,')) {
+    try {
+      const drawImg = await loadImage(custom.drawLayer);
+      ctx.drawImage(drawImg, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+    } catch (e) {
+      console.error('Error loading drawLayer:', e);
+    }
+  }
 
   const baseImages = custom.baseImages || [];
   const logos = custom.logos || [];
