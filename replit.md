@@ -1,6 +1,12 @@
 # -Niveles
 
 ## Recent Changes
+- **Mejoras Mobile + Rediseño Leaderboard (Febrero 2026):**
+  - **Menú hamburguesa móvil:** Botón de 3 líneas que abre/cierra la navegación en pantallas pequeñas (<768px). Se cierra automáticamente al seleccionar una sección.
+  - **Sección Inactividad fusionada:** El contenido de la sección "Inactividad" fue integrado como una tarjeta dentro de "Características", eliminando el enlace de navegación independiente.
+  - **Rediseño del Leaderboard:** Top 3 usuarios mostrados en tarjetas tipo podio (oro, plata, bronce) con avatares grandes, corona animada para el #1 y efectos de brillo. El resto de usuarios en lista compacta con filas hover. Paginación corregida para contabilizar el podio.
+  - **CSS responsive completo:** Media queries mejoradas para todos los componentes: hero stats compactos, grids de una columna, tarjetas de comandos adaptadas, tablas con fuentes reducidas, leaderboard adaptado a columnas verticales en móvil, espaciados optimizados.
+
 - **Dashboard Admin v3 - Sección Economía (Febrero 2026):**
   - Nueva página "Economía" en el panel admin con navegación en sidebar.
   - **Resumen económico:** Total coins en circulación, coins en banco, riqueza total, total de transacciones, usuario más rico.

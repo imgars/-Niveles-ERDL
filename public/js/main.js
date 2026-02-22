@@ -41,9 +41,16 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('stats-error').style.display = 'none';
         }
 
-        if (sectionId === 'inactividad') {
-            // Lógica adicional para inactividad si fuera necesaria
-        }
+    }
+
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navMenu.classList.toggle('open');
+        });
     }
 
     navLinks.forEach(link => {
@@ -52,6 +59,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const sectionId = this.getAttribute('data-section');
             showSection(sectionId);
             history.pushState(null, '', `#${sectionId}`);
+            if (hamburgerBtn) {
+                hamburgerBtn.classList.remove('active');
+                navMenu.classList.remove('open');
+            }
         });
     });
 
@@ -225,107 +236,122 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function loadLeaderboard() {
-        const tbody = document.getElementById('leaderboard-body');
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" class="loading-row">
-                    <div class="loading-spinner"></div>
-                    <span>Cargando leaderboard...</span>
-                </td>
-            </tr>
-        `;
+        const podiumEl = document.getElementById('lb-podium');
+        const listEl = document.getElementById('lb-list');
+
+        podiumEl.innerHTML = '<div class="lb-podium-loading"><div class="loading-spinner"></div><span>Cargando podio...</span></div>';
+        listEl.innerHTML = '<div class="lb-list-loading"><div class="loading-spinner"></div><span>Cargando leaderboard...</span></div>';
 
         try {
             const response = await fetch('/api/leaderboard');
             const data = await response.json();
-            
+
             leaderboardData = data.users;
             filteredData = [...leaderboardData];
-            
+
             document.getElementById('total-users').textContent = data.total;
-            document.getElementById('lb-total').textContent = `Total: ${data.total} usuarios`;
-            
+            document.getElementById('lb-total').textContent = `${data.total} usuarios`;
+
             currentPage = 1;
             renderLeaderboard();
         } catch (error) {
             console.error('Error loading leaderboard:', error);
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="loading-row">
-                        <span style="color: #FF6B6B;">Error al cargar el leaderboard</span>
-                    </td>
-                </tr>
-            `;
+            podiumEl.innerHTML = '';
+            listEl.innerHTML = '<div class="lb-list-loading"><span style="color: #FF6B6B;">Error al cargar el leaderboard</span></div>';
         }
     }
 
+    function buildUserDataAttr(user, rank) {
+        return JSON.stringify({
+            userId: user.userId,
+            username: user.username || user.displayName || '',
+            displayName: user.displayName || user.username || 'Usuario ' + user.userId.slice(-4),
+            avatar: user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png',
+            level: user.level,
+            totalXp: user.totalXp,
+            rank: rank
+        }).replace(/'/g, "\\'");
+    }
+
     function renderLeaderboard() {
-        const tbody = document.getElementById('leaderboard-body');
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pageData = filteredData.slice(startIndex, endIndex);
-        
-        if (pageData.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="loading-row">
-                        <span>No se encontraron usuarios</span>
-                    </td>
-                </tr>
-            `;
+        const podiumEl = document.getElementById('lb-podium');
+        const listEl = document.getElementById('lb-list');
+        const isSearching = document.getElementById('search-user').value.trim() !== '';
+
+        if (filteredData.length === 0) {
+            podiumEl.innerHTML = '';
+            listEl.innerHTML = '<div class="lb-list-loading"><span>No se encontraron usuarios</span></div>';
+            updatePagination();
             return;
         }
 
-        tbody.innerHTML = pageData.map((user, index) => {
-            const rank = startIndex + index + 1;
-            let rankClass = '';
-            let rankIcon = '';
-            
-            if (rank === 1) {
-                rankClass = 'rank-1';
-                rankIcon = '&#9813;';
-            } else if (rank === 2) {
-                rankClass = 'rank-2';
-                rankIcon = '&#9814;';
-            } else if (rank === 3) {
-                rankClass = 'rank-3';
-                rankIcon = '&#9815;';
-            }
-            
-            const displayName = user.displayName || user.username || `Usuario ${user.userId.slice(-4)}`;
+        if (currentPage === 1 && !isSearching) {
+            const top3 = filteredData.slice(0, 3);
+            const classes = ['gold', 'silver', 'bronze'];
+            const medals = ['👑', '', ''];
+
+            podiumEl.innerHTML = top3.map((user, i) => {
+                const displayName = user.displayName || user.username || 'Usuario ' + user.userId.slice(-4);
+                const avatarUrl = user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                const crown = i === 0 ? '<div class="lb-crown">👑</div>' : '';
+                return '<div class="lb-podium-card ' + classes[i] + '" data-user=\'' + buildUserDataAttr(user, i + 1) + '\'>' +
+                    '<div class="lb-podium-rank">' + (i + 1) + '</div>' +
+                    crown +
+                    '<img src="' + avatarUrl + '" alt="" class="lb-podium-avatar" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
+                    '<div class="lb-podium-name">' + escapeHtml(displayName) + '</div>' +
+                    '<div class="lb-podium-level">Nivel ' + user.level + '</div>' +
+                    '<div class="lb-podium-xp">' + formatNumber(user.totalXp) + ' XP</div>' +
+                '</div>';
+            }).join('');
+
+            podiumEl.querySelectorAll('.lb-podium-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    try { showUserModal(JSON.parse(this.dataset.user)); } catch(e) {}
+                });
+            });
+            podiumEl.style.display = 'flex';
+        } else {
+            podiumEl.innerHTML = '';
+            podiumEl.style.display = 'none';
+        }
+
+        const hasPodium = currentPage === 1 && !isSearching;
+        const podiumCount = hasPodium ? Math.min(3, filteredData.length) : 0;
+        let listStart, listEnd;
+        if (isSearching) {
+            listStart = (currentPage - 1) * itemsPerPage;
+            listEnd = listStart + itemsPerPage;
+        } else {
+            listStart = podiumCount + (currentPage - 1) * itemsPerPage;
+            listEnd = listStart + itemsPerPage;
+        }
+        const pageData = filteredData.slice(listStart, listEnd);
+
+        if (pageData.length === 0 && currentPage === 1) {
+            listEl.innerHTML = '';
+            updatePagination();
+            return;
+        }
+
+        listEl.innerHTML = pageData.map((user, index) => {
+            const rank = listStart + index + 1;
+            const displayName = user.displayName || user.username || 'Usuario ' + user.userId.slice(-4);
             const avatarUrl = user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
-            
-            return `
-                <tr class="user-row" data-user='${JSON.stringify({
-                    userId: user.userId,
-                    username: user.username || displayName,
-                    displayName: displayName,
-                    avatar: avatarUrl,
-                    level: user.level,
-                    totalXp: user.totalXp,
-                    rank: rank
-                }).replace(/'/g, "\\'")}'>
-                    <td class="rank-col ${rankClass}">${rankIcon} #${rank}</td>
-                    <td class="user-col">
-                        <div class="user-info clickable-user">
-                            <img src="${avatarUrl}" alt="Avatar" class="user-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
-                            <span class="user-name">${escapeHtml(displayName)}</span>
-                        </div>
-                    </td>
-                    <td class="level-col">Nivel ${user.level}</td>
-                    <td class="xp-col">${formatNumber(user.totalXp)} XP</td>
-                </tr>
-            `;
+
+            return '<div class="lb-row" data-user=\'' + buildUserDataAttr(user, rank) + '\'>' +
+                '<div class="lb-row-rank">#' + rank + '</div>' +
+                '<div class="lb-row-user">' +
+                    '<img src="' + avatarUrl + '" alt="" class="lb-row-avatar" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
+                    '<span class="lb-row-name">' + escapeHtml(displayName) + '</span>' +
+                '</div>' +
+                '<div class="lb-row-level">Nv. ' + user.level + '</div>' +
+                '<div class="lb-row-xp">' + formatNumber(user.totalXp) + ' XP</div>' +
+            '</div>';
         }).join('');
-        
-        document.querySelectorAll('.user-row').forEach(row => {
+
+        listEl.querySelectorAll('.lb-row').forEach(row => {
             row.addEventListener('click', function() {
-                try {
-                    const userData = JSON.parse(this.dataset.user);
-                    showUserModal(userData);
-                } catch (e) {
-                    console.error('Error parsing user data:', e);
-                }
+                try { showUserModal(JSON.parse(this.dataset.user)); } catch(e) {}
             });
         });
 
@@ -333,14 +359,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePagination() {
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+        const isSearching = document.getElementById('search-user').value.trim() !== '';
+        const dataLen = filteredData.length;
+        let totalPages;
+        if (isSearching) {
+            totalPages = Math.ceil(dataLen / itemsPerPage);
+        } else {
+            const podiumCount = Math.min(3, dataLen);
+            const remaining = Math.max(0, dataLen - podiumCount);
+            totalPages = remaining > 0 ? Math.ceil(remaining / itemsPerPage) : (dataLen > 0 ? 1 : 0);
+        }
         const pageInfo = document.getElementById('page-info');
         const prevBtn = document.getElementById('prev-page');
         const nextBtn = document.getElementById('next-page');
-        
-        pageInfo.textContent = `Pagina ${currentPage} de ${totalPages}`;
+
+        pageInfo.textContent = 'Pagina ' + currentPage + ' de ' + totalPages;
         prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+        nextBtn.disabled = currentPage >= totalPages || totalPages === 0;
     }
 
     document.getElementById('prev-page').addEventListener('click', function() {
@@ -351,8 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('next-page').addEventListener('click', function() {
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        if (currentPage < totalPages) {
+        if (!this.disabled) {
             currentPage++;
             renderLeaderboard();
         }

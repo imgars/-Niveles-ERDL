@@ -17,14 +17,18 @@
                 <span class="logo-icon">&#9733;</span>
                 <h1>- Niveles</h1>
             </div>
-            <nav class="nav">
+            <button class="hamburger" id="hamburger-btn" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <nav class="nav" id="nav-menu">
                 <a href="#inicio" class="nav-link active" data-section="inicio">Inicio</a>
                 <a href="#caracteristicas" class="nav-link" data-section="caracteristicas">Caracteristicas</a>
                 <a href="#comandos" class="nav-link" data-section="comandos">Comandos</a>
                 <a href="#economia" class="nav-link" data-section="economia">Economia</a>
                 <a href="#minijuegos" class="nav-link" data-section="minijuegos">Minijuegos</a>
                 <a href="#misiones" class="nav-link" data-section="misiones">Misiones</a>
-                <a href="#inactividad" class="nav-link" data-section="inactividad">Inactividad</a>
                 <a href="#tarjetas" class="nav-link" data-section="tarjetas">Tarjetas</a>
                 <a href="#preguntas" class="nav-link" data-section="preguntas">Preguntas</a>
                 <a href="#estadisticas" class="nav-link" data-section="estadisticas">Estadisticas</a>
@@ -175,6 +179,18 @@
                         <div class="formula-row very-slow"><span>Nivel 90+</span><span>3500 XP</span><span class="speed">MUY LENTO</span></div>
                     </div>
                     <p class="formula-note">Multiplicador: baseXP * (1 + nivel * 0.1)</p>
+                </div>
+
+                <div class="feature-box retro-box inactivity-box">
+                    <h3>⚠️ Sistema de Inactividad</h3>
+                    <p style="font-size: 9px; color: var(--text-dim); margin-bottom: 12px;">Si pasas mas de 7 dias sin enviar un mensaje, entras en estado de inactividad.</p>
+                    <ul class="pixel-list">
+                        <li>Ganas XP 2 veces mas lento (50% de penalizacion)</li>
+                        <li>Cooldown de XP sube a 30 segundos (normal 10s)</li>
+                        <li>No puedes participar en minijuegos ni reclamar recompensas</li>
+                        <li>Para recuperarte: Envia 50 mensajes en el servidor</li>
+                        <li>Recompensa por recuperarte: Boost de 50% XP por 24h</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -808,57 +824,6 @@
             </div>
         </section>
 
-        <!-- INACTIVIDAD -->
-        <section id="inactividad" class="section">
-            <h2 class="section-title">
-                <span class="title-icon">⚠️</span>
-                Sistema de Inactividad
-            </h2>
-
-            <div class="features-grid">
-                <div class="feature-box retro-box">
-                    <div class="inactivity-icon" style="font-size: 50px; text-align: center; margin-bottom: 20px;">💤</div>
-                    <h3>¿Que es la Inactividad?</h3>
-                    <p class="section-intro">Si pasas más de 7 días sin enviar un mensaje, entrarás en estado de inactividad.</p>
-                    <div class="missions-table">
-                        <div class="mission-row hard">
-                            <span class="mission-name">Penalización</span>
-                            <span class="mission-desc">Ganas XP 2 veces más lento (50% de penalización).</span>
-                        </div>
-                        <div class="mission-row hard">
-                            <span class="mission-name">Cooldown</span>
-                            <span class="mission-desc">El cooldown de XP sube a 30 segundos (normal 10s).</span>
-                        </div>
-                        <div class="mission-row medium">
-                            <span class="mission-name">Restricción</span>
-                            <span class="mission-desc">No puedes participar en minijuegos ni reclamar recompensas.</span>
-                        </div>
-                        <div class="mission-row medium">
-                            <span class="mission-name">Bloqueo</span>
-                            <span class="mission-desc">No puedes hablar en el canal #1400931230266032149.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="feature-box retro-box">
-                    <h3>¿Como recuperar tu estado?</h3>
-                    <p class="section-intro">Para volver a la normalidad, debes demostrar tu actividad de nuevo.</p>
-                    <div class="missions-rewards">
-                        <div class="reward-item">
-                            <span class="icon">💬</span>
-                            <span>Enviar 50 mensajes en el servidor.</span>
-                        </div>
-                        <div class="reward-item special">
-                            <span class="icon">🎁 Recompensa</span>
-                            <span>Al terminar los 50 mensajes, ganas un Boost de 50% XP por 24h.</span>
-                        </div>
-                    </div>
-                    <div style="margin-top: 20px; padding: 15px; border: 2px dashed var(--primary); font-size: 8px;">
-                        <strong>Nota:</strong> El bot te notificará en el canal de avisos cuando entres en inactividad y cuando te recuperes.
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- TARJETAS -->
         <section id="tarjetas" class="section">
@@ -1343,39 +1308,27 @@
         <section id="leaderboard" class="section">
             <h2 class="section-title">
                 <span class="title-icon">&#9813;</span>
-                Leaderboard Completo
+                Leaderboard
             </h2>
 
-            <div class="leaderboard-container">
-                <div class="leaderboard-header">
-                    <div class="leaderboard-stats">
-                        <span id="lb-total">Cargando...</span>
-                        <span class="lb-note">(Maximo 500 usuarios)</span>
-                    </div>
-                    <div class="leaderboard-search">
-                        <input type="text" id="search-user" placeholder="Buscar usuario..." class="pixel-input">
-                    </div>
-                </div>
+            <div class="lb-search-bar">
+                <input type="text" id="search-user" placeholder="Buscar usuario..." class="pixel-input">
+                <span id="lb-total" class="lb-total-badge">Cargando...</span>
+            </div>
 
-                <div class="leaderboard-table-container">
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th class="rank-col">#</th>
-                                <th class="user-col">Usuario</th>
-                                <th class="level-col">Nivel</th>
-                                <th class="xp-col">XP Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboard-body">
-                            <tr>
-                                <td colspan="4" class="loading-row">
-                                    <div class="loading-spinner"></div>
-                                    <span>Cargando leaderboard...</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div id="lb-podium" class="lb-podium">
+                <div class="lb-podium-loading">
+                    <div class="loading-spinner"></div>
+                    <span>Cargando podio...</span>
+                </div>
+            </div>
+
+            <div class="lb-list-container">
+                <div id="lb-list" class="lb-list">
+                    <div class="lb-list-loading">
+                        <div class="loading-spinner"></div>
+                        <span>Cargando leaderboard...</span>
+                    </div>
                 </div>
 
                 <div class="leaderboard-footer">
