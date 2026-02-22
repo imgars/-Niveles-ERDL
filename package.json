@@ -17,8 +17,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google/genai": "^1.40.0",
-    "@napi-rs/canvas": "^0.1.91",
+    "@google/genai": "^1.42.0",
+    "@napi-rs/canvas": "^0.1.94",
     "cookie-parser": "^1.4.7",
     "discord.js": "^14.25.1",
     "drizzle-zod": "^0.8.3",
