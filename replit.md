@@ -1,6 +1,20 @@
 # -Niveles
 
 ## Recent Changes
+- **Dashboard Admin v3 - Expansión Completa (Febrero 2026):**
+  - **Nuevas páginas:** Graficas (Chart.js), Alertas, Misiones Live, Control Sistemas, Audit Log.
+  - **Chart.js integrado:** 4 gráficas interactivas (XP timeseries, niveles subidos, distribución de niveles, comandos top 10), selector de período 7/14/30 días.
+  - **Sistema de alertas:** Polling cada 60s, badges con número en campana y sidebar, descartar alertas, severidades (info/warning/error/critical).
+  - **Misiones en tiempo real:** Polling cada 30s, barras de progreso animadas por misión y usuario.
+  - **Control avanzado de sistemas:** Toggle por sistema con razón, override por canal, programar reactivación, 8 sistemas configurables.
+  - **Audit Log:** Tabla paginada de acciones admin, filtros por acción/admin, exportar CSV.
+  - **Acciones en masa de usuarios:** Checkboxes de selección múltiple, barra de acciones flotante, 8 tipos de acción masiva.
+  - **Detalle de usuario con pestañas:** Stats, Controles Avanzados (ban XP, cooldowns, matrimonio, seguro, racha, nacionalidad), Inventario, Historial.
+  - **Gestión completa de boosts:** Crear boost global/usuario/canal con multiplicador y duración, eliminar boosts activos.
+  - **Exportar datos:** CSV y JSON para usuarios y leaderboard.
+  - **Mobile responsive:** Sidebar colapsable con hamburger, grids adaptables, tablas con scroll horizontal, toasts de notificación.
+  - **Backend:** 18+ nuevos endpoints API en index.js, audit log en database.js, timeseries, sistemas avanzados, boosts CRUD.
+
 - **Sistema de Auditoría Avanzado (Febrero 2026):**
   - Reescritura completa de `activityLogger.js` con persistencia MongoDB y 30+ tipos de log.
   - 13 categorías de sistema: economía, niveles, casino, minijuegos, misiones, nacionalidades, social, admin, tienda, powerups, robos, seguridad, general.

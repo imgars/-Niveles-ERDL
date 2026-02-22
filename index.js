@@ -3084,11 +3084,13 @@ app.post('/api/admin/user/:guildId/:userId/modify', verifyAdminToken, express.js
       user.totalXp = newValue;
       user.level = calculateLevel(newValue);
       user.xp = getXPProgress(newValue, user.level).current;
-      db.save();
+      db.saveUser(guildId, userId, user);
       
       if (isMongoConnected()) {
-        await saveUserToMongo(user);
+        await saveUserToMongo(guildId, userId, user);
       }
+
+      db.logAdminAction(adminName, `modify_xp_${action}`, { userId, oldValue, newValue, reason });
       
       logActivity({
         type: newValue > oldValue ? LOG_TYPES.XP_GAIN : LOG_TYPES.XP_LOSS,
@@ -3127,11 +3129,13 @@ app.post('/api/admin/user/:guildId/:userId/modify', verifyAdminToken, express.js
       user.totalXp = getTotalXPForLevel(newLevel);
       user.level = newLevel;
       user.xp = 0;
-      db.save();
+      db.saveUser(guildId, userId, user);
       
       if (isMongoConnected()) {
-        await saveUserToMongo(user);
+        await saveUserToMongo(user.guildId, user.userId, user);
       }
+
+      db.logAdminAction(adminName, `modify_level_${action}`, { userId, oldLevel, newLevel, reason });
       
       logActivity({
         type: newLevel > oldLevel ? LOG_TYPES.LEVEL_UP : LOG_TYPES.LEVEL_DOWN,
@@ -3186,6 +3190,496 @@ app.get('/api/admin/users/list', verifyAdminToken, (req, res) => {
     });
   } catch (error) {
     console.error('Error en Users List API:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== ANALYTICS TIME SERIES =====
+app.get('/api/admin/analytics/timeseries', verifyAdminToken, (req, res) => {
+  try {
+    const days = Math.min(parseInt(req.query.days) || 7, 30);
+    const series = db.getTimeSeriesData(days);
+    res.json({ series, days });
+  } catch (error) {
+    console.error('Error en analytics timeseries:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.get('/api/admin/analytics/commands', verifyAdminToken, (req, res) => {
+  try {
+    const stats = db.getCommandStats().slice(0, 20);
+    res.json({ commands: stats });
+  } catch (error) {
+    console.error('Error en analytics commands:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== AUDIT LOG =====
+app.get('/api/admin/audit', verifyAdminToken, (req, res) => {
+  try {
+    const { page = 1, limit = 50, action, adminName, since } = req.query;
+    const result = db.getAuditLog({
+      page: parseInt(page),
+      limit: parseInt(limit),
+      action: action || null,
+      adminName: adminName || null,
+      since: since ? parseInt(since) : null
+    });
+    res.json(result);
+  } catch (error) {
+    console.error('Error en audit log:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== BULK USER ACTIONS =====
+app.post('/api/admin/users/bulk', verifyAdminToken, express.json(), async (req, res) => {
+  try {
+    const { userIds, action, value, reason } = req.body;
+    if (!userIds || !Array.isArray(userIds) || !action) {
+      return res.status(400).json({ message: 'Faltan parámetros: userIds[], action requeridos' });
+    }
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    const session = sessionTokens.get(token);
+    const adminName = session?.username || 'Admin';
+
+    let successCount = 0;
+    let errors = [];
+
+    for (const entry of userIds) {
+      try {
+        const { guildId, userId } = typeof entry === 'object' ? entry : { guildId: null, userId: entry };
+        const key = Object.keys(db.users).find(k => k.endsWith(`-${userId}`));
+        if (!key) { errors.push(`Usuario ${userId} no encontrado`); continue; }
+
+        const [uGuildId] = key.split('-');
+        const user = db.users[key];
+
+        if (action === 'banXp') {
+          const durationMs = value ? parseInt(value) * 60000 : null;
+          db.banUser(userId, durationMs);
+          successCount++;
+        } else if (action === 'unbanXp') {
+          db.unbanUser(userId);
+          successCount++;
+        } else if (action === 'resetXp') {
+          user.totalXp = 0;
+          user.level = 0;
+          user.xp = 0;
+          db.saveUser(uGuildId, userId, user);
+          successCount++;
+        } else if (action === 'addCoins' || action === 'removeCoins') {
+          const { getUserEconomy, saveUserEconomy } = await import('./utils/economyDB.js');
+          let economy = await getUserEconomy(uGuildId, userId) || { guildId: uGuildId, userId, lagcoins: 0, bank: 0 };
+          const amount = parseInt(value) || 0;
+          economy.lagcoins = action === 'addCoins'
+            ? economy.lagcoins + amount
+            : Math.max(0, economy.lagcoins - amount);
+          await saveUserEconomy(uGuildId, userId, economy);
+          successCount++;
+        } else if (action === 'addXp' || action === 'removeXp') {
+          const amount = parseInt(value) || 0;
+          const oldXp = user.totalXp || 0;
+          user.totalXp = action === 'addXp'
+            ? oldXp + amount
+            : Math.max(0, oldXp - amount);
+          const { calculateLevel, getXPProgress } = await import('./utils/xpSystem.js');
+          user.level = calculateLevel(user.totalXp);
+          user.xp = getXPProgress(user.totalXp, user.level).current;
+          db.saveUser(uGuildId, userId, user);
+          successCount++;
+        } else if (action === 'resetCooldowns') {
+          db.resetUserCooldowns(userId);
+          successCount++;
+        }
+      } catch (err) {
+        errors.push(`Error en ${entry}: ${err.message}`);
+      }
+    }
+
+    db.logAdminAction(adminName, `bulk_${action}`, {
+      count: successCount,
+      value,
+      reason: reason || 'Sin motivo',
+      errors: errors.length
+    });
+
+    res.json({ success: true, successCount, errors, total: userIds.length });
+  } catch (error) {
+    console.error('Error en bulk actions:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== EXPORT ENDPOINTS =====
+app.get('/api/admin/export/users', verifyAdminToken, (req, res) => {
+  try {
+    const { format = 'json' } = req.query;
+    const allUsers = Object.values(db.users).map(u => ({
+      userId: u.userId,
+      guildId: u.guildId,
+      username: u.username || 'Desconocido',
+      displayName: u.displayName || u.username || 'Desconocido',
+      level: u.level || 0,
+      totalXp: u.totalXp || 0,
+      xp: u.xp || 0,
+      lastActivity: u.lastActivity ? new Date(u.lastActivity).toISOString() : null,
+      isInactive: u.isInactive || false,
+      bannedXp: db.isUserBanned(u.userId)
+    })).sort((a, b) => b.totalXp - a.totalXp);
+
+    if (format === 'csv') {
+      const headers = ['userId', 'guildId', 'username', 'displayName', 'level', 'totalXp', 'xp', 'lastActivity', 'isInactive', 'bannedXp'];
+      const csvRows = [headers.join(',')];
+      for (const u of allUsers) {
+        csvRows.push(headers.map(h => `"${String(u[h] ?? '').replace(/"/g, '""')}"`).join(','));
+      }
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=usuarios_${Date.now()}.csv`);
+      return res.send(csvRows.join('\n'));
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename=usuarios_${Date.now()}.json`);
+    res.json({ users: allUsers, total: allUsers.length, exportedAt: new Date().toISOString() });
+  } catch (error) {
+    console.error('Error exportando usuarios:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.get('/api/admin/export/leaderboard', verifyAdminToken, (req, res) => {
+  try {
+    const { format = 'json', by = 'xp' } = req.query;
+    const allUsers = Object.values(db.users)
+      .filter(u => (u.totalXp || 0) > 0 || (u.level || 0) > 0)
+      .sort((a, b) => (b.totalXp || 0) - (a.totalXp || 0))
+      .slice(0, 500)
+      .map((u, i) => ({
+        rank: i + 1,
+        userId: u.userId,
+        username: u.username || 'Desconocido',
+        level: u.level || 0,
+        totalXp: u.totalXp || 0
+      }));
+
+    if (format === 'csv') {
+      const headers = ['rank', 'userId', 'username', 'level', 'totalXp'];
+      const csvRows = [headers.join(',')];
+      for (const u of allUsers) {
+        csvRows.push(headers.map(h => `"${String(u[h] ?? '').replace(/"/g, '""')}"`).join(','));
+      }
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename=leaderboard_${Date.now()}.csv`);
+      return res.send(csvRows.join('\n'));
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename=leaderboard_${Date.now()}.json`);
+    res.json({ leaderboard: allUsers, total: allUsers.length, exportedAt: new Date().toISOString() });
+  } catch (error) {
+    console.error('Error exportando leaderboard:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== XP BAN PER USER =====
+app.get('/api/admin/user/:guildId/:userId/xpban', verifyAdminToken, (req, res) => {
+  try {
+    const { userId } = req.params;
+    const info = db.getUserBanInfo(userId);
+    res.json({ banned: !!info?.banned, info });
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.post('/api/admin/user/:guildId/:userId/xpban', verifyAdminToken, express.json(), (req, res) => {
+  try {
+    const { guildId, userId } = req.params;
+    const { ban, durationMinutes, reason } = req.body;
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    const session = sessionTokens.get(token);
+    const adminName = session?.username || 'Admin';
+
+    if (ban) {
+      const durationMs = durationMinutes > 0 ? parseInt(durationMinutes) * 60000 : null;
+      db.banUser(userId, durationMs);
+      db.logAdminAction(adminName, 'xpban_user', { userId, guildId, durationMinutes, reason });
+      res.json({ success: true, banned: true });
+    } else {
+      db.unbanUser(userId);
+      db.logAdminAction(adminName, 'xpunban_user', { userId, guildId, reason });
+      res.json({ success: true, banned: false });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== EXTENDED USER DETAILS =====
+app.get('/api/admin/user/:guildId/:userId/details', verifyAdminToken, async (req, res) => {
+  try {
+    const { guildId, userId } = req.params;
+    const key = `${guildId}-${userId}`;
+    const user = db.users[key] || null;
+
+    const guild = client.guilds.cache.get(guildId);
+    const member = guild?.members.cache.get(userId);
+
+    let economy = null;
+    try {
+      const { getUserEconomy } = await import('./utils/economyDB.js');
+      economy = await getUserEconomy(guildId, userId);
+    } catch (e) {}
+
+    const banInfo = db.getUserBanInfo(userId);
+    const cooldowns = db.getUserCooldowns(userId);
+    const userLogs = getUserLogs(userId, 50);
+
+    const inventory = user?.inventory || [];
+    const marriage = user?.married ? { partnerId: user.married, since: user.marriedAt } : null;
+    const streak = user?.streak || null;
+    const insurance = user?.insurance || null;
+    const nationality = user?.nationality || null;
+
+    res.json({
+      user,
+      economy,
+      username: member?.user?.username || user?.username || 'Desconocido',
+      displayName: member?.displayName || user?.displayName || 'Desconocido',
+      avatar: member?.user?.avatarURL() || user?.avatar || null,
+      guildName: guild?.name || 'Servidor',
+      roles: member?.roles.cache.map(r => ({ id: r.id, name: r.name, color: r.hexColor })) || [],
+      banInfo,
+      cooldowns,
+      inventory,
+      marriage,
+      streak,
+      insurance,
+      nationality,
+      logs: userLogs
+    });
+  } catch (error) {
+    console.error('Error en user details:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== RESET USER COOLDOWNS =====
+app.post('/api/admin/user/:guildId/:userId/reset-cooldowns', verifyAdminToken, express.json(), (req, res) => {
+  try {
+    const { userId } = req.params;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    const session = sessionTokens.get(token);
+    const adminName = session?.username || 'Admin';
+
+    const reset = db.resetUserCooldowns(userId);
+    db.logAdminAction(adminName, 'reset_cooldowns', { userId });
+    res.json({ success: true, reset });
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== ADVANCED SYSTEMS CONTROL =====
+app.get('/api/admin/systems/advanced', verifyAdminToken, (req, res) => {
+  try {
+    const guildId = req.query.guildId || (client.guilds.cache.first()?.id) || 'default';
+    db.checkScheduledReactivations(guildId);
+    const systems = db.getSystemsAdvanced(guildId);
+    res.json({ systems, guildId });
+  } catch (error) {
+    console.error('Error en systems advanced:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.post('/api/admin/systems/advanced', verifyAdminToken, express.json(), (req, res) => {
+  try {
+    const { guildId, system, enabled, reason, scheduledReactivation, channelOverride, removeChannelOverride } = req.body;
+
+    if (!system) return res.status(400).json({ message: 'system requerido' });
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    const session = sessionTokens.get(token);
+    const adminName = session?.username || 'Admin';
+
+    const resolvedGuildId = guildId || (client.guilds.cache.first()?.id) || 'default';
+
+    db.setSystemAdvanced(resolvedGuildId, system, {
+      enabled,
+      reason,
+      scheduledReactivation: scheduledReactivation ? new Date(scheduledReactivation).getTime() : undefined,
+      channelOverride,
+      removeChannelOverride,
+      adminName
+    });
+
+    db.logAdminAction(adminName, `system_${enabled !== undefined ? (enabled ? 'enable' : 'disable') : 'config'}`, {
+      system,
+      guildId: resolvedGuildId,
+      enabled,
+      reason,
+      scheduledReactivation,
+      channelOverride
+    });
+
+    const updated = db.getSystemsAdvanced(resolvedGuildId);
+    res.json({ success: true, systems: updated });
+  } catch (error) {
+    console.error('Error en systems advanced update:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== REAL-TIME MISSIONS =====
+app.get('/api/admin/missions/realtime', verifyAdminToken, async (req, res) => {
+  try {
+    const weekNumber = Math.ceil((new Date().getDate()) / 7);
+    const year = new Date().getFullYear();
+    const allUsers = Object.values(db.users).slice(0, 100);
+    const activeMissions = [];
+
+    for (const user of allUsers) {
+      try {
+        const missions = await getUserMissions(user.guildId, user.userId, weekNumber, year);
+        if (missions?.missions) {
+          const inProgress = missions.missions.filter(m => !m.completed);
+          if (inProgress.length > 0) {
+            activeMissions.push({
+              userId: user.userId,
+              username: user.username || user.displayName || 'Desconocido',
+              guildId: user.guildId,
+              missions: inProgress.map(m => ({
+                name: m.name || m.type,
+                progress: m.progress || 0,
+                target: m.target || 1,
+                percent: Math.round(((m.progress || 0) / (m.target || 1)) * 100)
+              }))
+            });
+          }
+        }
+      } catch (e) {}
+    }
+
+    const completedToday = Object.values(db.users).reduce((sum, u) => {
+      if (u.lastMissionComplete && new Date(u.lastMissionComplete).toDateString() === new Date().toDateString()) {
+        return sum + 1;
+      }
+      return sum;
+    }, 0);
+
+    res.json({ activeMissions, completedToday, weekNumber, year, checkedUsers: allUsers.length });
+  } catch (error) {
+    console.error('Error en missions realtime:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== SYSTEM ALERTS =====
+app.get('/api/admin/alerts', verifyAdminToken, (req, res) => {
+  try {
+    const includeDismissed = req.query.all === 'true';
+
+    const allUsers = Object.values(db.users);
+    for (const u of allUsers) {
+      if ((u.level || 0) >= 100) {
+        db.generateAlert('level100', `${u.displayName || u.username || u.userId} alcanzó nivel 100`, 'info', { userId: u.userId });
+      }
+      if ((u.lagcoins || 0) > 1000000) {
+        db.generateAlert('economy_anomaly', `${u.displayName || u.username || u.userId} tiene más de 1M de lagcoins`, 'warning', { userId: u.userId, amount: u.lagcoins });
+      }
+    }
+
+    if (!isMongoConnected()) {
+      db.generateAlert('mongo_disconnected', 'MongoDB está desconectado', 'error');
+    }
+
+    if (!client.isReady()) {
+      db.generateAlert('bot_offline', 'El bot de Discord está offline', 'error');
+    }
+
+    const alerts = db.getAlertsList({ includeDismissed });
+    const unreadCount = alerts.filter(a => !a.dismissed).length;
+    res.json({ alerts, unreadCount });
+  } catch (error) {
+    console.error('Error en alerts:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.post('/api/admin/alerts/:id/dismiss', verifyAdminToken, (req, res) => {
+  try {
+    const dismissed = db.dismissAlert(req.params.id);
+    res.json({ success: dismissed });
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+// ===== BOOSTS MANAGEMENT =====
+app.get('/api/admin/boosts/all', verifyAdminToken, (req, res) => {
+  try {
+    const all = db.getAllBoostsRaw();
+    res.json({ boosts: all, total: all.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.post('/api/admin/boosts/create', verifyAdminToken, express.json(), (req, res) => {
+  try {
+    const { type, target, multiplier, durationHours, description } = req.body;
+
+    if (!type || !multiplier) {
+      return res.status(400).json({ message: 'type y multiplier son requeridos' });
+    }
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    const session = sessionTokens.get(token);
+    const adminName = session?.username || 'Admin';
+
+    const durationMs = durationHours ? parseFloat(durationHours) * 3600000 : null;
+    const resolvedTarget = type === 'global' ? 'global' : (target || 'global');
+
+    const boost = db.addBoost(
+      type === 'global' ? 'global' : type,
+      resolvedTarget,
+      parseFloat(multiplier),
+      durationMs,
+      description || `Boost creado por ${adminName}`
+    );
+
+    db.logAdminAction(adminName, 'create_boost', { type, target, multiplier, durationHours, description });
+
+    res.json({ success: true, boost });
+  } catch (error) {
+    console.error('Error creando boost:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.delete('/api/admin/boosts/:id', verifyAdminToken, (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+    const session = sessionTokens.get(token);
+    const adminName = session?.username || 'Admin';
+
+    const removed = db.removeBoostById(req.params.id);
+    if (removed) {
+      db.logAdminAction(adminName, 'delete_boost', { boostId: req.params.id });
+    }
+    res.json({ success: removed });
+  } catch (error) {
     res.status(500).json({ message: 'Error del servidor' });
   }
 });

@@ -8,60 +8,50 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/admin/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="admin-container">
-        <aside class="sidebar">
+        <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2>Panel Admin</h2>
             </div>
             
             <nav class="sidebar-nav">
-                <a href="#dashboard" class="nav-link active" data-page="dashboard">
-                    <span>📊</span> Dashboard
-                </a>
-                <a href="#xp" class="nav-link" data-page="xp">
-                    <span>⭐</span> Sistema XP
-                </a>
-                <a href="#niveles" class="nav-link" data-page="niveles">
-                    <span>🏆</span> Niveles
-                </a>
-                <a href="#roles" class="nav-link" data-page="roles">
-                    <span>🎭</span> Roles por Nivel
-                </a>
-                <a href="#misiones" class="nav-link" data-page="misiones">
-                    <span>🎯</span> Misiones
-                </a>
-                <a href="#powerups" class="nav-link" data-page="powerups">
-                    <span>⚡</span> Power-ups
-                </a>
-                <a href="#estadisticas" class="nav-link" data-page="estadisticas">
-                    <span>📈</span> Estadisticas
-                </a>
-                <a href="#logs" class="nav-link" data-page="logs">
-                    <span>📋</span> Logs en Vivo
-                </a>
-                <a href="#usuarios" class="nav-link" data-page="usuarios">
-                    <span>👥</span> Gestion Usuarios
-                </a>
-                <a href="#configuracion" class="nav-link" data-page="configuracion">
-                    <span>⚙️</span> Configuracion
-                </a>
-                <a href="#personalizacion" class="nav-link" data-page="personalizacion">
-                    <span>🎨</span> Personalizar
-                </a>
+                <div class="nav-group-label">Principal</div>
+                <a href="#dashboard" class="nav-link active" data-page="dashboard"><span>📊</span> Dashboard</a>
+                <a href="#graficas" class="nav-link" data-page="graficas"><span>📈</span> Graficas</a>
+                <a href="#alertas" class="nav-link" data-page="alertas"><span>🔔</span> <span class="nav-text">Alertas</span><span class="alert-badge" id="navAlertBadge" style="display:none">0</span></a>
+
+                <div class="nav-group-label">Sistemas</div>
+                <a href="#xp" class="nav-link" data-page="xp"><span>⭐</span> Sistema XP</a>
+                <a href="#niveles" class="nav-link" data-page="niveles"><span>🏆</span> Niveles</a>
+                <a href="#roles" class="nav-link" data-page="roles"><span>🎭</span> Roles por Nivel</a>
+                <a href="#misiones" class="nav-link" data-page="misiones"><span>🎯</span> Misiones</a>
+                <a href="#misiones-live" class="nav-link" data-page="misiones-live"><span>🔴</span> Misiones Live</a>
+                <a href="#powerups" class="nav-link" data-page="powerups"><span>⚡</span> Power-ups</a>
+                <a href="#sistemas-avanzados" class="nav-link" data-page="sistemas-avanzados"><span>🎛️</span> Control Sistemas</a>
+
+                <div class="nav-group-label">Administracion</div>
+                <a href="#usuarios" class="nav-link" data-page="usuarios"><span>👥</span> Gestion Usuarios</a>
+                <a href="#estadisticas" class="nav-link" data-page="estadisticas"><span>📉</span> Estadisticas</a>
+                <a href="#audit-log" class="nav-link" data-page="audit-log"><span>📋</span> Audit Log</a>
+                <a href="#logs" class="nav-link" data-page="logs"><span>🗒️</span> Logs en Vivo</a>
+                <a href="#configuracion" class="nav-link" data-page="configuracion"><span>⚙️</span> Configuracion</a>
+                <a href="#personalizacion" class="nav-link" data-page="personalizacion"><span>🎨</span> Personalizar</a>
             </nav>
-            
         </aside>
         
         <main class="main-content">
             <header class="top-bar">
                 <h1 id="pageTitle">Dashboard Principal</h1>
                 <div class="header-right">
+                    <button class="alert-bell-btn" id="alertBellBtn" title="Alertas" onclick="showPage('alertas')">
+                        🔔 <span class="alert-bell-badge" id="alertBellBadge" style="display:none">0</span>
+                    </button>
                     <div class="quick-customize">
-                        <button class="customize-btn" id="quickCustomizeBtn" title="Personalizar">
-                            🎨
-                        </button>
+                        <button class="customize-btn" id="quickCustomizeBtn" title="Personalizar">🎨</button>
                         <div class="customize-dropdown" id="customizeDropdown">
                             <div class="dropdown-section">
                                 <h5>Tema Sidebar</h5>
@@ -108,6 +98,8 @@
             </header>
             
             <div class="content-area">
+
+                <!-- ===== DASHBOARD ===== -->
                 <div id="dashboard-page" class="page active">
                     <div class="dashboard-grid">
                         <div class="stats-grid">
@@ -119,7 +111,6 @@
                                     <p class="stat-label">Online</p>
                                 </div>
                             </div>
-                            
                             <div class="stat-card">
                                 <div class="stat-icon">⏱️</div>
                                 <div class="stat-content">
@@ -128,7 +119,6 @@
                                     <p class="stat-label">Tiempo activo</p>
                                 </div>
                             </div>
-                            
                             <div class="stat-card">
                                 <div class="stat-icon">🌐</div>
                                 <div class="stat-content">
@@ -137,7 +127,6 @@
                                     <p class="stat-label">Conectados</p>
                                 </div>
                             </div>
-                            
                             <div class="stat-card">
                                 <div class="stat-icon">👥</div>
                                 <div class="stat-content">
@@ -216,7 +205,61 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- ===== GRAFICAS ===== -->
+                <div id="graficas-page" class="page">
+                    <div class="section-content">
+                        <div class="charts-toolbar">
+                            <h3>Graficas de Actividad</h3>
+                            <div class="charts-period-selector">
+                                <button class="period-btn active" data-days="7">7 dias</button>
+                                <button class="period-btn" data-days="14">14 dias</button>
+                                <button class="period-btn" data-days="30">30 dias</button>
+                            </div>
+                        </div>
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <h4>XP Generado por Dia</h4>
+                                <div class="chart-container">
+                                    <canvas id="chartXpTimeline"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h4>Niveles Subidos por Dia</h4>
+                                <div class="chart-container">
+                                    <canvas id="chartLevelsTimeline"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h4>Distribucion de Niveles</h4>
+                                <div class="chart-container">
+                                    <canvas id="chartLevelDist"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <h4>Comandos Mas Usados (Top 10)</h4>
+                                <div class="chart-container">
+                                    <canvas id="chartCommands"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ALERTAS ===== -->
+                <div id="alertas-page" class="page">
+                    <div class="section-content">
+                        <div class="page-header-actions">
+                            <h3>Alertas del Sistema</h3>
+                            <button class="btn-secondary" onclick="loadAlertsData()">Actualizar</button>
+                        </div>
+                        <div id="alertsList" class="alerts-list">
+                            <p class="loading-text">Cargando alertas...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== XP ===== -->
                 <div id="xp-page" class="page">
                     <div class="section-content">
                         <div class="stats-grid">
@@ -253,7 +296,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="config-section">
                             <h3>Configuracion XP</h3>
                             <div class="config-grid">
@@ -275,16 +317,14 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="top-section">
                             <h3>Top 10 Usuarios por XP</h3>
-                            <div class="top-list" id="topXpUsers">
-                                <p class="loading-text">Cargando...</p>
-                            </div>
+                            <div class="top-list" id="topXpUsers"><p class="loading-text">Cargando...</p></div>
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- ===== NIVELES ===== -->
                 <div id="niveles-page" class="page">
                     <div class="section-content">
                         <div class="stats-grid">
@@ -313,39 +353,29 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="distribution-section">
                             <h3>Distribucion por Nivel</h3>
-                            <div class="distribution-chart" id="levelDistribution">
-                                <p class="loading-text">Cargando...</p>
-                            </div>
+                            <div class="distribution-chart" id="levelDistribution"><p class="loading-text">Cargando...</p></div>
                         </div>
-                        
                         <div class="top-section">
                             <h3>Top 10 Usuarios por Nivel</h3>
-                            <div class="top-list" id="topLevelUsers">
-                                <p class="loading-text">Cargando...</p>
-                            </div>
+                            <div class="top-list" id="topLevelUsers"><p class="loading-text">Cargando...</p></div>
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- ===== ROLES ===== -->
                 <div id="roles-page" class="page">
                     <div class="section-content">
                         <h3>Roles por Nivel</h3>
                         <p class="section-desc">Roles que se asignan automaticamente al alcanzar ciertos niveles</p>
-                        
-                        <div class="roles-grid" id="levelRolesGrid">
-                            <p class="loading-text">Cargando...</p>
-                        </div>
-                        
+                        <div class="roles-grid" id="levelRolesGrid"><p class="loading-text">Cargando...</p></div>
                         <h3 style="margin-top: 30px;">Roles Especiales</h3>
-                        <div class="special-roles-grid" id="specialRolesGrid">
-                            <p class="loading-text">Cargando...</p>
-                        </div>
+                        <div class="special-roles-grid" id="specialRolesGrid"><p class="loading-text">Cargando...</p></div>
                     </div>
                 </div>
-                
+
+                <!-- ===== MISIONES ===== -->
                 <div id="misiones-page" class="page">
                     <div class="section-content">
                         <div class="stats-grid">
@@ -382,7 +412,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="info-section" style="margin-top: 20px;">
                             <div class="info-card">
                                 <h3>Configuracion de Misiones</h3>
@@ -396,7 +425,39 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- ===== MISIONES LIVE ===== -->
+                <div id="misiones-live-page" class="page">
+                    <div class="section-content">
+                        <div class="page-header-actions">
+                            <h3>Misiones en Tiempo Real</h3>
+                            <div class="live-indicator"><span class="live-dot"></span> En vivo (actualiza cada 30s)</div>
+                        </div>
+                        <div class="stats-grid" style="margin-bottom:20px">
+                            <div class="stat-card">
+                                <div class="stat-icon">🎯</div>
+                                <div class="stat-content">
+                                    <h3>En Progreso</h3>
+                                    <p class="stat-value" id="liveActiveMissions">0</p>
+                                    <p class="stat-label">Usuarios con misiones activas</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-content">
+                                    <h3>Completadas Hoy</h3>
+                                    <p class="stat-value" id="liveCompletedToday">0</p>
+                                    <p class="stat-label">Misiones terminadas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="liveMissionsList" class="live-missions-list">
+                            <p class="loading-text">Cargando misiones en progreso...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== POWER-UPS ===== -->
                 <div id="powerups-page" class="page">
                     <div class="section-content">
                         <div class="stats-grid">
@@ -433,14 +494,45 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="boosts-list-section">
-                            <h3>Boosts Globales Activos</h3>
-                            <div class="boosts-list" id="globalBoostsList">
-                                <p class="empty-text">No hay boosts globales activos</p>
+
+                        <div class="boost-create-section">
+                            <h3>Crear Nuevo Boost</h3>
+                            <div class="boost-create-form">
+                                <div class="form-row">
+                                    <label>Tipo</label>
+                                    <select id="newBoostType">
+                                        <option value="global">Global (todos)</option>
+                                        <option value="user">Por usuario (ID)</option>
+                                        <option value="channel">Por canal (ID)</option>
+                                    </select>
+                                </div>
+                                <div class="form-row" id="boostTargetRow" style="display:none">
+                                    <label>ID del objetivo</label>
+                                    <input type="text" id="newBoostTarget" placeholder="ID de usuario o canal">
+                                </div>
+                                <div class="form-row">
+                                    <label>Multiplicador</label>
+                                    <input type="number" id="newBoostMult" min="1.1" max="10" step="0.1" value="2" placeholder="2.0">
+                                </div>
+                                <div class="form-row">
+                                    <label>Duracion (horas, 0 = permanente)</label>
+                                    <input type="number" id="newBoostDuration" min="0" step="0.5" value="24" placeholder="24">
+                                </div>
+                                <div class="form-row">
+                                    <label>Descripcion</label>
+                                    <input type="text" id="newBoostDesc" placeholder="Evento especial...">
+                                </div>
+                                <button class="btn-primary" onclick="createBoost()">Crear Boost</button>
                             </div>
                         </div>
-                        
+
+                        <div class="boosts-list-section">
+                            <h3>Todos los Boosts Activos</h3>
+                            <div class="boosts-list" id="allBoostsList">
+                                <p class="loading-text">Cargando boosts...</p>
+                            </div>
+                        </div>
+
                         <div class="config-section">
                             <h3>Multiplicadores Base</h3>
                             <div class="config-grid">
@@ -456,7 +548,22 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- ===== SISTEMAS AVANZADOS ===== -->
+                <div id="sistemas-avanzados-page" class="page">
+                    <div class="section-content">
+                        <div class="page-header-actions">
+                            <h3>Control Avanzado de Sistemas</h3>
+                            <button class="btn-secondary" onclick="loadAdvancedSystems()">Actualizar</button>
+                        </div>
+                        <p class="section-desc">Activa o desactiva sistemas del bot con razon, programacion de reactivacion y overrides por canal.</p>
+                        <div id="systemsGrid" class="systems-advanced-grid">
+                            <p class="loading-text">Cargando sistemas...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ESTADISTICAS ===== -->
                 <div id="estadisticas-page" class="page">
                     <div class="section-content">
                         <div class="stats-grid">
@@ -493,7 +600,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="stats-grid" style="margin-top: 20px;">
                             <div class="stat-card">
                                 <div class="stat-icon">⭐</div>
@@ -520,14 +626,19 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="distribution-section">
                             <h3>Distribucion por Rango de Nivel</h3>
-                            <div class="distribution-chart" id="statsLevelBrackets">
-                                <p class="loading-text">Cargando...</p>
+                            <div class="distribution-chart" id="statsLevelBrackets"><p class="loading-text">Cargando...</p></div>
+                        </div>
+                        <div class="page-header-actions" style="margin-top:20px">
+                            <h3>Exportar Datos</h3>
+                            <div class="export-btns">
+                                <button class="btn-secondary" onclick="exportData('users','json')">Usuarios JSON</button>
+                                <button class="btn-secondary" onclick="exportData('users','csv')">Usuarios CSV</button>
+                                <button class="btn-secondary" onclick="exportData('leaderboard','json')">Leaderboard JSON</button>
+                                <button class="btn-secondary" onclick="exportData('leaderboard','csv')">Leaderboard CSV</button>
                             </div>
                         </div>
-                        
                         <div class="system-stats">
                             <h3>Sistema</h3>
                             <div class="config-grid">
@@ -547,13 +658,245 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- ===== AUDIT LOG ===== -->
+                <div id="audit-log-page" class="page">
+                    <div class="section-content">
+                        <div class="page-header-actions">
+                            <h3>Audit Log - Acciones de Administradores</h3>
+                            <div class="export-btns">
+                                <button class="btn-secondary" onclick="exportAuditLog()">Exportar CSV</button>
+                                <button class="btn-secondary" onclick="loadAuditLog()">Actualizar</button>
+                            </div>
+                        </div>
+                        <div class="audit-filters">
+                            <input type="text" id="auditFilterAction" placeholder="Filtrar por accion..." class="filter-input">
+                            <input type="text" id="auditFilterAdmin" placeholder="Filtrar por admin..." class="filter-input">
+                            <button class="btn-primary" onclick="loadAuditLog(1)">Buscar</button>
+                        </div>
+                        <div class="audit-table-wrapper">
+                            <table class="audit-table" id="auditTable">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Admin</th>
+                                        <th>Accion</th>
+                                        <th>Detalles</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTableBody">
+                                    <tr><td colspan="4" class="loading-text">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="auditPagination"></div>
+                    </div>
+                </div>
+
+                <!-- ===== LOGS ===== -->
+                <div id="logs-page" class="page">
+                    <div class="section-content">
+                        <div class="logs-container">
+                            <div class="logs-filters">
+                                <select id="logTypeFilter">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="xp_gain">XP Ganado</option>
+                                    <option value="level_up">Subida de Nivel</option>
+                                    <option value="coins_gain">Monedas Ganadas</option>
+                                    <option value="casino_win">Casino Win</option>
+                                    <option value="admin_action">Accion Admin</option>
+                                </select>
+                                <select id="logSystemFilter">
+                                    <option value="">Todos los sistemas</option>
+                                    <option value="economia">Economia</option>
+                                    <option value="niveles">Niveles</option>
+                                    <option value="casino">Casino</option>
+                                    <option value="misiones">Misiones</option>
+                                </select>
+                                <select id="logPeriodFilter">
+                                    <option value="today">Hoy</option>
+                                    <option value="week">Esta semana</option>
+                                    <option value="all" selected>Todo</option>
+                                </select>
+                                <button class="filter-btn" id="applyLogsFilter">Filtrar</button>
+                                <button class="filter-btn export-btn" id="exportLogsBtn">Exportar</button>
+                            </div>
+                            <div class="logs-list" id="logsList">
+                                <p class="loading-text">Cargando logs...</p>
+                            </div>
+                            <div class="logs-pagination" id="logsPagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== USUARIOS ===== -->
+                <div id="usuarios-page" class="page">
+                    <div class="section-content">
+                        <div class="user-search-section">
+                            <div class="search-bar">
+                                <input type="text" id="userSearchInput" placeholder="Buscar usuario por nombre, ID o apodo..." />
+                                <button id="userSearchBtn" class="search-btn">Buscar</button>
+                            </div>
+                        </div>
+
+                        <div class="bulk-action-bar" id="bulkActionBar" style="display:none">
+                            <span id="bulkSelectedCount">0 seleccionados</span>
+                            <select id="bulkAction">
+                                <option value="">-- Seleccionar accion --</option>
+                                <option value="addXp">Agregar XP</option>
+                                <option value="removeXp">Quitar XP</option>
+                                <option value="addCoins">Agregar Coins</option>
+                                <option value="removeCoins">Quitar Coins</option>
+                                <option value="resetXp">Resetear XP</option>
+                                <option value="banXp">Ban XP</option>
+                                <option value="unbanXp">Desbanear XP</option>
+                                <option value="resetCooldowns">Resetear Cooldowns</option>
+                            </select>
+                            <input type="number" id="bulkValue" placeholder="Valor" min="0">
+                            <button class="btn-danger" onclick="executeBulkAction()">Aplicar</button>
+                            <button class="btn-secondary" onclick="clearBulkSelection()">Cancelar</button>
+                        </div>
+
+                        <div class="users-list-section">
+                            <div class="users-list-header">
+                                <label class="checkbox-master">
+                                    <input type="checkbox" id="selectAllUsers" onchange="toggleSelectAll(this)">
+                                    <span>Seleccionar todos</span>
+                                </label>
+                                <span class="users-total" id="usersTotal"></span>
+                            </div>
+                            <div class="users-list" id="usersList">
+                                <p class="empty-text">Busca un usuario para comenzar o carga la lista</p>
+                            </div>
+                            <button class="btn-secondary" id="loadAllUsersBtn" onclick="loadAllUsers()" style="margin-top:10px">Cargar todos los usuarios</button>
+                            <div class="users-pagination" id="usersPagination"></div>
+                        </div>
+
+                        <div class="user-detail-panel" id="userDetailPanel" style="display:none;">
+                            <div class="user-detail-header">
+                                <img id="userDetailAvatar" src="" alt="Avatar" class="user-detail-avatar">
+                                <div>
+                                    <h3 id="userDetailName">Usuario</h3>
+                                    <p id="userDetailId" class="user-detail-id"></p>
+                                    <span id="userDetailBanBadge" class="ban-badge" style="display:none">BAN XP</span>
+                                </div>
+                                <button class="close-btn" onclick="closeUserDetail()">×</button>
+                            </div>
+
+                            <div class="user-tabs">
+                                <button class="user-tab-btn active" data-tab="stats">Stats</button>
+                                <button class="user-tab-btn" data-tab="advanced">Controles Avanzados</button>
+                                <button class="user-tab-btn" data-tab="inventory">Inventario</button>
+                                <button class="user-tab-btn" data-tab="history">Historial</button>
+                            </div>
+
+                            <div class="user-tab-content active" id="tab-stats">
+                                <div class="user-stats-grid">
+                                    <div class="user-stat-card">
+                                        <h4>Total XP</h4>
+                                        <span id="userTotalXp" class="user-stat-value">0</span>
+                                        <div class="user-stat-actions">
+                                            <button onclick="modifyUser('totalXp', 'add')">+</button>
+                                            <button onclick="modifyUser('totalXp', 'remove')">-</button>
+                                            <button onclick="modifyUser('totalXp', 'set')">Establecer</button>
+                                            <button onclick="modifyUser('totalXp', 'reset')">Reset</button>
+                                        </div>
+                                    </div>
+                                    <div class="user-stat-card">
+                                        <h4>Nivel</h4>
+                                        <span id="userLevel" class="user-stat-value">0</span>
+                                        <div class="user-stat-actions">
+                                            <button onclick="modifyUser('level', 'add')">+</button>
+                                            <button onclick="modifyUser('level', 'remove')">-</button>
+                                            <button onclick="modifyUser('level', 'set')">Establecer</button>
+                                            <button onclick="modifyUser('level', 'reset')">Reset</button>
+                                        </div>
+                                    </div>
+                                    <div class="user-stat-card">
+                                        <h4>Lagcoins (Cartera)</h4>
+                                        <span id="userLagcoins" class="user-stat-value">0</span>
+                                        <div class="user-stat-actions">
+                                            <button onclick="modifyUser('lagcoins', 'add')">+</button>
+                                            <button onclick="modifyUser('lagcoins', 'remove')">-</button>
+                                            <button onclick="modifyUser('lagcoins', 'set')">Establecer</button>
+                                            <button onclick="modifyUser('lagcoins', 'reset')">Reset</button>
+                                        </div>
+                                    </div>
+                                    <div class="user-stat-card">
+                                        <h4>Lagcoins (Banco)</h4>
+                                        <span id="userBank" class="user-stat-value">0</span>
+                                        <div class="user-stat-actions">
+                                            <button onclick="modifyUser('bank', 'add')">+</button>
+                                            <button onclick="modifyUser('bank', 'remove')">-</button>
+                                            <button onclick="modifyUser('bank', 'set')">Establecer</button>
+                                            <button onclick="modifyUser('bank', 'reset')">Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="user-extra-info">
+                                    <div class="user-info-card">
+                                        <h4>Roles del Usuario</h4>
+                                        <div id="userRoles" class="user-roles-list"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-tab-content" id="tab-advanced">
+                                <div class="advanced-controls-grid">
+                                    <div class="advanced-control-card">
+                                        <h4>Ban de XP</h4>
+                                        <div id="userXpBanStatus" class="xp-ban-status"></div>
+                                        <div class="xp-ban-controls">
+                                            <input type="number" id="xpBanDuration" placeholder="Duracion en minutos (0=perm)" min="0">
+                                            <div class="xp-ban-buttons">
+                                                <button class="btn-danger" onclick="applyXpBan(true)">Banear XP</button>
+                                                <button class="btn-success" onclick="applyXpBan(false)">Desbanear</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="advanced-control-card">
+                                        <h4>Cooldowns Activos</h4>
+                                        <div id="userCooldownsList" class="cooldowns-list"></div>
+                                        <button class="btn-secondary" onclick="resetUserCooldowns()">Resetear Cooldowns</button>
+                                    </div>
+                                    <div class="advanced-control-card">
+                                        <h4>Matrimonio</h4>
+                                        <div id="userMarriageInfo" class="marriage-info"></div>
+                                    </div>
+                                    <div class="advanced-control-card">
+                                        <h4>Seguro</h4>
+                                        <div id="userInsuranceInfo" class="insurance-info"></div>
+                                    </div>
+                                    <div class="advanced-control-card">
+                                        <h4>Nacionalidad</h4>
+                                        <div id="userNationalityInfo" class="nationality-info"></div>
+                                    </div>
+                                    <div class="advanced-control-card">
+                                        <h4>Racha</h4>
+                                        <div id="userStreakInfo" class="streak-info"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="user-tab-content" id="tab-inventory">
+                                <div id="userInventoryList" class="inventory-list">
+                                    <p class="loading-text">Cargando inventario...</p>
+                                </div>
+                            </div>
+
+                            <div class="user-tab-content" id="tab-history">
+                                <div id="userActivityLogs" class="user-activity-logs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== CONFIGURACION ===== -->
                 <div id="configuracion-page" class="page">
                     <div class="section-content">
                         <div class="config-warning">
                             <span>Los cambios en la configuracion afectan el funcionamiento del bot. Cada cambio requiere confirmacion.</span>
                         </div>
-                        
                         <h3>Sistema de XP</h3>
                         <div class="config-grid">
                             <div class="config-item editable" data-field="cooldown" data-category="xpSystem">
@@ -592,7 +935,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <h3 style="margin-top: 30px;">Canales</h3>
                         <div class="config-grid">
                             <div class="config-item wide editable" data-field="levelUp" data-category="channels">
@@ -610,365 +952,105 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <h3 style="margin-top: 30px;">Canales sin XP</h3>
                         <div class="no-xp-channels-wrapper">
-                            <div class="no-xp-channels" id="cfgNoXpChannels">
-                                <p class="loading-text">Cargando...</p>
-                            </div>
+                            <div class="no-xp-channels" id="cfgNoXpChannels"><p class="loading-text">Cargando...</p></div>
                             <div class="no-xp-add">
                                 <input type="text" id="newNoXpChannel" placeholder="ID del canal a agregar">
                                 <button class="btn-add-channel" id="addNoXpChannel">Agregar</button>
                             </div>
                         </div>
-                        
                         <h3 style="margin-top: 30px;">Roles Especiales</h3>
                         <div class="config-grid">
                             <div class="config-item editable" data-field="staff" data-category="roles">
                                 <span class="config-label">Staff (ID)</span>
                                 <div class="config-edit-wrapper">
-                                    <input type="text" class="config-input" id="cfgStaffRole" placeholder="ID del rol">
+                                    <input type="text" class="config-input" id="cfgStaffRole">
                                     <button class="config-save-btn" data-field="staff">Guardar</button>
                                 </div>
                             </div>
                             <div class="config-item editable" data-field="booster" data-category="roles">
                                 <span class="config-label">Booster (ID)</span>
                                 <div class="config-edit-wrapper">
-                                    <input type="text" class="config-input" id="cfgBoosterRole" placeholder="ID del rol">
+                                    <input type="text" class="config-input" id="cfgBoosterRole">
                                     <button class="config-save-btn" data-field="booster">Guardar</button>
                                 </div>
                             </div>
                             <div class="config-item editable" data-field="vip" data-category="roles">
                                 <span class="config-label">VIP (ID)</span>
                                 <div class="config-edit-wrapper">
-                                    <input type="text" class="config-input" id="cfgVipRole" placeholder="ID del rol">
+                                    <input type="text" class="config-input" id="cfgVipRole">
                                     <button class="config-save-btn" data-field="vip">Guardar</button>
                                 </div>
                             </div>
                             <div class="config-item editable" data-field="level100" data-category="roles">
                                 <span class="config-label">Nivel 100 (ID)</span>
                                 <div class="config-edit-wrapper">
-                                    <input type="text" class="config-input" id="cfgLevel100Role" placeholder="ID del rol">
+                                    <input type="text" class="config-input" id="cfgLevel100Role">
                                     <button class="config-save-btn" data-field="level100">Guardar</button>
                                 </div>
                             </div>
                         </div>
-                        
                         <h3 style="margin-top: 30px;">Modo Mantenimiento</h3>
-                        <div class="maintenance-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="maintenanceToggle">
+                        <div class="maintenance-section">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="maintenanceToggle" onchange="toggleMaintenance(this.checked)">
                                 <span class="toggle-slider"></span>
+                                <span id="maintenanceStatus">Desactivado</span>
                             </label>
-                            <span id="maintenanceStatus">Desactivado</span>
+                            <p class="section-desc">El modo mantenimiento bloquea los comandos de economia para todos los usuarios no staff.</p>
                         </div>
                     </div>
                 </div>
-                
-                <div id="confirmModal" class="modal-overlay" style="display: none;">
-                    <div class="modal-content confirm-modal">
-                        <h3>Confirmar Cambio</h3>
-                        <p id="confirmMessage">¿Estas seguro de que deseas cambiar esta configuracion?</p>
-                        <div class="confirm-details" id="confirmDetails"></div>
-                        <div class="modal-actions">
-                            <button class="btn-cancel" id="confirmCancel">Cancelar</button>
-                            <button class="btn-confirm" id="confirmAccept">Confirmar Cambio</button>
-                        </div>
-                    </div>
-                </div>
-                
+
+                <!-- ===== PERSONALIZACION ===== -->
                 <div id="personalizacion-page" class="page">
                     <div class="section-content">
                         <h3>Personalizar Panel</h3>
-                        <p style="color: #666; margin-bottom: 20px;">Ajusta la apariencia del panel a tu gusto. Los cambios se guardan automaticamente. Tambien puedes usar el boton 🎨 en la barra superior para acceso rapido.</p>
-                        
-                        <div class="customization-section">
-                            <h4>Tema de Sidebar</h4>
-                            <div class="theme-options">
-                                <div class="theme-option" data-theme="default">
-                                    <div class="theme-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-                                    <span>Morado (Default)</span>
-                                </div>
-                                <div class="theme-option" data-theme="ocean">
-                                    <div class="theme-preview" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);"></div>
-                                    <span>Oceano</span>
-                                </div>
-                                <div class="theme-option" data-theme="sunset">
-                                    <div class="theme-preview" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
-                                    <span>Atardecer</span>
-                                </div>
-                                <div class="theme-option" data-theme="forest">
-                                    <div class="theme-preview" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);"></div>
-                                    <span>Bosque</span>
-                                </div>
-                                <div class="theme-option" data-theme="dark">
-                                    <div class="theme-preview" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);"></div>
-                                    <span>Oscuro</span>
-                                </div>
-                                <div class="theme-option" data-theme="fire">
-                                    <div class="theme-preview" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);"></div>
-                                    <span>Fuego</span>
-                                </div>
+                        <p class="section-desc">Elige colores y fondos para personalizar tu experiencia en el panel.</p>
+                        <div class="customize-full-section">
+                            <h4>Temas de Sidebar</h4>
+                            <div class="themes-grid">
+                                <div class="theme-card" data-theme="default"><div class="theme-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div><span>Morado</span></div>
+                                <div class="theme-card" data-theme="ocean"><div class="theme-preview" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);"></div><span>Oceano</span></div>
+                                <div class="theme-card" data-theme="sunset"><div class="theme-preview" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div><span>Atardecer</span></div>
+                                <div class="theme-card" data-theme="forest"><div class="theme-preview" style="background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);"></div><span>Bosque</span></div>
+                                <div class="theme-card" data-theme="dark"><div class="theme-preview" style="background: linear-gradient(135deg, #232526 0%, #414345 100%);"></div><span>Oscuro</span></div>
+                                <div class="theme-card" data-theme="fire"><div class="theme-preview" style="background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);"></div><span>Fuego</span></div>
                             </div>
-                        </div>
-                        
-                        <div class="customization-section">
-                            <h4>Color de Fondo</h4>
-                            <div class="bg-options">
-                                <div class="bg-option" data-bg="light">
-                                    <div class="bg-preview" style="background: #f5f7fa;"></div>
-                                    <span>Claro (Default)</span>
-                                </div>
-                                <div class="bg-option" data-bg="dark">
-                                    <div class="bg-preview" style="background: #1a1a2e;"></div>
-                                    <span>Oscuro</span>
-                                </div>
-                                <div class="bg-option" data-bg="cream">
-                                    <div class="bg-preview" style="background: #faf8f5;"></div>
-                                    <span>Crema</span>
-                                </div>
-                                <div class="bg-option" data-bg="blue">
-                                    <div class="bg-preview" style="background: #e8f4fc;"></div>
-                                    <span>Azul Claro</span>
-                                </div>
-                                <div class="bg-option" data-bg="green">
-                                    <div class="bg-preview" style="background: #e8f5e9;"></div>
-                                    <span>Verde Claro</span>
-                                </div>
-                                <div class="bg-option" data-bg="purple">
-                                    <div class="bg-preview" style="background: #f3e5f5;"></div>
-                                    <span>Lila</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="customization-section">
-                            <h4>Fuente de Letra</h4>
-                            <div class="font-options">
-                                <div class="font-option" data-font="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">
-                                    <span style="font-family: 'Segoe UI', sans-serif;">Segoe UI (Default)</span>
-                                </div>
-                                <div class="font-option" data-font="'Arial', Helvetica, sans-serif">
-                                    <span style="font-family: Arial, sans-serif;">Arial</span>
-                                </div>
-                                <div class="font-option" data-font="'Roboto', sans-serif">
-                                    <span style="font-family: Roboto, sans-serif;">Roboto</span>
-                                </div>
-                                <div class="font-option" data-font="'Open Sans', sans-serif">
-                                    <span style="font-family: 'Open Sans', sans-serif;">Open Sans</span>
-                                </div>
-                                <div class="font-option" data-font="'Poppins', sans-serif">
-                                    <span style="font-family: Poppins, sans-serif;">Poppins</span>
-                                </div>
-                                <div class="font-option" data-font="'Courier New', monospace">
-                                    <span style="font-family: 'Courier New', monospace;">Courier (Monospace)</span>
-                                </div>
-                                <div class="font-option" data-font="'Comic Sans MS', cursive">
-                                    <span style="font-family: 'Comic Sans MS', cursive;">Comic Sans</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="customization-section">
-                            <h4>Vista Previa</h4>
-                            <div class="preview-box" id="previewBox">
-                                <div class="preview-sidebar"></div>
-                                <div class="preview-content">
-                                    <p>Asi se vera tu panel con los ajustes actuales.</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="customization-actions">
-                            <button class="btn-reset-theme" id="resetCustomization">Restaurar Default</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="logs-page" class="page">
-                    <div class="section-content">
-                        <div class="logs-header">
-                            <div class="logs-stats">
-                                <div class="log-stat">
-                                    <span class="log-stat-value" id="logsTotal">0</span>
-                                    <span class="log-stat-label">Total</span>
-                                </div>
-                                <div class="log-stat">
-                                    <span class="log-stat-value" id="logsLastHour">0</span>
-                                    <span class="log-stat-label">Ultima hora</span>
-                                </div>
-                                <div class="log-stat">
-                                    <span class="log-stat-value" id="logsLastDay">0</span>
-                                    <span class="log-stat-label">Ultimo dia</span>
-                                </div>
-                            </div>
-                            <div class="logs-filters">
-                                <select id="logTypeFilter">
-                                    <option value="">Todos los tipos</option>
-                                    <option value="command_use">Comando Usado</option>
-                                    <option value="xp_gain">XP Ganado</option>
-                                    <option value="xp_loss">XP Perdido</option>
-                                    <option value="level_up">Subida de Nivel</option>
-                                    <option value="level_down">Bajada de Nivel</option>
-                                    <option value="coins_gain">Lagcoins Ganados</option>
-                                    <option value="coins_loss">Lagcoins Perdidos</option>
-                                    <option value="work">Trabajo</option>
-                                    <option value="casino_win">Casino Ganado</option>
-                                    <option value="casino_loss">Casino Perdido</option>
-                                    <option value="theft_success">Robo Exitoso</option>
-                                    <option value="theft_fail">Robo Fallido</option>
-                                    <option value="gift_sent">Regalo Enviado</option>
-                                    <option value="gift_received">Regalo Recibido</option>
-                                    <option value="daily_reward">Recompensa Diaria</option>
-                                    <option value="bank_deposit">Deposito</option>
-                                    <option value="bank_withdraw">Retiro</option>
-                                    <option value="shop_purchase">Compra Tienda</option>
-                                    <option value="powerup_activate">Power-Up</option>
-                                    <option value="insurance_buy">Seguro</option>
-                                    <option value="marriage">Matrimonio</option>
-                                    <option value="divorce">Divorcio</option>
-                                    <option value="bank_heist">Atraco</option>
-                                    <option value="trade">Intercambio</option>
-                                    <option value="auction_create">Subasta</option>
-                                    <option value="mission_complete">Mision</option>
-                                    <option value="admin_action">Accion Admin</option>
-                                </select>
-                                <select id="logSystemFilter">
-                                    <option value="">Todos los sistemas</option>
-                                    <option value="economia">Economia</option>
-                                    <option value="casino">Casino</option>
-                                    <option value="niveles">Niveles</option>
-                                    <option value="robos">Robos</option>
-                                    <option value="social">Social</option>
-                                    <option value="tienda">Tienda</option>
-                                    <option value="misiones">Misiones</option>
-                                    <option value="minijuegos">Minijuegos</option>
-                                    <option value="powerups">Power-Ups</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="seguridad">Seguridad</option>
-                                    <option value="nacionalidades">Nacionalidades</option>
-                                </select>
-                                <select id="logImportanceFilter">
-                                    <option value="">Toda importancia</option>
-                                    <option value="critical">Critica</option>
-                                    <option value="high">Alta</option>
-                                    <option value="medium">Media</option>
-                                    <option value="low">Baja</option>
-                                </select>
-                                <select id="logPeriodFilter">
-                                    <option value="all">Todo el tiempo</option>
-                                    <option value="hour">Ultima hora</option>
-                                    <option value="day">Ultimo dia</option>
-                                    <option value="week">Ultima semana</option>
-                                </select>
-                            </div>
-                            <div class="logs-actions">
-                                <button id="refreshLogs" class="btn-primary">Actualizar</button>
-                                <button id="exportLogsCSV" class="btn-secondary">Exportar CSV</button>
-                                <label style="color: #fff; margin-left: 10px;">
-                                    <input type="checkbox" id="autoRefreshLogs" checked> Auto
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div id="alertsContainer" class="alerts-container" style="display: none;">
-                            <h4 style="color: #ff6b6b; margin-bottom: 8px;">Alertas de Actividad Sospechosa</h4>
-                            <div id="alertsList"></div>
-                        </div>
-                        
-                        <div class="logs-container" id="logsContainer">
-                            <p class="loading-text">Cargando logs...</p>
-                        </div>
-                        
-                        <div class="logs-pagination" id="logsPagination" style="display: none;">
-                            <button id="logsPrevPage" class="btn-secondary">Anterior</button>
-                            <span id="logsPageInfo" style="color: #fff; margin: 0 15px;">Pagina 1</span>
-                            <button id="logsNextPage" class="btn-secondary">Siguiente</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="usuarios-page" class="page">
-                    <div class="section-content">
-                        <div class="user-search-section">
-                            <h3>Buscar Usuario</h3>
-                            <div class="search-box">
-                                <input type="text" id="userSearchInput" placeholder="Nombre, apodo en el servidor o ID">
-                                <button id="userSearchBtn" class="btn-primary">Buscar</button>
-                            </div>
-                            <div id="searchResults" class="search-results"></div>
-                        </div>
-                        
-                        <div id="userDetailsSection" class="user-details-section" style="display: none;">
-                            <div class="user-header">
-                                <img id="userAvatar" src="" alt="Avatar" class="user-avatar">
-                                <div class="user-info-header">
-                                    <h2 id="userDisplayName">Usuario</h2>
-                                    <p id="userUsername">@username</p>
-                                    <p id="userGuild">Servidor</p>
-                                </div>
-                            </div>
-                            
-                            <div class="user-stats-grid">
-                                <div class="user-stat-card">
-                                    <h4>XP Total</h4>
-                                    <span id="userTotalXp" class="user-stat-value">0</span>
-                                    <div class="user-stat-actions">
-                                        <button onclick="modifyUser('totalXp', 'add')">+</button>
-                                        <button onclick="modifyUser('totalXp', 'remove')">-</button>
-                                        <button onclick="modifyUser('totalXp', 'set')">Establecer</button>
-                                        <button onclick="modifyUser('totalXp', 'reset')">Reset</button>
-                                    </div>
-                                </div>
-                                <div class="user-stat-card">
-                                    <h4>Nivel</h4>
-                                    <span id="userLevel" class="user-stat-value">0</span>
-                                    <div class="user-stat-actions">
-                                        <button onclick="modifyUser('level', 'add')">+</button>
-                                        <button onclick="modifyUser('level', 'remove')">-</button>
-                                        <button onclick="modifyUser('level', 'set')">Establecer</button>
-                                        <button onclick="modifyUser('level', 'reset')">Reset</button>
-                                    </div>
-                                </div>
-                                <div class="user-stat-card">
-                                    <h4>Lagcoins (Cartera)</h4>
-                                    <span id="userLagcoins" class="user-stat-value">0</span>
-                                    <div class="user-stat-actions">
-                                        <button onclick="modifyUser('lagcoins', 'add')">+</button>
-                                        <button onclick="modifyUser('lagcoins', 'remove')">-</button>
-                                        <button onclick="modifyUser('lagcoins', 'set')">Establecer</button>
-                                        <button onclick="modifyUser('lagcoins', 'reset')">Reset</button>
-                                    </div>
-                                </div>
-                                <div class="user-stat-card">
-                                    <h4>Lagcoins (Banco)</h4>
-                                    <span id="userBank" class="user-stat-value">0</span>
-                                    <div class="user-stat-actions">
-                                        <button onclick="modifyUser('bank', 'add')">+</button>
-                                        <button onclick="modifyUser('bank', 'remove')">-</button>
-                                        <button onclick="modifyUser('bank', 'set')">Establecer</button>
-                                        <button onclick="modifyUser('bank', 'reset')">Reset</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="user-extra-info">
-                                <div class="user-info-card">
-                                    <h4>Roles del Usuario</h4>
-                                    <div id="userRoles" class="user-roles-list"></div>
-                                </div>
-                                <div class="user-info-card">
-                                    <h4>Historial de Actividad</h4>
-                                    <div id="userActivityLogs" class="user-activity-logs"></div>
-                                </div>
+                            <h4 style="margin-top:24px">Fondos</h4>
+                            <div class="themes-grid">
+                                <div class="bg-card" data-bg="light"><div class="theme-preview" style="background: #f5f7fa;"></div><span>Claro</span></div>
+                                <div class="bg-card" data-bg="dark"><div class="theme-preview" style="background: #1a1a2e;"></div><span>Oscuro</span></div>
+                                <div class="bg-card" data-bg="cream"><div class="theme-preview" style="background: #faf8f5;"></div><span>Crema</span></div>
+                                <div class="bg-card" data-bg="blue"><div class="theme-preview" style="background: #e8f4fc;"></div><span>Azul</span></div>
+                                <div class="bg-card" data-bg="green"><div class="theme-preview" style="background: #e8f5e9;"></div><span>Verde</span></div>
+                                <div class="bg-card" data-bg="purple"><div class="theme-preview" style="background: #f3e5f5;"></div><span>Lila</span></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </main>
     </div>
-    
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal" style="display:none">
+        <div class="modal">
+            <h3 id="modalTitle">Confirmar accion</h3>
+            <p id="modalMessage"></p>
+            <div class="modal-input-wrapper" id="modalInputWrapper" style="display:none">
+                <input type="number" id="modalInputValue" placeholder="Valor" min="0">
+                <input type="text" id="modalInputReason" placeholder="Razon (opcional)">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-primary" id="modalConfirmBtn">Confirmar</button>
+                <button class="btn-secondary" id="modalCancelBtn" onclick="hideConfirmModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="/admin/js/admin.js"></script>
 </body>
 </html>

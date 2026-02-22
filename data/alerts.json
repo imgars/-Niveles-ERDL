@@ -1,0 +1,20 @@
+[
+  {
+    "id": "alert_1771720450232_x2dxkxou4",
+    "timestamp": 1771720450232,
+    "type": "bot_offline",
+    "message": "El bot de Discord está offline",
+    "severity": "error",
+    "details": {},
+    "dismissed": false
+  },
+  {
+    "id": "alert_1771720450232_14s2yh0p0",
+    "timestamp": 1771720450232,
+    "type": "mongo_disconnected",
+    "message": "MongoDB está desconectado",
+    "severity": "error",
+    "details": {},
+    "dismissed": false
+  }
+]
