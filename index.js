@@ -3684,6 +3684,149 @@ app.delete('/api/admin/boosts/:id', verifyAdminToken, (req, res) => {
   }
 });
 
+// ===== ECONOMY ADMIN =====
+app.get('/api/admin/economy/overview', verifyAdminToken, (req, res) => {
+  try {
+    const econPath = path.join(__dirname, 'data', 'economy.json');
+    let allEcon = {};
+    try { allEcon = JSON.parse(fs.readFileSync(econPath, 'utf8')); } catch (e) {}
+
+    const users = Object.values(allEcon);
+    let totalCoins = 0, totalBank = 0, totalTransactions = 0;
+    let richest = null, maxCoins = 0;
+
+    for (const u of users) {
+      const coins = u.lagcoins || 0;
+      const bank = u.bankBalance || u.bank || 0;
+      totalCoins += coins;
+      totalBank += bank;
+      totalTransactions += (u.transactions || []).length;
+      if (coins + bank > maxCoins) { maxCoins = coins + bank; richest = u; }
+    }
+
+    res.json({
+      totalUsers: users.length,
+      totalCoins,
+      totalBank,
+      totalWealth: totalCoins + totalBank,
+      avgCoins: users.length > 0 ? Math.round(totalCoins / users.length) : 0,
+      avgBank: users.length > 0 ? Math.round(totalBank / users.length) : 0,
+      totalTransactions,
+      richest: richest ? {
+        userId: richest.userId,
+        username: richest.username || richest.displayName || 'Desconocido',
+        lagcoins: richest.lagcoins || 0,
+        bank: richest.bankBalance || richest.bank || 0
+      } : null
+    });
+  } catch (error) {
+    console.error('Error economy overview:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.get('/api/admin/economy/transactions', verifyAdminToken, (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 100, 500);
+    const typeFilter = req.query.type || '';
+    const econPath = path.join(__dirname, 'data', 'economy.json');
+    let allEcon = {};
+    try { allEcon = JSON.parse(fs.readFileSync(econPath, 'utf8')); } catch (e) {}
+
+    const transactions = [];
+    for (const [key, u] of Object.entries(allEcon)) {
+      const txList = u.transactions || [];
+      for (const tx of txList) {
+        if (typeFilter && tx.type !== typeFilter) continue;
+        transactions.push({
+          ...tx,
+          userId: u.userId || key.split('-')[1],
+          username: u.username || u.displayName || 'Desconocido',
+          guildId: u.guildId || key.split('-')[0]
+        });
+      }
+    }
+
+    transactions.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+    res.json({
+      transactions: transactions.slice(0, limit),
+      total: transactions.length,
+      showing: Math.min(limit, transactions.length)
+    });
+  } catch (error) {
+    console.error('Error economy transactions:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.get('/api/admin/economy/anomalies', verifyAdminToken, (req, res) => {
+  try {
+    const econPath = path.join(__dirname, 'data', 'economy.json');
+    let allEcon = {};
+    try { allEcon = JSON.parse(fs.readFileSync(econPath, 'utf8')); } catch (e) {}
+
+    const anomalies = [];
+    for (const u of Object.values(allEcon)) {
+      const coins = u.lagcoins || 0;
+      const bank = u.bankBalance || u.bank || 0;
+      const total = coins + bank;
+      const reasons = [];
+
+      if (total > 1000000) reasons.push(`Riqueza total: ${total.toLocaleString()} LC`);
+      if (coins > 500000) reasons.push(`Cartera alta: ${coins.toLocaleString()} LC`);
+      const casinoWon = u.casinoStats?.totalWon || 0;
+      if (casinoWon > 200000) reasons.push(`Casino: ganó ${casinoWon.toLocaleString()} LC`);
+      const txCount = (u.transactions || []).length;
+      const recentTx = (u.transactions || []).filter(t => {
+        const age = Date.now() - new Date(t.date || 0).getTime();
+        return age < 86400000;
+      }).length;
+      if (recentTx > 50) reasons.push(`${recentTx} transacciones en 24h`);
+
+      if (reasons.length > 0) {
+        anomalies.push({
+          userId: u.userId,
+          username: u.username || u.displayName || 'Desconocido',
+          guildId: u.guildId,
+          lagcoins: coins,
+          bank,
+          totalWealth: total,
+          reasons,
+          severity: total > 2000000 ? 'critical' : total > 500000 ? 'high' : 'medium'
+        });
+      }
+    }
+
+    anomalies.sort((a, b) => b.totalWealth - a.totalWealth);
+    res.json({ anomalies, total: anomalies.length });
+  } catch (error) {
+    console.error('Error economy anomalies:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+app.get('/api/admin/economy/shop', verifyAdminToken, async (req, res) => {
+  try {
+    const { ITEMS } = await import('./utils/economyDB.js');
+    const items = Object.entries(ITEMS).map(([id, item]) => ({
+      id,
+      name: item.name,
+      emoji: item.emoji || '',
+      price: item.price || 0,
+      category: item.category || 'otro',
+      description: item.description || '',
+      unlocks: item.unlocks || null,
+      effect: item.effect || null
+    }));
+    items.sort((a, b) => a.category.localeCompare(b.category) || a.price - b.price);
+    res.json({ items, total: items.length });
+  } catch (error) {
+    console.error('Error economy shop:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
 // ===== EXPORT LOG FUNCTION FOR OTHER MODULES =====
 globalThis.logBotActivity = logActivity;
 globalThis.LOG_TYPES = LOG_TYPES;

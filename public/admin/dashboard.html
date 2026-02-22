@@ -13,6 +13,7 @@
 <body>
     <div class="admin-container">
         <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h2>Panel Admin</h2>
@@ -31,6 +32,7 @@
                 <a href="#misiones" class="nav-link" data-page="misiones"><span>🎯</span> Misiones</a>
                 <a href="#misiones-live" class="nav-link" data-page="misiones-live"><span>🔴</span> Misiones Live</a>
                 <a href="#powerups" class="nav-link" data-page="powerups"><span>⚡</span> Power-ups</a>
+                <a href="#economia" class="nav-link" data-page="economia"><span>💰</span> Economia</a>
                 <a href="#sistemas-avanzados" class="nav-link" data-page="sistemas-avanzados"><span>🎛️</span> Control Sistemas</a>
 
                 <div class="nav-group-label">Administracion</div>
@@ -549,7 +551,124 @@
                     </div>
                 </div>
 
-                <!-- ===== SISTEMAS AVANZADOS ===== -->
+                <!-- ===== ECONOMIA ===== -->
+                <div id="economia-page" class="page">
+                    <div class="section-content">
+                        <div class="page-header-actions">
+                            <h3>Gestion de Economia</h3>
+                            <button class="btn-secondary" onclick="loadEconomyData()">Actualizar</button>
+                        </div>
+
+                        <div class="stats-grid" id="econStatsGrid">
+                            <div class="stat-card">
+                                <div class="stat-icon">💰</div>
+                                <div class="stat-content">
+                                    <h3>Coins en Circulacion</h3>
+                                    <p class="stat-value" id="econTotalCoins">-</p>
+                                    <p class="stat-label">Total cartera</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🏦</div>
+                                <div class="stat-content">
+                                    <h3>Coins en Banco</h3>
+                                    <p class="stat-value" id="econTotalBank">-</p>
+                                    <p class="stat-label">Total banco</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-content">
+                                    <h3>Riqueza Total</h3>
+                                    <p class="stat-value" id="econTotalWealth">-</p>
+                                    <p class="stat-label">Cartera + banco</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📋</div>
+                                <div class="stat-content">
+                                    <h3>Transacciones</h3>
+                                    <p class="stat-value" id="econTotalTx">-</p>
+                                    <p class="stat-label">Registradas</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="econ-richest-section" id="econRichest" style="display:none">
+                            <h4>Usuario mas rico</h4>
+                            <div class="richest-card" id="econRichestCard"></div>
+                        </div>
+
+                        <!-- ANOMALIAS -->
+                        <div class="page-header-actions" style="margin-top:24px">
+                            <h4>Deteccion de Anomalias</h4>
+                            <button class="btn-sm btn-secondary" onclick="loadEconomyAnomalies()">Actualizar</button>
+                        </div>
+                        <div id="econAnomaliesList" class="anomalies-list">
+                            <p class="loading-text">Cargando analisis...</p>
+                        </div>
+
+                        <!-- TRANSACCIONES RECIENTES -->
+                        <div class="page-header-actions" style="margin-top:24px">
+                            <h4>Transacciones Recientes</h4>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <select id="txTypeFilter" class="filter-select" onchange="loadEconomyTransactions()">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="work">Trabajo</option>
+                                    <option value="casino_win">Casino (ganancia)</option>
+                                    <option value="casino_loss">Casino (perdida)</option>
+                                    <option value="shop_purchase">Compra tienda</option>
+                                    <option value="bank_deposit">Deposito banco</option>
+                                    <option value="bank_withdraw">Retiro banco</option>
+                                    <option value="daily_reward">Recompensa diaria</option>
+                                    <option value="theft_success">Robo exitoso</option>
+                                    <option value="admin_gift">Regalo admin</option>
+                                </select>
+                                <button class="btn-sm btn-secondary" onclick="loadEconomyTransactions()">Cargar</button>
+                            </div>
+                        </div>
+                        <div class="table-scroll-wrapper">
+                            <table class="data-table" id="econTxTable">
+                                <thead>
+                                    <tr>
+                                        <th>Usuario</th>
+                                        <th>Tipo</th>
+                                        <th>Cantidad</th>
+                                        <th>Descripcion</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="econTxBody">
+                                    <tr><td colspan="5" class="empty-text">Haz clic en "Cargar" para ver transacciones</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="econTxTotal" class="section-desc" style="margin-top:6px"></p>
+
+                        <!-- TIENDA -->
+                        <div class="page-header-actions" style="margin-top:24px">
+                            <h4>Catalogo de la Tienda</h4>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <select id="shopCatFilter" class="filter-select" onchange="filterShopItems()">
+                                    <option value="">Todas las categorias</option>
+                                    <option value="herramienta">Herramientas</option>
+                                    <option value="tecnologia">Tecnologia</option>
+                                    <option value="vehiculo">Vehiculos</option>
+                                    <option value="profesional">Profesional</option>
+                                    <option value="instrumento">Instrumentos</option>
+                                    <option value="consumible">Consumibles</option>
+                                    <option value="powerup">Power-ups</option>
+                                    <option value="coleccionable">Coleccionables</option>
+                                    <option value="viaje">Viaje</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="shop-items-grid" id="shopItemsGrid">
+                            <p class="loading-text">Cargando tienda...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="sistemas-avanzados-page" class="page">
                     <div class="section-content">
                         <div class="page-header-actions">

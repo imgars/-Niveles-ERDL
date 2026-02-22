@@ -38,9 +38,19 @@ if (adminNameEl) {
 }
 
 // ===== SIDEBAR TOGGLE (MOBILE) =====
+function closeSidebar() {
+    document.getElementById('sidebar')?.classList.remove('open');
+    document.getElementById('sidebarOverlay')?.classList.remove('active');
+}
+
 document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-    document.getElementById('sidebar')?.classList.toggle('open');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const isOpen = sidebar?.classList.toggle('open');
+    overlay?.classList.toggle('active', isOpen);
 });
+
+document.getElementById('sidebarOverlay')?.addEventListener('click', closeSidebar);
 
 // ===== NAV ROUTING =====
 const PAGE_TITLES = {
@@ -53,6 +63,7 @@ const PAGE_TITLES = {
     misiones: 'Misiones',
     'misiones-live': 'Misiones en Tiempo Real',
     powerups: 'Power-ups y Boosts',
+    economia: 'Gestion de Economia',
     'sistemas-avanzados': 'Control Avanzado de Sistemas',
     estadisticas: 'Estadisticas',
     'audit-log': 'Audit Log',
@@ -69,7 +80,7 @@ function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(`${page}-page`)?.classList.add('active');
     document.getElementById('pageTitle').textContent = PAGE_TITLES[page] || 'Panel Admin';
-    document.getElementById('sidebar')?.classList.remove('open');
+    closeSidebar();
     loadPageData(page);
 }
 
@@ -1211,7 +1222,143 @@ customizeBtn?.addEventListener('click', (e) => {
 });
 document.addEventListener('click', () => document.getElementById('customizeDropdown')?.classList.remove('active'));
 
-// ===== PAGE ROUTER =====
+// ===== ECONOMY =====
+let allShopItems = [];
+
+async function loadEconomyData() {
+    await Promise.all([
+        loadEconomyOverview(),
+        loadEconomyAnomalies(),
+        loadEconomyShop()
+    ]);
+}
+
+async function loadEconomyOverview() {
+    try {
+        const data = await fetchAPI('/api/admin/economy/overview');
+        document.getElementById('econTotalCoins').textContent = (data.totalCoins || 0).toLocaleString();
+        document.getElementById('econTotalBank').textContent = (data.totalBank || 0).toLocaleString();
+        document.getElementById('econTotalWealth').textContent = (data.totalWealth || 0).toLocaleString();
+        document.getElementById('econTotalTx').textContent = (data.totalTransactions || 0).toLocaleString();
+
+        if (data.richest) {
+            const section = document.getElementById('econRichest');
+            const card = document.getElementById('econRichestCard');
+            section.style.display = '';
+            card.innerHTML = `
+                <span class="richest-username">${escHtml(data.richest.username)}</span>
+                <span class="richest-id">${data.richest.userId}</span>
+                <span class="richest-coins">💰 ${(data.richest.lagcoins || 0).toLocaleString()} LC</span>
+                <span class="richest-bank">🏦 ${(data.richest.bank || 0).toLocaleString()} LC</span>
+                <span class="richest-total">Total: ${((data.richest.lagcoins || 0) + (data.richest.bank || 0)).toLocaleString()} LC</span>`;
+        }
+    } catch (err) {
+        console.error('Error economy overview:', err);
+    }
+}
+
+async function loadEconomyAnomalies() {
+    const list = document.getElementById('econAnomaliesList');
+    if (!list) return;
+    list.innerHTML = '<p class="loading-text">Analizando...</p>';
+    try {
+        const data = await fetchAPI('/api/admin/economy/anomalies');
+        const items = data.anomalies || [];
+        if (!items.length) {
+            list.innerHTML = '<p class="empty-text">No se detectaron anomalias</p>';
+            return;
+        }
+        list.innerHTML = items.map(a => `
+            <div class="anomaly-card severity-${a.severity}">
+                <div class="anomaly-header">
+                    <span class="anomaly-severity-badge ${a.severity}">${a.severity.toUpperCase()}</span>
+                    <span class="anomaly-username">${escHtml(a.username)}</span>
+                    <span class="anomaly-id">${a.userId}</span>
+                </div>
+                <div class="anomaly-wealth">
+                    💰 ${(a.lagcoins || 0).toLocaleString()} LC &nbsp;|&nbsp; 🏦 ${(a.bank || 0).toLocaleString()} LC &nbsp;|&nbsp; Total: <b>${(a.totalWealth || 0).toLocaleString()} LC</b>
+                </div>
+                <div class="anomaly-reasons">
+                    ${a.reasons.map(r => `<span class="anomaly-reason-tag">${escHtml(r)}</span>`).join('')}
+                </div>
+            </div>`).join('');
+    } catch (err) {
+        list.innerHTML = '<p class="error-text">Error cargando anomalias</p>';
+    }
+}
+
+async function loadEconomyTransactions() {
+    const tbody = document.getElementById('econTxBody');
+    const totalEl = document.getElementById('econTxTotal');
+    const typeFilter = document.getElementById('txTypeFilter')?.value || '';
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Cargando...</td></tr>';
+    try {
+        const data = await fetchAPI(`/api/admin/economy/transactions?limit=100&type=${typeFilter}`);
+        const txs = data.transactions || [];
+        if (!txs.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-text">Sin transacciones</td></tr>';
+            if (totalEl) totalEl.textContent = '';
+            return;
+        }
+        tbody.innerHTML = txs.map(tx => {
+            const amount = tx.amount || 0;
+            const amountClass = amount >= 0 ? 'tx-positive' : 'tx-negative';
+            const amountStr = amount !== 0 ? `<span class="${amountClass}">${amount >= 0 ? '+' : ''}${amount.toLocaleString()} LC</span>` : '-';
+            const date = tx.date ? new Date(tx.date).toLocaleString('es-ES') : '-';
+            return `<tr>
+                <td>${escHtml(tx.username || tx.userId || '-')}</td>
+                <td><span class="tx-type-badge">${escHtml(tx.type || '-')}</span></td>
+                <td>${amountStr}</td>
+                <td>${escHtml(tx.description || '-')}</td>
+                <td>${date}</td>
+            </tr>`;
+        }).join('');
+        if (totalEl) totalEl.textContent = `Mostrando ${txs.length} de ${data.total} transacciones`;
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="error-text">Error cargando transacciones</td></tr>';
+    }
+}
+
+async function loadEconomyShop() {
+    const grid = document.getElementById('shopItemsGrid');
+    if (!grid) return;
+    grid.innerHTML = '<p class="loading-text">Cargando tienda...</p>';
+    try {
+        const data = await fetchAPI('/api/admin/economy/shop');
+        allShopItems = data.items || [];
+        renderShopItems(allShopItems);
+    } catch (err) {
+        grid.innerHTML = '<p class="error-text">Error cargando tienda</p>';
+    }
+}
+
+function filterShopItems() {
+    const cat = document.getElementById('shopCatFilter')?.value || '';
+    const filtered = cat ? allShopItems.filter(i => i.category === cat) : allShopItems;
+    renderShopItems(filtered);
+}
+
+function renderShopItems(items) {
+    const grid = document.getElementById('shopItemsGrid');
+    if (!grid) return;
+    if (!items.length) { grid.innerHTML = '<p class="empty-text">Sin items en esta categoria</p>'; return; }
+    grid.innerHTML = items.map(item => `
+        <div class="shop-item-card">
+            <div class="shop-item-emoji">${item.emoji}</div>
+            <div class="shop-item-info">
+                <span class="shop-item-name">${escHtml(item.name)}</span>
+                <span class="shop-item-category">${escHtml(item.category)}</span>
+                <span class="shop-item-desc">${escHtml(item.description)}</span>
+                ${item.unlocks ? `<span class="shop-item-unlocks">Desbloquea: /${item.unlocks}</span>` : ''}
+            </div>
+            <div class="shop-item-price">
+                <span class="price-value">${(item.price || 0).toLocaleString()}</span>
+                <span class="price-label">LC</span>
+            </div>
+        </div>`).join('');
+}
+
 function loadPageData(page) {
     switch (page) {
         case 'dashboard': loadDashboardData(); break;
@@ -1223,6 +1370,7 @@ function loadPageData(page) {
         case 'misiones': loadMissionsData(); break;
         case 'misiones-live': startMissionsLivePolling(); break;
         case 'powerups': loadPowerupsData(); break;
+        case 'economia': loadEconomyData(); break;
         case 'sistemas-avanzados': loadAdvancedSystems(); break;
         case 'estadisticas': loadStatisticsData(); break;
         case 'audit-log': loadAuditLog(1); break;

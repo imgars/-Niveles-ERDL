@@ -1,6 +1,15 @@
 # -Niveles
 
 ## Recent Changes
+- **Dashboard Admin v3 - Sección Economía (Febrero 2026):**
+  - Nueva página "Economía" en el panel admin con navegación en sidebar.
+  - **Resumen económico:** Total coins en circulación, coins en banco, riqueza total, total de transacciones, usuario más rico.
+  - **Detección de anomalías:** Análisis automático de usuarios con riqueza > 500k, wallet alta, ganancias excesivas en casino, transacciones masivas en 24h. Severidades: medium/high/critical con colores.
+  - **Historial de transacciones:** Tabla de todas las transacciones recientes con filtro por tipo, cantidades coloreadas (positivo/negativo), usuario, descripción y fecha.
+  - **Catálogo de tienda:** Vista de todos los items (50+) con emoji, nombre, categoría, descripción, precio y comando que desbloquea. Filtro por categoría.
+  - **4 nuevos endpoints API:** `/api/admin/economy/overview`, `/api/admin/economy/transactions`, `/api/admin/economy/anomalies`, `/api/admin/economy/shop`.
+  - Completamente responsive para mobile.
+
 - **Dashboard Admin v3 - Expansión Completa (Febrero 2026):**
   - **Nuevas páginas:** Graficas (Chart.js), Alertas, Misiones Live, Control Sistemas, Audit Log.
   - **Chart.js integrado:** 4 gráficas interactivas (XP timeseries, niveles subidos, distribución de niveles, comandos top 10), selector de período 7/14/30 días.
